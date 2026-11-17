@@ -1,0 +1,51 @@
+name: AutoStudio PERSONAL · voces KELT-9b
+on:
+  push:
+    branches: [feature/topic-intake-v04]
+    paths:
+      - scripts/kelt9b_voice_comparison.py
+      - .github/workflows/kelt9b-voice-comparison.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  listen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar voces neuronales verificadas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Tres comparaciones de la misma narración
+        run: |
+          python -m scripts.kelt9b_voice_comparison --out /tmp/autostudio-kelt9b-voices
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          info=json.loads(Path("/tmp/autostudio-kelt9b-voices/comparison.json").read_text())
+          assert not info["ready_for_youtube"]
+          assert len(info["candidates"])>=2
+          for item in info["candidates"]:
+              assert item["phoneme_words"]>40
+              assert item["metrics"]["peak"]<1
+              assert Path("/tmp/autostudio-kelt9b-voices",item["file"]).is_file()
+          print("KELT9B_VOICE_CANDIDATES",len(info["candidates"]))
+          print("KELT9B_VOICE_LABELS",[i["label"] for i in info["candidates"]])
+          PY
+      - name: Adjuntar muestras para escucharlas
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-KELT9b-voces-neuronales
+          path: |
+            /tmp/autostudio-kelt9b-voices/*.mp3
+            /tmp/autostudio-kelt9b-voices/comparison.json
+            /tmp/autostudio-kelt9b-voices/LEEME.txt
+          if-no-files-found: error
+          retention-days: 7
