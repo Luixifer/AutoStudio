@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 583567fbcfc7c1019edb75e6f19b3bd916dcee12
+          ref: 1be14075486bc9b3aa7fe19d6f6ccfcb09ad43bd
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -131,7 +131,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
-          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
       - name: Generar vista previa narrada sin revisión editorial
         if: ${{ inputs.topic == '¿Qué ocurre dentro de un agujero negro?' }}
         env:
