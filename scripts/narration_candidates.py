@@ -72,7 +72,7 @@ def relevance(question, sentence):
     topical = q & s
     if not topical:
         return None
-    normalized_q = set(tokens(question))
+    normalized_q = set(re.findall(r"[a-z0-9]+", normalize(question)))
     normalized_s = normalize(sentence)
     required = []
     for triggers, cues in INTENTS:
