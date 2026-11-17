@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 7d75877fa4632c9d242603910ee39e5014506c2b
+          ref: c84eae017b64d44e52c256c2ab63a5a03dd06815
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -53,11 +53,16 @@ jobs:
               f"**Estado:** {safe(pkg['state'])}",
               f"**Investigación:** {safe(research.get('status', 'sin consulta'))}",
               f"**Referencias preliminares:** {len(dossier.get('sources', []))}",
+              f"**Enlaces NASA (contenido no leído):** {research.get('institutional_leads', 0)}",
+              f"**Metadatos académicos Crossref:** {research.get('academic_metadata_leads', 0)}",
+              f"**Referencias secundarias Wikipedia:** {research.get('secondary_leads', 0)}",
+              "**Afirmaciones científicas verificadas:** 0",
               "",
               "### Fuentes encontradas (sin verificar científicamente)",
           ]
           for source in dossier.get("sources", []):
-              output.append(f"- {safe(source.get('title', 'Sin título'))}: {safe(source.get('url', 'Sin enlace'))}")
+              output.append(f"- **{safe(source.get('provider', 'Fuente'))}** · {safe(source.get('title', 'Sin título'))}: {safe(source.get('url', 'Sin enlace'))} ({safe(source.get('evidence_level', 'sin verificar'))})")
+          output.extend(["", "**NASA:** enlaces seleccionados, sin extraer su contenido. **Crossref:** únicamente metadatos; la presencia de un DOI no verifica las afirmaciones ni garantiza revisión por pares."])
           extractive = pkg.get("narration_candidates", {})
           output.extend(["", "### Fragmentos de narración extraídos de fuentes (NO es un guion original)"])
           for quote in extractive.get("candidates", []):
