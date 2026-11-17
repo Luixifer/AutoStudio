@@ -110,7 +110,7 @@ def produce(package, directory):
         video=directory/f"scene_{i:02}.mp4"
         frame(scene,i,len(scenes),still)
         synthesis=narrator.synthesize(scene["narration_draft_es"],audio)
-        if synthesis.get("engine")!="Kokoro ONNX 0.6.1, local CPU" or not synthesis.get("words"):
+        if synthesis.get("engine")!="Kokoro ONNX 0.6.1, local CPU" or synthesis.get("voice")!="em_alex" or not synthesis.get("words"):
             raise ValueError("Voz neuronal o duraciones de palabras no verificadas.")
         audio_checks.append({"scene":i,"engine":synthesis["engine"],"timed_words":len(synthesis["words"])})
         with wave.open(str(audio),"rb") as wav:
@@ -147,7 +147,7 @@ def produce(package, directory):
         "paid_inference":False,
         "visuals":"Distinct conceptual schematic illustrations and slow zoom; not footage or simulation",
         "visual_role_signatures":[scene_visual_signature(scene["role"]) for scene in scenes],
-        "audio":"Kokoro ONNX offline, ef_dora (sin validación humana de naturalidad)",
+        "audio":"Kokoro ONNX offline, em_alex; voz elegida por usuario, ajuste todavía sin aprobación de la versión completa",
         "audio_checks":audio_checks,
         "references":[s["reference_url"] for s in scenes],
     }
