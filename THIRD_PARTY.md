@@ -21,3 +21,7 @@ El ZIP original del usuario se conserva sin cambios; SHA-256: `4b6ac66a9f9f605f6
 - `assets/cinematic/manifest.json` registra hashes, dimensiones, procedencia, iluminación virtual y el filtro espacial de reducción de ruido aplicado a los renders.
 
 Las referencias científicas NOAA/WHOI siguen siendo enlaces editoriales. Su acceso está bloqueado en este entorno; no se presentan como páginas consultadas ni como licencias de imágenes. No se ha descargado material visual de esas fuentes. La evidencia y licencias del modelo se han consultado en GitHub; la ficha de voces enlazada en Hugging Face no era accesible aquí.
+
+## Control Android 0.3
+
+Aplicación nativa original en Java, sin bibliotecas Android externas. Se compila con el SDK oficial Android (aapt2, D8, zipalign, apksigner y plataforma 35; términos oficiales de Android SDK) y OpenJDK 17/Temurin (GPL con Classpath Exception). El repositorio no redistribuye los SDK, JDK, imágenes de emulador ni claves privadas de firma. El APK contiene el código de la aplicación y recursos propios; usa el reproductor del sistema Android. GitHub REST y el token de acceso del usuario autorizan Actions: no son APIs de IA ni servicios facturados por tokens.

@@ -2,6 +2,12 @@
 
 Fábrica experimental de vídeos científicos con programas libres y **sin APIs de pago ni publicación en YouTube**. Montaje reproducible en GitHub Actions, administrable desde el móvil. No es un generador cinematográfico autónomo terminado.
 
+## Aplicación Android de control — incremento 0.3
+
+[Guía de instalación, conexión y prueba desde Samsung](android/README.md) · [Arquitectura y límites](docs/ANDROID_ARCHITECTURE.md)
+
+Este incremento prioriza tema → solicitud a Actions → MP4 correlacionado → reproducción nativa. Conserva el renderizador 0.2 y solo utiliza el contenido gratuito realmente disponible. No promete todavía edición, lotes, documentales o temas científicos ilimitados. El estado de la compilación y las pruebas se registra en `android-preview/attempt.json`.
+
 ## Prueba 0.2 ya ejecutada
 
 [**Descargar el nuevo MP4 de 34,44 segundos**](https://github.com/Luixifer/AutoStudio/raw/efed2972fdad05c364512744fdf45ef1e1776ec3/short_ciencia_demo.mp4) · [Actions: SUCCESS, 34 pruebas](https://github.com/Luixifer/AutoStudio/actions/runs/44074329488) · [Comparativa real](docs/images/02-before-after.jpg)

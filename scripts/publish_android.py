@@ -46,6 +46,8 @@ def main():
         state='APK compilada y recorrido real superado en emulador Android 15.' if checked else 'Este intento no ha completado la validación integral. Consulta attempt.json; un APK anterior no se considera nuevo.'
         (ROOT/'README.md').write_text(f'# AutoStudio Control LAB 0.3\n\n{state}\n\n[Descargar APK](https://github.com/{repo}/raw/refs/heads/{BRANCH}/{NAME}) · [ZIP alternativo](https://github.com/{repo}/raw/refs/heads/{BRANCH}/AutoStudio-Control-0.3.0-lab.zip)\n\n[Prueba real de Actions]({attempt["run_url"]}) · [Guía móvil](https://github.com/{repo}/blob/main/android/README.md)\n\nFirma de depuración. Credencial introducida por el usuario y cifrada en Android Keystore; no incluida en el APK. No se ha probado físicamente en Samsung. No hay publicación en YouTube ni APIs de IA de pago.\n')
         git('config','user.name','AutoStudio Actions');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
-        paths=['attempt.json','README.md','reports']+([NAME,'apk-info.json','SHA256SUMS','AutoStudio-Control-0.3.0-lab.zip'] if info else [])+(['qa'] if (stage/'qa').exists() else [])
+        paths=['attempt.json','README.md']+([NAME,'apk-info.json','SHA256SUMS','AutoStudio-Control-0.3.0-lab.zip'] if info else [])
+        paths += [str(Path('reports')/p.name) for p in (stage/'reports').iterdir()]
+        if (stage/'qa').exists():paths += [str(p.relative_to(stage)) for p in (stage/'qa').rglob('*') if p.is_file()]
         git('add','--',*paths);git('commit','-m',f'Android lab run {run} ({status})');git('push','origin','HEAD:refs/heads/'+BRANCH)
 if __name__=='__main__':main()
