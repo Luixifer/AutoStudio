@@ -104,7 +104,7 @@ def narration_candidates(dossier, max_candidates=MAX_CANDIDATES):
     question = dossier.get("topic", "")
     max_candidates = max(0, min(MAX_CANDIDATES, int(max_candidates)))
     ranked = []
-    for source in leads[:3]:
+    for source in leads[:8]:
         if not isinstance(source, dict) or source.get("evidence_level") != "secondary_lead_only":
             continue
         if not _wiki_url(source.get("url")):
