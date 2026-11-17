@@ -25,7 +25,7 @@ def main():
     if 'AutoStudio' not in names.splitlines():raise RuntimeError('Emulator cannot find the AVD created by avdmanager.')
     Path('reports').mkdir(exist_ok=True)
     with open('reports/emulator.log','w') as log:
-        process=subprocess.Popen([str(tools['emulator']),'-avd','AutoStudio','-no-window','-no-metrics','-no-audio','-no-boot-anim','-no-snapshot','-gpu','swiftshader','-camera-back','none','-camera-front','none','-memory','2048','-cores','2','-accel','on'],env=env,stdout=log,stderr=subprocess.STDOUT)
+        process=subprocess.Popen([str(tools['emulator']),'-avd','AutoStudio','-no-window','-no-metrics','-no-audio','-no-boot-anim','-no-snapshot','-dns-server','8.8.8.8,8.8.4.4','-gpu','swiftshader','-camera-back','none','-camera-front','none','-memory','2048','-cores','2','-accel','on'],env=env,stdout=log,stderr=subprocess.STDOUT)
     Path('reports/emulator.pid').write_text(str(process.pid))
     run('adb','wait-for-device');deadline=time.monotonic()+300
     while time.monotonic()<deadline:
