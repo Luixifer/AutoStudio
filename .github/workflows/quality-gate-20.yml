@@ -8,6 +8,8 @@ on:
       - 'scripts/personal_quality.py'
       - 'tests/test_personal_studio.py'
       - 'tests/test_personal_video_real.py'
+      - 'scripts/personal_prepare.py'
+      - 'tests/test_personal_prepare.py'
       - '.github/workflows/quality-gate-20.yml'
   workflow_dispatch:
 permissions:
@@ -28,6 +30,8 @@ jobs:
           python -m pip install --disable-pip-version-check Pillow==11.3.0
       - name: Pruebas de seguridad y formatos
         run: python -m unittest discover -s tests -p 'test_personal_studio.py' -v
+      - name: Prueba de entrada con guion, imágenes y voz Álex validada
+        run: python -m unittest discover -s tests -p 'test_personal_prepare.py' -v
       - name: Compilación MP4 real sin fingir voz neuronal
         run: python -m unittest discover -s tests -p 'test_personal_video_real.py' -v
       - name: Guardar informe de pruebas
