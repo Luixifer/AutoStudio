@@ -55,6 +55,29 @@ class ResearchTests(unittest.TestCase):
         self.assertLessEqual(len(results[0]["excerpt"]), 1200)
         self.assertEqual(results[0]["evidence_level"], "secondary_lead_only")
 
+    def test_inside_question_retrieves_second_targeted_query(self):
+        from scripts.topic_research import focused_query
+        self.assertIn("interior horizonte", focused_query("¿Qué ocurre dentro de un agujero negro?"))
+        urls = []
+        def fake_open(request, timeout):
+            from urllib.parse import parse_qs, urlsplit
+            term = parse_qs(urlsplit(request.full_url).query)["gsrsearch"][0]
+            urls.append(term)
+            if len(urls) == 1:
+                return Response({"query": {"pages": [{
+                    "title": "Estrella compacta",
+                    "fullurl": "https://es.wikipedia.org/wiki/Estrella_compacta",
+                    "extract": "Las estrellas compactas son objetos astronómicos muy densos."}]}})
+            return Response({"query": {"pages": [{
+                "title": "Singularidad gravitacional",
+                "fullurl": "https://es.wikipedia.org/wiki/Singularidad_gravitacional",
+                "extract": "El interior de un agujero negro plantea preguntas sobre la singularidad gravitacional."}]}})
+        results = fetch_wikipedia_candidates("¿Qué ocurre dentro de un agujero negro?", opener=fake_open)
+        self.assertEqual(len(urls), 2)
+        self.assertEqual(len(results), 2)
+        self.assertIn("horizonte", urls[1])
+        self.assertEqual(results[1]["discovery_query"], urls[1])
+
     def test_response_size_limit(self):
         class HugeResponse(Response):
             def read(self, count=-1):
