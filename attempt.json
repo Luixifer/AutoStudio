@@ -1,0 +1,11 @@
+{
+  "managed_by": "autostudio-android-lab",
+  "repository": "Luixifer/AutoStudio",
+  "github_run_id": "44085521884",
+  "source_commit": "b0357a5475bfaccb4a98b5bcc64fddbc5da39db4",
+  "status": "failure",
+  "new_apk": true,
+  "android_emulator_cloud_roundtrip_passed": false,
+  "physical_samsung_tested": false,
+  "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44085521884"
+}
