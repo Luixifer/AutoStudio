@@ -72,12 +72,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     clean_title=subtitle_text(str(heading)[:48])
     notice="RECREACIÓN ARTÍSTICA" if source_type=="illustration" else "MATERIAL VISUAL IDENTIFICADO"
     events=[
-        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Heading,,0,0,0,,{clean_title}\\n",
-        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Disclosure,,0,0,0,,{notice}\\n",
+        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Heading,,0,0,0,,{clean_title}\n",
+        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Disclosure,,0,0,0,,{notice}\n",
     ]
     for cue in cues:
-        events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\\n")
-    Path(path).write_text(header+"".join(events),encoding="utf-8")
+        events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
+    result=header+"".join(events)
+    if result.count("\\nDialogue:") != len(cues)+2:
+        raise ValueError("Malformed ASS event separators; refusing visual corruption.")
+    Path(path).write_text(result,encoding="utf-8")
 
 
 def background_still(picture,out,width,height,heading,source_type):
