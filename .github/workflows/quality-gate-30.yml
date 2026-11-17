@@ -23,6 +23,8 @@ jobs:
           python-version: '3.12'
       - name: Preparar codecs y dependencias
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
           ffmpeg -version | head -1
           python -m pip install --disable-pip-version-check Pillow==11.3.0
       - name: Seguridad de storyboard, voz, licencias y panorámica
