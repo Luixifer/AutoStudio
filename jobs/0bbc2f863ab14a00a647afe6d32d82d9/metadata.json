@@ -1,0 +1,808 @@
+{
+  "schema": 1,
+  "managed_by": "autostudio-mvp",
+  "version": "0.2-cinematic.1",
+  "profile": "cinematic",
+  "title": "Auroras: cuando la energía se convierte en color",
+  "generated_utc": "2026-11-17T14:55:28.176242+00:00",
+  "execution": {
+    "context": "github-actions",
+    "github_repository": "Luixifer/AutoStudio",
+    "github_run_id": "44108051606",
+    "github_run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44108051606",
+    "git": {
+      "commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+      "worktree_dirty": false
+    },
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+  },
+  "video": {
+    "frames": 989,
+    "fps": 25,
+    "duration_seconds": 39.56,
+    "size": [
+      720,
+      1280
+    ]
+  },
+  "narration": [
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "El",
+          "start": 0.07933333333333334,
+          "end": 0.17933333333333334
+        },
+        {
+          "word": "cielo",
+          "start": 0.25433333333333336,
+          "end": 0.6043333333333333
+        },
+        {
+          "word": "no",
+          "start": 0.6793333333333333,
+          "end": 0.7793333333333333
+        },
+        {
+          "word": "está",
+          "start": 0.8043333333333333,
+          "end": 1.0293333333333334
+        },
+        {
+          "word": "ardiendo.",
+          "start": 1.0543333333333333,
+          "end": 1.9293333333333333
+        },
+        {
+          "word": "Lo",
+          "start": 2.0043333333333333,
+          "end": 2.1043333333333334
+        },
+        {
+          "word": "que",
+          "start": 2.154333333333333,
+          "end": 2.2543333333333333
+        },
+        {
+          "word": "ves",
+          "start": 2.304333333333333,
+          "end": 2.529333333333333
+        },
+        {
+          "word": "son",
+          "start": 2.5793333333333335,
+          "end": 2.779333333333333
+        },
+        {
+          "word": "átomos",
+          "start": 2.8293333333333335,
+          "end": 3.2043333333333335
+        },
+        {
+          "word": "emitiendo",
+          "start": 3.2293333333333334,
+          "end": 3.7293333333333334
+        },
+        {
+          "word": "luz.",
+          "start": 3.779333333333333,
+          "end": 4.16
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "El",
+          "start": 0.07933333333333334,
+          "end": 0.15433333333333332
+        },
+        {
+          "word": "viento",
+          "start": 0.20433333333333334,
+          "end": 0.5293333333333333
+        },
+        {
+          "word": "solar",
+          "start": 0.5793333333333334,
+          "end": 1.0043333333333333
+        },
+        {
+          "word": "transporta",
+          "start": 1.0793333333333333,
+          "end": 1.6793333333333333
+        },
+        {
+          "word": "partículas",
+          "start": 1.7293333333333334,
+          "end": 2.3293333333333335
+        },
+        {
+          "word": "cargadas",
+          "start": 2.3793333333333333,
+          "end": 3.029333333333333
+        },
+        {
+          "word": "y",
+          "start": 3.1043333333333334,
+          "end": 3.1293333333333333
+        },
+        {
+          "word": "un",
+          "start": 3.154333333333333,
+          "end": 3.279333333333333
+        },
+        {
+          "word": "campo",
+          "start": 3.3293333333333335,
+          "end": 3.654333333333333
+        },
+        {
+          "word": "magnético.",
+          "start": 3.7043333333333335,
+          "end": 4.394666666666667
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Al",
+          "start": 0.07933333333333334,
+          "end": 0.15433333333333332
+        },
+        {
+          "word": "interactuar",
+          "start": 0.17933333333333334,
+          "end": 0.8043333333333333
+        },
+        {
+          "word": "con",
+          "start": 0.8543333333333333,
+          "end": 0.9793333333333333
+        },
+        {
+          "word": "la",
+          "start": 1.0043333333333333,
+          "end": 1.1043333333333334
+        },
+        {
+          "word": "Tierra,",
+          "start": 1.1543333333333334,
+          "end": 1.9293333333333333
+        },
+        {
+          "word": "esa",
+          "start": 1.9793333333333334,
+          "end": 2.179333333333333
+        },
+        {
+          "word": "energía",
+          "start": 2.2043333333333335,
+          "end": 2.7293333333333334
+        },
+        {
+          "word": "puede",
+          "start": 2.804333333333333,
+          "end": 3.0043333333333333
+        },
+        {
+          "word": "acelerar",
+          "start": 3.029333333333333,
+          "end": 3.529333333333333
+        },
+        {
+          "word": "partículas",
+          "start": 3.5793333333333335,
+          "end": 4.254333333333333
+        },
+        {
+          "word": "hacia",
+          "start": 4.304333333333333,
+          "end": 4.504333333333333
+        },
+        {
+          "word": "la",
+          "start": 4.529333333333334,
+          "end": 4.604333333333333
+        },
+        {
+          "word": "atmósfera.",
+          "start": 4.629333333333333,
+          "end": 5.269333333333333
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Allí",
+          "start": 0.07933333333333334,
+          "end": 0.30433333333333334
+        },
+        {
+          "word": "chocan",
+          "start": 0.35433333333333333,
+          "end": 0.7543333333333333
+        },
+        {
+          "word": "con",
+          "start": 0.8043333333333333,
+          "end": 0.9293333333333333
+        },
+        {
+          "word": "oxígeno",
+          "start": 0.9793333333333333,
+          "end": 1.5293333333333334
+        },
+        {
+          "word": "y",
+          "start": 1.5793333333333333,
+          "end": 1.6043333333333334
+        },
+        {
+          "word": "nitrógeno.",
+          "start": 1.6543333333333334,
+          "end": 2.654333333333333
+        },
+        {
+          "word": "Los",
+          "start": 2.7293333333333334,
+          "end": 2.8793333333333333
+        },
+        {
+          "word": "átomos",
+          "start": 2.929333333333333,
+          "end": 3.3793333333333333
+        },
+        {
+          "word": "y",
+          "start": 3.429333333333333,
+          "end": 3.4793333333333334
+        },
+        {
+          "word": "moléculas",
+          "start": 3.529333333333333,
+          "end": 4.154333333333334
+        },
+        {
+          "word": "reciben",
+          "start": 4.2043333333333335,
+          "end": 4.629333333333333
+        },
+        {
+          "word": "energía.",
+          "start": 4.654333333333334,
+          "end": 5.205333333333333
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Cuando",
+          "start": 0.07933333333333334,
+          "end": 0.30433333333333334
+        },
+        {
+          "word": "liberan",
+          "start": 0.3293333333333333,
+          "end": 0.7293333333333333
+        },
+        {
+          "word": "parte",
+          "start": 0.7793333333333333,
+          "end": 1.1043333333333334
+        },
+        {
+          "word": "de",
+          "start": 1.1293333333333333,
+          "end": 1.2043333333333333
+        },
+        {
+          "word": "esa",
+          "start": 1.2293333333333334,
+          "end": 1.4293333333333333
+        },
+        {
+          "word": "energía,",
+          "start": 1.4543333333333333,
+          "end": 2.279333333333333
+        },
+        {
+          "word": "aparece",
+          "start": 2.3293333333333335,
+          "end": 2.8543333333333334
+        },
+        {
+          "word": "la",
+          "start": 2.904333333333333,
+          "end": 3.0043333333333333
+        },
+        {
+          "word": "luz",
+          "start": 3.054333333333333,
+          "end": 3.279333333333333
+        },
+        {
+          "word": "de",
+          "start": 3.3293333333333335,
+          "end": 3.3793333333333333
+        },
+        {
+          "word": "la",
+          "start": 3.404333333333333,
+          "end": 3.4793333333333334
+        },
+        {
+          "word": "aurora.",
+          "start": 3.529333333333333,
+          "end": 3.989333333333333
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "El",
+          "start": 0.07933333333333334,
+          "end": 0.15433333333333332
+        },
+        {
+          "word": "oxígeno",
+          "start": 0.20433333333333334,
+          "end": 0.7543333333333333
+        },
+        {
+          "word": "puede",
+          "start": 0.8043333333333333,
+          "end": 1.0543333333333333
+        },
+        {
+          "word": "dar",
+          "start": 1.1043333333333334,
+          "end": 1.2793333333333334
+        },
+        {
+          "word": "verdes",
+          "start": 1.3293333333333333,
+          "end": 1.7543333333333333
+        },
+        {
+          "word": "y",
+          "start": 1.8043333333333333,
+          "end": 1.8543333333333334
+        },
+        {
+          "word": "rojos.",
+          "start": 1.9043333333333334,
+          "end": 2.679333333333333
+        },
+        {
+          "word": "El",
+          "start": 2.7543333333333333,
+          "end": 2.8293333333333335
+        },
+        {
+          "word": "nitrógeno",
+          "start": 2.8793333333333333,
+          "end": 3.429333333333333
+        },
+        {
+          "word": "aporta",
+          "start": 3.4793333333333334,
+          "end": 3.8293333333333335
+        },
+        {
+          "word": "otros",
+          "start": 3.8543333333333334,
+          "end": 4.129333333333333
+        },
+        {
+          "word": "tonos.",
+          "start": 4.179333333333333,
+          "end": 4.544
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Por",
+          "start": 0.07933333333333334,
+          "end": 0.20433333333333334
+        },
+        {
+          "word": "eso",
+          "start": 0.22933333333333333,
+          "end": 0.5043333333333333
+        },
+        {
+          "word": "brillan",
+          "start": 0.5543333333333333,
+          "end": 0.9793333333333333
+        },
+        {
+          "word": "cerca",
+          "start": 1.0543333333333333,
+          "end": 1.3543333333333334
+        },
+        {
+          "word": "de",
+          "start": 1.3793333333333333,
+          "end": 1.4293333333333333
+        },
+        {
+          "word": "los",
+          "start": 1.4543333333333333,
+          "end": 1.6043333333333334
+        },
+        {
+          "word": "polos,",
+          "start": 1.6543333333333334,
+          "end": 2.304333333333333
+        },
+        {
+          "word": "donde",
+          "start": 2.404333333333333,
+          "end": 2.604333333333333
+        },
+        {
+          "word": "el",
+          "start": 2.6293333333333333,
+          "end": 2.704333333333333
+        },
+        {
+          "word": "campo",
+          "start": 2.7543333333333333,
+          "end": 3.079333333333333
+        },
+        {
+          "word": "magnético",
+          "start": 3.1293333333333333,
+          "end": 3.779333333333333
+        },
+        {
+          "word": "guía",
+          "start": 3.854333333333333,
+          "end": 4.054333333333333
+        },
+        {
+          "word": "muchas",
+          "start": 4.104333333333333,
+          "end": 4.479333333333333
+        },
+        {
+          "word": "partículas.",
+          "start": 4.529333333333333,
+          "end": 5.212666666666666
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "No",
+          "start": 0.10433333333333333,
+          "end": 0.22933333333333333
+        },
+        {
+          "word": "es",
+          "start": 0.25433333333333336,
+          "end": 0.37933333333333336
+        },
+        {
+          "word": "fuego",
+          "start": 0.42933333333333334,
+          "end": 0.7043333333333334
+        },
+        {
+          "word": "en",
+          "start": 0.7293333333333333,
+          "end": 0.7793333333333333
+        },
+        {
+          "word": "el",
+          "start": 0.8043333333333333,
+          "end": 0.9043333333333333
+        },
+        {
+          "word": "cielo.",
+          "start": 0.9793333333333333,
+          "end": 1.6543333333333334
+        },
+        {
+          "word": "Es",
+          "start": 1.8143333333333334,
+          "end": 1.9643333333333333
+        },
+        {
+          "word": "física",
+          "start": 2.0143333333333335,
+          "end": 2.414333333333333
+        },
+        {
+          "word": "convirtiendo",
+          "start": 2.4643333333333333,
+          "end": 3.039333333333333
+        },
+        {
+          "word": "energía",
+          "start": 3.0643333333333334,
+          "end": 3.514333333333333
+        },
+        {
+          "word": "en",
+          "start": 3.539333333333333,
+          "end": 3.639333333333333
+        },
+        {
+          "word": "color.",
+          "start": 3.6893333333333334,
+          "end": 4.142
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    }
+  ],
+  "subtitle_timing": "Kokoro phoneme duration output mapped at explicit word boundaries; short dynamic word-highlighted captions. Not an independent human/ASR alignment review.",
+  "soundscape": {
+    "origin": "Original low-level synthetic soundscape: auroras",
+    "real_field_recording": false,
+    "music_asset_downloaded": false,
+    "mix_volume": 0.42,
+    "seed": 202602
+  },
+  "scenes": [
+    {
+      "scene": 1,
+      "visual": "science",
+      "voice_seconds": 4.28,
+      "video_seconds": 4.44,
+      "frames": 111,
+      "narration": "El cielo no está ardiendo. Lo que ves son átomos emitiendo luz.",
+      "asset": "auroras_01",
+      "camera": "push"
+    },
+    {
+      "scene": 2,
+      "visual": "science",
+      "voice_seconds": 4.524666666666667,
+      "video_seconds": 4.68,
+      "frames": 117,
+      "narration": "El viento solar transporta partículas cargadas y un campo magnético.",
+      "asset": "auroras_02",
+      "camera": "pan_right"
+    },
+    {
+      "scene": 3,
+      "visual": "science",
+      "voice_seconds": 5.399333333333334,
+      "video_seconds": 5.52,
+      "frames": 138,
+      "narration": "Al interactuar con la Tierra, esa energía puede acelerar partículas hacia la atmósfera.",
+      "asset": "auroras_03",
+      "camera": "drift"
+    },
+    {
+      "scene": 4,
+      "visual": "science",
+      "voice_seconds": 5.345291666666666,
+      "video_seconds": 5.48,
+      "frames": 137,
+      "narration": "Allí chocan con oxígeno y nitrógeno. Los átomos y moléculas reciben energía.",
+      "asset": "auroras_04",
+      "camera": "push"
+    },
+    {
+      "scene": 5,
+      "visual": "science",
+      "voice_seconds": 4.129291666666667,
+      "video_seconds": 4.28,
+      "frames": 107,
+      "narration": "Cuando liberan parte de esa energía, aparece la luz de la aurora.",
+      "asset": "auroras_05",
+      "camera": "pull"
+    },
+    {
+      "scene": 6,
+      "visual": "science",
+      "voice_seconds": 4.674,
+      "video_seconds": 4.8,
+      "frames": 120,
+      "narration": "El oxígeno puede dar verdes y rojos. El nitrógeno aporta otros tonos.",
+      "asset": "auroras_06",
+      "camera": "pan_left"
+    },
+    {
+      "scene": 7,
+      "visual": "science",
+      "voice_seconds": 5.352625,
+      "video_seconds": 5.48,
+      "frames": 137,
+      "narration": "Por eso brillan cerca de los polos, donde el campo magnético guía muchas partículas.",
+      "asset": "auroras_07",
+      "camera": "drift"
+    },
+    {
+      "scene": 8,
+      "visual": "science",
+      "voice_seconds": 4.261958333333333,
+      "video_seconds": 4.88,
+      "frames": 122,
+      "narration": "No es fuego en el cielo. Es física convirtiendo energía en color.",
+      "asset": "auroras_08",
+      "camera": "push"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://spaceplace.nasa.gov/aurora/en/",
+      "publisher": "NASA Space Place",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    },
+    {
+      "url": "https://www.swpc.noaa.gov/phenomena/aurora",
+      "publisher": "NOAA Space Weather Prediction Center",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    }
+  ],
+  "source_verification": {
+    "report": "research/source-check-20261117.json",
+    "retrieval_run_id": "44100546363",
+    "scope": "HTTP, page title and scientific text inspected; authored summary, not an automated truth guarantee.",
+    "human_editorial_approval": false
+  },
+  "visual_disclosure": "Original scientific illustrations; qualitative and not to scale. Not real recordings, measured molecular structures or a physical simulation.",
+  "paid_api_requests": 0,
+  "youtube_publication": "disabled",
+  "elapsed_render_seconds": 87.3,
+  "script_sha256": "df4338cbcf2d6d27ee569640f438945cce45e22156c449054aadbd3ef1573f0b",
+  "code_sha256": {
+    "review_phase_a.py": "f7570abf2e100e5cc4efcaff22e05398d2defa585f68ce2b8bbb9eb688f10919",
+    "project_science_motion.py": "0722dbbea6e7fd24857d2b321cc29c71b9b3cf3b99f5085e36c896b3b3241376",
+    "cinematic.py": "ef1bcb66f2dfe64b35caa6c64d5cb088950395893c5908a8da21d242f1388e83",
+    "neural_narration.py": "3e592f0f1be5d93413c95022c6c79c771b6688879c776bcb962f5cd561f11240",
+    "create_cinematic_assets.py": "6556bf68127b5aaedb2cc64b3bc2ddac347af7bece25deeac447dddf1678818b",
+    "check_science_sources.py": "2a07b8a47099828a7ba025cca1f26cf2883c4097f7624519ad00c962eb534f69",
+    "publish_phase_a_review.py": "a0a5bc5a1af43e6ca1f9b60ab3b827c7f24841b17ef7f84279b072189b829ade",
+    "finish_assets.py": "87d25b8c7ed182b260dfd80143ed6607273f664eed3bedb4923926a69463c18d",
+    "subtitles.py": "8a00a195ccf045ad2a61a26226d559f1050780058b02cc28034eabe8d2eb5d41",
+    "fetch_voice.py": "98842bf320955ff2249a73b4def4912031491f924033aca857081b27e06b54ef",
+    "narration.py": "cfd83547b3ab219beb3c6ee0529de0942db5f16d465e68e010fc820099b10edf",
+    "science_motion.py": "88593955462a81c2f25297b29aa6ec25a92a896641e6b1dfd31a278c41d87d51",
+    "create_science_art.py": "1f3ee29cc41dadca6b000138b7f659511ad2952ef6e1b9c12d1e967f24f59322",
+    "diagnose_android_ci.py": "fbb6fafad6c9683d7c6fc0cb24f1f9e8f1e69281a7b0e7b389052db73047733e",
+    "publish_result.py": "f4b74f15398fbf18298430bfe9a1688829632df2d41bfc88b4bd51f630cee329",
+    "render.py": "9b3e41a5cd326cd987a53a6f2cd627c03f6a679025c03cb5d1d0674adcc91173",
+    "publish_job.py": "2a063f6678ad1a168d66552e60366c16a82a900fd36454a036f4057dc415f3b4",
+    "production.py": "934151f00c54c8f34a7a3c63c927b8555a3f9541445bdec0040d002d5e4cfd09",
+    "validate_video.py": "b46c8f6303cf9ecf876ebbe0dd2c3d94e9edac8fc663815cab8b985ece7fadc8",
+    "soundscape.py": "f19831383ccbeb67de0193fddac5c9aad1ff656e7be49f6d88fac8ad3d2a5bd7",
+    "publish_android.py": "88b53ad0a7f809526c1e8a684322cfa6000dc6c4399aa808335d06c895cd388d",
+    "artwork.py": "986515c84ccf22cafb8969879cf324f4bea3a90f1d7dc04004e431f5b1d71669"
+  },
+  "production": {
+    "request_id": "0bbc2f863ab14a00a647afe6d32d82d9",
+    "topic": "Auroras polares",
+    "schema": 1,
+    "format": "short",
+    "script_provider": "curated-local-v1",
+    "topic_id": "auroras"
+  },
+  "asset_manifest_sha256": "66e973fdb5f8b7584b68ce5d64116ec48ce423da5c4f797761ad6151221aef1c",
+  "topic_id": "auroras"
+}
