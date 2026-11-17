@@ -6,10 +6,12 @@ on:
       - 'scripts/topic_research.py'
       - 'scripts/storyboard_draft.py'
       - 'scripts/research_pipeline.py'
+      - 'scripts/narration_candidates.py'
       - 'tests/test_topic_intake.py'
       - 'tests/test_topic_research.py'
       - 'tests/test_storyboard_draft.py'
       - 'tests/test_research_pipeline.py'
+      - 'tests/test_narration_candidates.py'
       - '.github/workflows/topic-research-tests.yml'
   workflow_dispatch:
 permissions:
@@ -29,6 +31,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_topic_*.py' -v
           python -m unittest discover -s tests -p 'test_storyboard_draft.py' -v
           python -m unittest discover -s tests -p 'test_research_pipeline.py' -v
+          python -m unittest discover -s tests -p 'test_narration_candidates.py' -v
       - name: Probe public research access for a new topic (non-blocking)
         run: |
           python -m scripts.research_pipeline "¿Por qué vemos siempre la misma cara de la Luna?" --out-dir /tmp/autostudio-research
