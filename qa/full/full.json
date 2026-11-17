@@ -3,6 +3,7 @@
   "mode": "full",
   "scope": "Android emulator UI and native decoder, not a physical Samsung test",
   "physical_samsung_tested": false,
+  "native_github_api_verified": true,
   "passed": false,
-  "failure": "Exception: Real GitHub connection could not be saved"
+  "failure": "Exception: Connection screen: No se guardó la conexión: La credencial no tiene un formato válido."
 }

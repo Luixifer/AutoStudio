@@ -8,7 +8,8 @@ test_bad_camera_rejected (test_cinematic.CinematicTests.test_bad_camera_rejected
 test_caption_does_not_cross_sentence_boundary (test_cinematic.CinematicTests.test_caption_does_not_cross_sentence_boundary) ... ok
 test_each_shot_moves_and_remains_vertical (test_cinematic.CinematicTests.test_each_shot_moves_and_remains_vertical) ... ok
 test_hook_is_in_first_scene_not_after_intro (test_cinematic.CinematicTests.test_hook_is_in_first_scene_not_after_intro) ... ok
-test_missing_voice_model_fails_closed (test_cinematic.CinematicTests.test_missing_voice_model_fails_closed) ... ok
+test_missing_voice_model_fails_closed (test_cinematic.CinematicTests.test_missing_voice_model_fails_closed) ... [0;93m2026-11-17 13:06:00.602843656 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+ok
 test_negative_time_rejected (test_cinematic.CinematicTests.test_negative_time_rejected) ... ok
 test_no_paragraph_size_captions (test_cinematic.CinematicTests.test_no_paragraph_size_captions) ... ok
 test_overlap_is_rejected (test_cinematic.CinematicTests.test_overlap_is_rejected) ... ok
@@ -57,6 +58,6 @@ test_unknown_theme_does_not_silently_use_ocean (test_production.ProductionTests.
 test_unknown_visual_resource_rejected (test_production.ProductionTests.test_unknown_visual_resource_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 57 tests in 1.977s
+Ran 57 tests in 1.695s
 
 OK

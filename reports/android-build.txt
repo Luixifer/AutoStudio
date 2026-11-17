@@ -11,14 +11,14 @@ Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
 Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
-Signer #1 certificate SHA-256 digest: f92f2a9edd008efdb5c3226c48ffe34aa83bf2a48f5313651c2de1f5eca1657b
-Signer #1 certificate SHA-1 digest: 1ba8cc74a3fe13cc2172fde8e3d0028530faea26
-Signer #1 certificate MD5 digest: ef56598f902b20ef97fbc8ca8feb2a80
+Signer #1 certificate SHA-256 digest: acd0f0b3a2daff4800b8b1a1f9f2fee58f76809e99fc89003ec7952371958be3
+Signer #1 certificate SHA-1 digest: de5b8f105b69bd6d9feb156bd6e6a81250c8080a
+Signer #1 certificate MD5 digest: c6204ab8fbd2e7f2b9471037dccb86e2
 Signer #1 key algorithm: RSA
 Signer #1 key size (bits): 2048
-Signer #1 public key SHA-256 digest: 859264da6a466ffc42132bd250f0ed18db67342a44f80e2661e5f62c697de925
-Signer #1 public key SHA-1 digest: 153adca46893a68c556a812f2960c175b15d6fb8
-Signer #1 public key MD5 digest: c3e6c93c248dfbe754b8bea0713bd07a
+Signer #1 public key SHA-256 digest: 9e7f07a859fbf006fc2758003d274ff5fd37e9040838118c49defb3bbddc6afd
+Signer #1 public key SHA-1 digest: a594618d17d4715d570a5d83b62c34c032695278
+Signer #1 public key MD5 digest: c3a1e0b3c291c4ea02e297f4cba1bff2
 Verifies
 Verified using v1 scheme (JAR signing): false
 Verified using v2 scheme (APK Signature Scheme v2): true
@@ -28,12 +28,12 @@ Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
 Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
-Signer #1 certificate SHA-256 digest: f92f2a9edd008efdb5c3226c48ffe34aa83bf2a48f5313651c2de1f5eca1657b
-Signer #1 certificate SHA-1 digest: 1ba8cc74a3fe13cc2172fde8e3d0028530faea26
-Signer #1 certificate MD5 digest: ef56598f902b20ef97fbc8ca8feb2a80
+Signer #1 certificate SHA-256 digest: acd0f0b3a2daff4800b8b1a1f9f2fee58f76809e99fc89003ec7952371958be3
+Signer #1 certificate SHA-1 digest: de5b8f105b69bd6d9feb156bd6e6a81250c8080a
+Signer #1 certificate MD5 digest: c6204ab8fbd2e7f2b9471037dccb86e2
 Signer #1 key algorithm: RSA
 Signer #1 key size (bits): 2048
-Signer #1 public key SHA-256 digest: 859264da6a466ffc42132bd250f0ed18db67342a44f80e2661e5f62c697de925
-Signer #1 public key SHA-1 digest: 153adca46893a68c556a812f2960c175b15d6fb8
-Signer #1 public key MD5 digest: c3e6c93c248dfbe754b8bea0713bd07a
+Signer #1 public key SHA-256 digest: 9e7f07a859fbf006fc2758003d274ff5fd37e9040838118c49defb3bbddc6afd
+Signer #1 public key SHA-1 digest: a594618d17d4715d570a5d83b62c34c032695278
+Signer #1 public key MD5 digest: c3a1e0b3c291c4ea02e297f4cba1bff2
 REAL_APK /home/runner/work/AutoStudio/AutoStudio/build/android/AutoStudio-Control-0.3.0-lab.apk
