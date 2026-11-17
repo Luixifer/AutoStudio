@@ -1,0 +1,70 @@
+name: AutoStudio 0.4 · Investigar un tema (prueba)
+run-name: Investigación · ${{ github.event.inputs.topic }}
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Tema científico que quieres investigar (solo borrador, no vídeo)'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-research-trial
+  cancel-in-progress: false
+jobs:
+  research:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      AUTOSTUDIO_TOPIC: ${{ inputs.topic }}
+    steps:
+      - name: Obtener versión de investigación 0.4 validada
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 1bfddc06df046b4fe98477974ac4dea0f7309100
+          persist-credentials: false
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar expediente de tema
+        run: |
+          python -m scripts.research_pipeline "$AUTOSTUDIO_TOPIC" --out-dir "$RUNNER_TEMP/autostudio-research"
+      - name: Mostrar resultado en el resumen de GitHub
+        env:
+          REPORT_DIR: ${{ runner.temp }}/autostudio-research
+        run: |
+          python - <<'PY'
+          import html, json, os
+          from pathlib import Path
+          reports = list(Path(os.environ["REPORT_DIR"]).glob("*.json"))
+          if len(reports) != 1:
+              raise SystemExit("Se esperaba exactamente un expediente.")
+          pkg = json.loads(reports[0].read_text(encoding="utf-8"))
+          dossier = pkg["dossier"]
+          research = dossier.get("research", {})
+          def safe(value):
+              return html.escape(str(value), quote=True)
+          output = [
+              "## AutoStudio · Resultado de la investigación",
+              f"**Tema:** {safe(pkg['topic'])}",
+              f"**Estado:** {safe(pkg['state'])}",
+              f"**Investigación:** {safe(research.get('status', 'sin consulta'))}",
+              f"**Referencias preliminares:** {len(dossier.get('sources', []))}",
+              "",
+              "### Fuentes encontradas (sin verificar científicamente)",
+          ]
+          for source in dossier.get("sources", []):
+              output.append(f"- {safe(source.get('title', 'Sin título'))}: {safe(source.get('url', 'Sin enlace'))}")
+          output.extend(["", "### Escenas previstas (borrador)"])
+          for scene in pkg["storyboard"]["scenes"]:
+              output.append(f"- {safe(scene['role'])}: {safe(scene['editorial_question'])}")
+          output.extend([
+              "", "**No se ha generado un vídeo.** Faltan contrastar fuentes, redactar narración y crear las imágenes.",
+              "Ninguna API de pago ni publicación en YouTube.",
+          ])
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as file:
+              file.write("\n".join(output) + "\n")
+          PY
