@@ -23,10 +23,14 @@ public final class SmokeInstrumentation extends Instrumentation {
             evidence.put("schema",1).put("mode",mode).put("scope","Android emulator UI and native decoder, not a physical Samsung test").put("physical_samsung_tested",false);
             Intent launch=new Intent(getTargetContext(),MainActivity.class);launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);MainActivity initial=(MainActivity)startActivitySync(launch);waitForIdleSync();shot("01-control.png");
             if(mode.equals("full")){
-                require(testToken!=null&&testToken.length()>20,"CI runtime credential missing");require(!new CredentialStore(getTargetContext()).connected(),"Expected an isolated fresh test profile");
+                require(testToken!=null&&testToken.length()>20,"CI runtime credential missing");new GitHubClient(testToken).verifyConnection();evidence.put("native_github_api_verified",true);require(!new CredentialStore(getTargetContext()).connected(),"Expected an isolated fresh test profile");
                 ActivityMonitor sm=addMonitor(SettingsActivity.class.getName(),null,false);runOnMainSync(()->initial.findViewById(Ui.SETTINGS).performClick());SettingsActivity settings=(SettingsActivity)sm.waitForActivityWithTimeout(10000);require(settings!=null,"Settings did not open");
                 final String credential=testToken;runOnMainSync(()->{((EditText)settings.findViewById(Ui.TOKEN)).setText(credential);settings.findViewById(Ui.CONNECT).performClick();});
-                await(()->new CredentialStore(getTargetContext()).connected(),60,"Real GitHub connection could not be saved");
+                await(()->{
+                    if(new CredentialStore(getTargetContext()).connected())return true;
+                    final String[] status={""};runOnMainSync(()->status[0]=((TextView)settings.findViewById(Ui.CONNECTION)).getText().toString());
+                    if(status[0].startsWith("No se guardó"))throw new Exception("Connection screen: "+status[0]);return false;
+                },60,"Real GitHub connection could not be saved");
                 require(!getTargetContext().getSharedPreferences("private_connection",0).getAll().toString().contains(testToken),"Credential found in plaintext preferences");evidence.put("credential_encrypted",true);
                 await(settings::isFinishing,5,"Settings did not return");waitForIdleSync();
                 runOnMainSync(()->{((EditText)initial.findViewById(Ui.TOPIC)).setText("Quimiosíntesis: vida sin Sol en el océano profundo");initial.findViewById(Ui.GENERATE).performClick();});
