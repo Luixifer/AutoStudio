@@ -20,10 +20,11 @@ LINES=[
     "El calor es tan brutal que puede separar las moléculas de hidrógeno en átomos.",
 ]
 SAMPLE_TEXT=" ".join(LINES)
+# Alex won the first real user listening comparison; all new trials use Alex.
 PRESETS=(
-    ("dora-narrativa","ef_dora",0.97,0.23,0.10),
-    ("dora-dinamica","ef_dora",1.06,0.15,0.06),
-    ("alex-narrativo","em_alex",0.99,0.22,0.09),
+    ("alex-elegida","em_alex",0.99,0.22,0.09),
+    ("alex-cinematica","em_alex",0.95,0.28,0.12),
+    ("alex-dinamica","em_alex",1.06,0.17,0.06),
 )
 
 def validate_wave(path):
