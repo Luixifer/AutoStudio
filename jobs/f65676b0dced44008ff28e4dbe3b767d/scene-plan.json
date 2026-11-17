@@ -1,0 +1,335 @@
+{
+  "schema": 1,
+  "request_id": "f65676b0dced44008ff28e4dbe3b767d",
+  "topic": "Auroras polares",
+  "format": "short",
+  "script_provider": "curated-local-v1",
+  "image_provider": "original-blender-library-v1",
+  "scenes": [
+    {
+      "id": "s01",
+      "narration": "El cielo no está ardiendo. Lo que ves son átomos emitiendo luz.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.44
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_01",
+        "file": "assets/science_v04/auroras/auroras_01.jpg",
+        "sha256": "9ed9086bf765f439c51f23810cdd578ac8187178b7ff3516bd76467d80572c90",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "sky"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 4.28,
+      "timeline_start_seconds": 0
+    },
+    {
+      "id": "s02",
+      "narration": "El viento solar transporta partículas cargadas y un campo magnético.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.68
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_02",
+        "file": "assets/science_v04/auroras/auroras_02.jpg",
+        "sha256": "3047f89f6bb125ed522c21d52660519d73254fdcc721248f50ac66948169360d",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_right",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "solar_wind"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 4.524666666666667,
+      "timeline_start_seconds": 4.44
+    },
+    {
+      "id": "s03",
+      "narration": "Al interactuar con la Tierra, esa energía puede acelerar partículas hacia la atmósfera.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.52
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_03",
+        "file": "assets/science_v04/auroras/auroras_03.jpg",
+        "sha256": "2b8d0df273565d92432d454588bfb41fe0fe80cd22e25ab267f76a50c28778d3",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "magnetosphere"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 5.399333333333334,
+      "timeline_start_seconds": 9.12
+    },
+    {
+      "id": "s04",
+      "narration": "Allí chocan con oxígeno y nitrógeno. Los átomos y moléculas reciben energía.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.48
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_04",
+        "file": "assets/science_v04/auroras/auroras_04.jpg",
+        "sha256": "5860d62692f18504bfa213fef203a1a6fce3cf4b27b241bac450f9dc6d7382e5",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "collision"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 5.345291666666666,
+      "timeline_start_seconds": 14.64
+    },
+    {
+      "id": "s05",
+      "narration": "Cuando liberan parte de esa energía, aparece la luz de la aurora.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.28
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_05",
+        "file": "assets/science_v04/auroras/auroras_05.jpg",
+        "sha256": "ff8b70b3828ba060a73c3abce4a11e1b7fd592f91807f69d581c4f227d7cd007",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pull",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "emission"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 4.129291666666667,
+      "timeline_start_seconds": 20.12
+    },
+    {
+      "id": "s06",
+      "narration": "El oxígeno puede dar verdes y rojos. El nitrógeno aporta otros tonos.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.8
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_06",
+        "file": "assets/science_v04/auroras/auroras_06.jpg",
+        "sha256": "fdd2082ab9a3c71ae2eb3ea79bf2bc572b5275a13581490d66581e211e3d2b8c",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_left",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "colors"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 4.674,
+      "timeline_start_seconds": 24.4
+    },
+    {
+      "id": "s07",
+      "narration": "Por eso brillan cerca de los polos, donde el campo magnético guía muchas partículas.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.48
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_07",
+        "file": "assets/science_v04/auroras/auroras_07.jpg",
+        "sha256": "8fb748e737a46a366037b6d92af2ef944f21ee2720571cf322a5dd383f946152",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "oval"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 5.352625,
+      "timeline_start_seconds": 29.2
+    },
+    {
+      "id": "s08",
+      "narration": "No es fuego en el cielo. Es física convirtiendo energía en color.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.88
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "auroras_08",
+        "file": "assets/science_v04/auroras/auroras_08.jpg",
+        "sha256": "2068b3aa64b1a3a2028605b4c7e1d6cc3082c5fa2f995dd66068ee6025b7c42b",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/auroras_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "auroras",
+          "kind": "finale"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://spaceplace.nasa.gov/aurora/en/",
+        "https://www.swpc.noaa.gov/phenomena/aurora"
+      ],
+      "voice_seconds": 4.261958333333333,
+      "timeline_start_seconds": 34.68
+    }
+  ],
+  "youtube": {
+    "enabled": false
+  },
+  "paid_api_allowed": false,
+  "topic_id": "auroras"
+}
