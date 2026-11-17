@@ -6,9 +6,9 @@
   "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
   "apk": "AutoStudio-Control-0.3.0-lab.apk",
   "bytes": 66018,
-  "sha256": "c04c1e9bff53d2ffda3658d3f1f7ac3808b075274f2de07fc9ae9f559d706c46",
+  "sha256": "506bb32b43ca41a1fa614d7e6e1bd7fc433d5c713658a532a85e0a5747e0b01a",
   "source_commit": "16192bde48a62b605af46f9f554172877f08292f",
-  "github_run_id": "44086726077",
+  "github_run_id": "44086768350",
   "worktree_dirty": false,
   "physical_samsung_tested": false
 }
