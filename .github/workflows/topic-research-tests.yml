@@ -46,3 +46,20 @@ jobs:
           print("PUBLIC_RESEARCH_LEADS:",len(result["dossier"].get("sources",[])))
           print("No se ha generado ninguna narración, imagen ni MP4.")
           PY
+      - name: Real-world black-hole question relevance probe (non-blocking)
+        run: |
+          python -m scripts.research_pipeline "¿Qué ocurre dentro de un agujero negro?" --out-dir /tmp/autostudio-black-hole
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(next(Path("/tmp/autostudio-black-hole").glob("*.json")).read_text(encoding="utf-8"))
+          assert not report["safe_for_render"]
+          candidates=report["narration_candidates"]["candidates"]
+          from scripts.narration_candidates import relevance
+          for item in candidates:
+              assert relevance(report["topic"],item["source_excerpt_exact"]) is not None
+          print("BLACK_HOLE_SOURCE_LEADS:",len(report["dossier"].get("sources",[])))
+          print("BLACK_HOLE_RELEVANT_CANDIDATES:",len(candidates))
+          print("BLACK_HOLE_STATUS:",report["narration_candidates"]["status"])
+          PY
+          PY
