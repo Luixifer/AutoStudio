@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: aa5efec33cec0b24a279e74d86cddcba0eb04ce3
+          ref: b731c9b38db77ecb13a7c10c412da62e04ee3d42
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -67,7 +67,7 @@ jobs:
                   f"{safe(quote.get('source_url', ''))}"
               )
           if not extractive.get("candidates"):
-              output.append("- No se han localizado frases completas utilizables. No se inventará narración.")
+              output.append("- Ningún fragmento responde con suficiente relevancia a esta pregunta. No se inventará narración.")
           output.extend([
               "",
               "Estas frases son extractos literales de Wikipedia, con sus respectivos enlaces,",
