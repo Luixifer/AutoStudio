@@ -1,6 +1,28 @@
 [
   {
     "schema": 1,
+    "request_id": "3e74587aa5bc4a34b81cdee0d260af1a",
+    "run_id": "44106949073",
+    "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+    "repository": "Luixifer/AutoStudio",
+    "status": "completed",
+    "youtube_published": false,
+    "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44106949073",
+    "topic_id": "volcanoes",
+    "topic": "Volcanes: magma y lava",
+    "title": "La Tierra no está rellena de lava",
+    "video": {
+      "file": "short_ciencia_demo.mp4",
+      "sha256": "32e315dbac9a39a00135731cbf2b918fac1923fd737a65a1122e203c0711d993",
+      "bytes": 2510425,
+      "duration_seconds": 35.88,
+      "width": 720,
+      "height": 1280
+    },
+    "scene_plan": "scene-plan.json"
+  },
+  {
+    "schema": 1,
     "request_id": "3f1f947696734d85976263f7228bfe0a",
     "run_id": "44106411816",
     "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
