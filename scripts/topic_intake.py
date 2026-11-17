@@ -12,9 +12,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def normalize_topic(topic):
     if not isinstance(topic, str):
         raise ValueError("El tema debe ser texto.")
+    # Reject control characters before whitespace normalisation: otherwise
+    # newlines and tabs silently disappear and bypass the validation contract.
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in topic):
+        raise ValueError("El tema no puede contener caracteres de control.")
     value = " ".join(topic.split())
-    if not 3 <= len(value) <= 160 or any(ord(ch) < 32 for ch in topic):
-        raise ValueError("El tema debe tener entre 3 y 160 caracteres y no contener caracteres de control.")
+    if not 3 <= len(value) <= 160:
+        raise ValueError("El tema debe tener entre 3 y 160 caracteres.")
     return value
 
 
