@@ -1,0 +1,15 @@
+{
+  "id": "ocean",
+  "title": "¿Cómo hay vida donde no llega la luz?",
+  "language": "es",
+  "editorial_status": "draft_requires_human_fact_check",
+  "sources": [
+    {"url": "https://oceanservice.noaa.gov/facts/vents.html", "publisher": "NOAA Ocean Service", "role": "Referencia aportada para fuentes hidrotermales y quimiosíntesis; comprobar editorialmente antes de publicar."},
+    {"url": "https://www.whoi.edu/know-your-ocean/ocean-topics/ocean-life/ecosystems/hydrothermal-vents/", "publisher": "Woods Hole Oceanographic Institution", "role": "Referencia aportada sobre ecosistemas hidrotermales; comprobar editorialmente antes de publicar."}
+  ],
+  "scenes": [
+    {"visual":"ocean","title":"Donde no llega la luz","caption":"Oscuridad no significa ausencia de vida.","voice":"En el océano profundo, la luz del Sol deja de ser suficiente para la fotosíntesis. Pero la oscuridad no significa que no pueda haber vida."},
+    {"visual":"vent","title":"Energía química","caption":"Quimiosíntesis junto a ciertas fuentes hidrotermales.","voice":"Cerca de ciertas fuentes hidrotermales, algunos microbios aprovechan la energía de reacciones químicas. Así producen materia orgánica. Este proceso se llama quimiosíntesis."},
+    {"visual":"microbes","title":"Una red de vida","caption":"La conexión con la superficie también importa.","voice":"Estos microorganismos sostienen comunidades de animales. Eso no implica independencia total de la superficie. Algunas reacciones usan oxígeno producido por la fotosíntesis. Lo que ves son esquemas, no filmaciones submarinas."}
+  ]
+}

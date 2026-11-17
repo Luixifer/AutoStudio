@@ -1,0 +1,43 @@
+name: Crear vídeo científico de prueba (sin YouTube)
+run-name: AutoStudio · prueba narrada · ${{ github.ref_name }}
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'render-*'
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-render
+  cancel-in-progress: false
+jobs:
+  render:
+    # Standard hosted Linux in a PUBLIC repository only. No paid/larger/GPU runner.
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write  # Required only for the managed video-preview output branch.
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Python gratuito
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Instalar herramientas libres
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+          mkdir -p reports
+      - name: Ejecutar pruebas
+        run: .venv/bin/python -m unittest discover -s tests -v > reports/unit-tests.txt 2>&1
+      - name: Generar y verificar vídeo con narración real
+        run: .venv/bin/python scripts/render.py --out output > reports/render.log 2>&1
+      - name: Guardar resultado y descarga móvil por Git
+        if: ${{ always() }}
+        env:
+          AUTOSTUDIO_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/publish_result.py
