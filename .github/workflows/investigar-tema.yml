@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: f5733af493136531acba015ed00d75809d1b391d
+          ref: 71fc58abe70059e1ada020ec16d0d5dc98034a30
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -82,6 +82,23 @@ jobs:
           if not nasa.get("passages"):
               output.append("- No se han podido extraer pasajes pertinentes de las páginas consultadas.")
           output.append("Los pasajes son pistas textuales sin comprobación editorial; no son un guion ni están aprobados para narración.")
+          draft = pkg.get("spanish_draft", {})
+          output.extend([
+              "",
+              "### Borrador de narración en español (experimental, NO aprobado)",
+              f"**Escenas con texto:** {len(draft.get('scenes', []))}",
+              f"**Palabras:** {draft.get('word_count', 0)}",
+              "**Método:** plantillas conservadoras activadas por pasajes NASA; no es una IA generativa libre.",
+          ])
+          for scene in draft.get("scenes", []):
+              output.extend([
+                  f"**{safe(scene.get('role', 'Escena'))}:** {safe(scene.get('narration_draft_es', ''))}",
+                  f"Fuente: {safe(scene.get('reference_title', 'NASA'))} — {safe(scene.get('reference_url', ''))}",
+                  "",
+              ])
+          if not draft.get("scenes"):
+              output.append("- No hay suficientes evidencias para producir texto sin inventarlo.")
+          output.append("**Revisión humana y científica obligatoria.** Todavía no se genera voz, imagen ni MP4 con este borrador.")
           extractive = pkg.get("narration_candidates", {})
           output.extend(["", "### Fragmentos de narración extraídos de fuentes (NO es un guion original)"])
           for quote in extractive.get("candidates", []):
