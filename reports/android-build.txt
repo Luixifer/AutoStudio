@@ -1,3 +1,4 @@
+Credential format JVM regressions passed: 12
 Note: /home/runner/work/AutoStudio/AutoStudio/android/app/src/com/luixifer/autostudio/Ui.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 10,000 days
@@ -11,14 +12,14 @@ Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
 Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
-Signer #1 certificate SHA-256 digest: acd0f0b3a2daff4800b8b1a1f9f2fee58f76809e99fc89003ec7952371958be3
-Signer #1 certificate SHA-1 digest: de5b8f105b69bd6d9feb156bd6e6a81250c8080a
-Signer #1 certificate MD5 digest: c6204ab8fbd2e7f2b9471037dccb86e2
+Signer #1 certificate SHA-256 digest: fcab6fbbc4fd721497f665741ea15f1af500671cb8e9b0f097d3deeb58c3097f
+Signer #1 certificate SHA-1 digest: ae5712e9f07a1ed8ff8ed4e04b70fd24c8c053ea
+Signer #1 certificate MD5 digest: ff69b3f1080145634fce1a82730cda77
 Signer #1 key algorithm: RSA
 Signer #1 key size (bits): 2048
-Signer #1 public key SHA-256 digest: 9e7f07a859fbf006fc2758003d274ff5fd37e9040838118c49defb3bbddc6afd
-Signer #1 public key SHA-1 digest: a594618d17d4715d570a5d83b62c34c032695278
-Signer #1 public key MD5 digest: c3a1e0b3c291c4ea02e297f4cba1bff2
+Signer #1 public key SHA-256 digest: 06084f269f0a8db21cbe61a23ed86cb8ff134f948b050cdedb332bcb1ca412aa
+Signer #1 public key SHA-1 digest: bce22a878c239a289f848b5ccb0f817998b99828
+Signer #1 public key MD5 digest: a4c2567f8f56b898a046f182e71ddd28
 Verifies
 Verified using v1 scheme (JAR signing): false
 Verified using v2 scheme (APK Signature Scheme v2): true
@@ -28,12 +29,12 @@ Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
 Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
-Signer #1 certificate SHA-256 digest: acd0f0b3a2daff4800b8b1a1f9f2fee58f76809e99fc89003ec7952371958be3
-Signer #1 certificate SHA-1 digest: de5b8f105b69bd6d9feb156bd6e6a81250c8080a
-Signer #1 certificate MD5 digest: c6204ab8fbd2e7f2b9471037dccb86e2
+Signer #1 certificate SHA-256 digest: fcab6fbbc4fd721497f665741ea15f1af500671cb8e9b0f097d3deeb58c3097f
+Signer #1 certificate SHA-1 digest: ae5712e9f07a1ed8ff8ed4e04b70fd24c8c053ea
+Signer #1 certificate MD5 digest: ff69b3f1080145634fce1a82730cda77
 Signer #1 key algorithm: RSA
 Signer #1 key size (bits): 2048
-Signer #1 public key SHA-256 digest: 9e7f07a859fbf006fc2758003d274ff5fd37e9040838118c49defb3bbddc6afd
-Signer #1 public key SHA-1 digest: a594618d17d4715d570a5d83b62c34c032695278
-Signer #1 public key MD5 digest: c3a1e0b3c291c4ea02e297f4cba1bff2
+Signer #1 public key SHA-256 digest: 06084f269f0a8db21cbe61a23ed86cb8ff134f948b050cdedb332bcb1ca412aa
+Signer #1 public key SHA-1 digest: bce22a878c239a289f848b5ccb0f817998b99828
+Signer #1 public key MD5 digest: a4c2567f8f56b898a046f182e71ddd28
 REAL_APK /home/runner/work/AutoStudio/AutoStudio/build/android/AutoStudio-Control-0.3.0-lab.apk
