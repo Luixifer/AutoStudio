@@ -48,11 +48,11 @@ def srt_time(t):
     ms=round(t*1000);h,ms=divmod(ms,3600000);m,ms=divmod(ms,60000);s,ms=divmod(ms,1000)
     return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
-def write_ass(path,cues,size):
+def write_ass(path,cues,size,heading,duration,source_type="illustration"):
     width,height=size
-    # Caption bar sits in a visually quiet lower band. Short 1-3-word groups.
-    font_size=40 if height>width else 32
-    margin_v=230 if height>width else 90
+    font_size=41 if height>width else 34
+    margin_v=205 if height>width else 86
+    title_size=26 if height>width else 25
     header=f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {width}
@@ -63,39 +63,57 @@ ScaledBorderAndShadow: yes
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,DejaVu Sans,{font_size},&H00FFFFFF,&H0000FFFF,&H00100A08,&H9B000000,-1,0,0,0,100,100,0,0,1,3,1,2,50,50,{margin_v},1
+Style: Heading,DejaVu Sans,{title_size},&H00F5F5F5,&H0000FFFF,&H00120B07,&H99000000,-1,0,0,0,100,100,0,0,3,1,0,7,30,30,32,1
+Style: Disclosure,DejaVu Sans,18,&H00DDDDDD,&H0000FFFF,&H00120B07,&H99000000,0,0,0,0,100,100,0,0,1,2,0,1,27,27,35,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    lines=[header]
+    clean_title=subtitle_text(str(heading)[:48])
+    notice="RECREACIÓN ARTÍSTICA" if source_type=="illustration" else "MATERIAL VISUAL IDENTIFICADO"
+    events=[
+        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Heading,,0,0,0,,{clean_title}\\n",
+        f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Disclosure,,0,0,0,,{notice}\\n",
+    ]
     for cue in cues:
-        lines.append(f"Dialogue: 0,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
-    Path(path).write_text("".join(lines),encoding="utf-8")
+        events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\\n")
+    Path(path).write_text(header+"".join(events),encoding="utf-8")
 
 
 def background_still(picture,out,width,height,heading,source_type):
-    from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageEnhance
+    from PIL import Image,ImageFilter,ImageEnhance,ImageOps,ImageDraw
     with Image.open(picture) as original:
-        picture=original.convert("RGB")
-    bg=picture.resize((width,height),Image.Resampling.LANCZOS)
-    bg=bg.filter(ImageFilter.GaussianBlur(max(12,width//24)))
-    bg=ImageEnhance.Brightness(bg).enhance(.29)
-    # Preserve a wide original without aggressive cropping; depth comes from
-    # a separate smoothly moving canvas, not turning it into a false photo.
-    limitw=width
-    limith=int(height*(.64 if height>width else .76))
-    ratio=min(limitw/picture.width,limith/picture.height)
-    resized=picture.resize((round(picture.width*ratio),round(picture.height*ratio)),Image.Resampling.LANCZOS)
-    x=(width-resized.width)//2
-    y=max(height//7,(height-resized.height)//2-40) if height>width else (height-resized.height)//2
-    bg.paste(resized,(x,y))
-    draw=ImageDraw.Draw(bg)
-    titlefont=ImageFont.truetype(BOLD,27 if height>width else 24)
-    labelfont=ImageFont.truetype(FONT,19 if height>width else 17)
-    draw.rounded_rectangle((24,24,min(width-24,686),100),radius=18,fill=(9,17,29))
-    draw.text((41,34),heading[:32],font=titlefont,fill=(249,247,244))
-    notice=("RECREACIÓN ARTÍSTICA" if source_type=="illustration" else "MATERIAL VISUAL CON PROCEDENCIA")
-    draw.text((28,height-85),notice,font=labelfont,fill=(225,231,242))
+        original=original.convert("RGB")
+        ratio=original.width/original.height
+        output_ratio=width/height
+        if abs(ratio-output_ratio)<.16:
+            # Preserve the entire 9:16 original as closely as possible: do not
+            # bury a cinematic vertical image inside a narrow rectangle.
+            bg=ImageOps.fit(original,(width,height),Image.Resampling.LANCZOS,centering=(.5,.5))
+        else:
+            bg=original.resize((width,height),Image.Resampling.LANCZOS)
+            bg=bg.filter(ImageFilter.GaussianBlur(max(12,width//24)))
+            bg=ImageEnhance.Brightness(bg).enhance(.32)
+            limitw=width
+            limith=int(height*(.70 if height>width else .82))
+            scale=min(limitw/original.width,limith/original.height)
+            fg=original.resize((round(original.width*scale),round(original.height*scale)),Image.Resampling.LANCZOS)
+            x=(width-fg.width)//2
+            y=(height-fg.height)//2
+            bg.paste(fg,(x,y))
+    # Faint gradients behind title/subtitles to ensure legibility without
+    # painting permanently moving text into the image.
+    overlay=Image.new("RGBA",(width,height),(0,0,0,0))
+    draw=ImageDraw.Draw(overlay)
+    for y in range(height):
+        if y<height*.13:
+            alpha=round(100*(1-y/(height*.13)))
+        elif y>height*.66:
+            alpha=round(95*((y-height*.66)/(height*.34)))
+        else:
+            alpha=0
+        if alpha:draw.line((0,y,width,y),fill=(1,5,12,min(alpha,95)))
+    bg=Image.alpha_composite(bg.convert("RGBA"),overlay).convert("RGB")
     bg.save(out,optimize=True)
 
 
@@ -140,7 +158,7 @@ def produce(manifest,out,allow_lab=False):
         background_still(entry["image_path"],still,width,height,
                          raw.get("heading",project["title"]),raw.get("source_type","illustration"))
         cues=caption_groups(entry["timed_words"])
-        write_ass(subtitle,cues,size)
+        write_ass(subtitle,cues,size,raw.get("heading",project["title"]),seconds,raw.get("source_type","illustration"))
         # Escaping is required because FFmpeg treats ':' and '\\' as filter delimiters.
         safe_path=subtitle.resolve().as_posix().replace("\\","\\\\").replace(":","\\:")
         vf=zoom_filter(entry,frames,size)+f",ass=filename='{safe_path}'"
