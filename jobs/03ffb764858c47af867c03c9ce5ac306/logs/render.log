@@ -1,0 +1,21 @@
+[0;93m2026-11-17 14:37:16.808062395 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+Traceback (most recent call last):
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/render.py", line 140, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/render.py", line 83, in main
+    image=art.frame(t,duration,subtitle,previous_visual=previous_visual) if cinematic else art.frame(t,duration,subtitle)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/cinematic.py", line 82, in frame
+    if len(lines)>3:raise ValueError('Headline exceeds safe area.')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Headline exceeds safe area.
+Traceback (most recent call last):
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/production.py", line 41, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/production.py", line 33, in main
+    subprocess.run([sys.executable,str(ROOT/'scripts/render.py'),'--profile','cinematic','--script',str(directory/'story.json'),'--out',str(ROOT/'output')],check=True)
+  File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/runner/work/AutoStudio/AutoStudio/.venv/bin/python', '/home/runner/work/AutoStudio/AutoStudio/scripts/render.py', '--profile', 'cinematic', '--script', '/home/runner/work/AutoStudio/AutoStudio/output/requests/03ffb764858c47af867c03c9ce5ac306/story.json', '--out', '/home/runner/work/AutoStudio/AutoStudio/output']' returned non-zero exit status 1.
