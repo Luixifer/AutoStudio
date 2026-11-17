@@ -16,7 +16,7 @@ from scripts.topic_intake import prepare_topic
 WIKIPEDIA_API = "https://es.wikipedia.org/w/api.php"
 USER_AGENT = "AutoStudio-Research/0.4 (educational; GitHub Luixifer/AutoStudio)"
 MAX_BYTES = 500_000
-MAX_EXCERPT = 1200
+MAX_EXCERPT = 12000
 
 
 def focused_query(topic):
@@ -42,8 +42,8 @@ def fetch_wikipedia_candidates(topic, opener=urlopen):
     def query_pages(query):
         params = {
             "action": "query", "generator": "search", "gsrsearch": query,
-            "gsrlimit": 5, "prop": "extracts|info", "exintro": "1",
-            "explaintext": "1", "exchars": "1600", "inprop": "url",
+            "gsrlimit": 5, "prop": "extracts|info",
+            "explaintext": "1", "exchars": "15000", "inprop": "url",
             "format": "json", "formatversion": "2",
         }
         url = WIKIPEDIA_API + "?" + urlencode(params)
