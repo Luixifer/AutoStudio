@@ -6,6 +6,7 @@ Exact Wikipedia quotes are only editorial candidates, never original scripts.
 import re
 import unicodedata
 from urllib.parse import urlsplit
+from scripts.source_quality import valid_science_lead
 
 MAX_CANDIDATES = 6
 MAX_QUOTE_CHARS = 190
@@ -108,6 +109,8 @@ def narration_candidates(dossier, max_candidates=MAX_CANDIDATES):
         if not isinstance(source, dict) or source.get("evidence_level") != "secondary_lead_only":
             continue
         if not _wiki_url(source.get("url")):
+            continue
+        if not valid_science_lead(question, source.get("title"), source.get("excerpt")):
             continue
         for sentence in _sentences(source.get("excerpt")):
             if not _eligible(sentence):
