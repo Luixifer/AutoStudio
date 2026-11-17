@@ -1,0 +1,55 @@
+name: AutoStudio 0.4 · APK de investigación para Samsung
+run-name: APK investigar · ${{ github.sha }}
+on:
+  push:
+    branches:
+      - feature/android-research-04
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar SDK oficial y Java 17
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Ejecutar regresiones Python
+        run: python -m unittest discover -s tests -v
+      - name: Compilar y firmar APK de laboratorio
+        run: python android/build.py
+      - name: Verificar APK y certificado
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/android/AutoStudio-Control-0.4.0-lab.apk
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          info=json.loads(Path('build/android/apk-info.json').read_text())
+          apk=Path('build/android')/info['apk']
+          assert apk.exists()
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()==info['sha256']
+          assert info['application_id']=='com.luixifer.autostudio.lab04'
+          print('APK_BYTES',info['bytes'])
+          print('APK_SHA256',info['sha256'])
+          print('SOURCE_COMMIT',info['source_commit'])
+          PY
+      - name: Subir APK de laboratorio como archivo de GitHub Actions
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-0.4-Investigar-APK
+          path: |
+            build/android/AutoStudio-Control-0.4.0-lab.apk
+            build/android/SHA256SUMS
+            build/android/apk-info.json
+          retention-days: 7
+          if-no-files-found: error
