@@ -14,7 +14,7 @@ public final class CredentialStore {
     public CredentialStore(Context c){context=c.getApplicationContext();}
     private KeyStore store() throws Exception{KeyStore s=KeyStore.getInstance("AndroidKeyStore");s.load(null);return s;}
     public void save(String token) throws Exception{
-        if(token==null||token.length()<20||token.length()>512||!token.matches("[A-Za-z0-9_]+"))throw new IllegalArgumentException("La credencial no tiene un formato válido.");
+        if(!TokenFormat.acceptable(token))throw new IllegalArgumentException("La credencial no tiene un formato válido.");
         KeyStore s=store();
         if(!s.containsAlias(ALIAS)){KeyGenerator k=KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,"AndroidKeyStore");k.init(new KeyGenParameterSpec.Builder(ALIAS,KeyProperties.PURPOSE_ENCRYPT|KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).setRandomizedEncryptionRequired(true).build());k.generateKey();}
         Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,(SecretKey)s.getKey(ALIAS,null));

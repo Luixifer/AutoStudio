@@ -12,7 +12,10 @@ def main():
     tools=sdk/'build-tools/35.0.0';platform=sdk/'platforms/android-35/android.jar'
     if not platform.is_file() or not (java/'bin/javac').is_file():raise RuntimeError('Need Android platform 35, build-tools 35.0.0 and a full JDK. See android/README.md.')
     os.environ['PATH']=str(java/'bin')+os.pathsep+os.environ['PATH'];os.environ['JAVA_HOME']=str(java)
-    OUT.mkdir(parents=True,exist_ok=True);work=OUT/'work';shutil.rmtree(work,ignore_errors=True);work.mkdir();classes=work/'classes';classes.mkdir();gen=work/'gen';gen.mkdir();res=work/'res';res.mkdir();dex=work/'dex';dex.mkdir()
+    OUT.mkdir(parents=True,exist_ok=True);unit=OUT/'unit';unit.mkdir(exist_ok=True)
+    run(java/'bin/javac','-encoding','UTF-8','-d',unit,PROJECT/'app/src/com/luixifer/autostudio/TokenFormat.java',PROJECT/'test/unit/TokenFormatTest.java')
+    run(java/'bin/java','-cp',unit,'TokenFormatTest')
+    work=OUT/'work';shutil.rmtree(work,ignore_errors=True);work.mkdir();classes=work/'classes';classes.mkdir();gen=work/'gen';gen.mkdir();res=work/'res';res.mkdir();dex=work/'dex';dex.mkdir()
     run(tools/'aapt2','compile','--dir',PROJECT/'app/res','-o',res)
     run(tools/'aapt2','link','-I',platform,'--manifest',PROJECT/'app/AndroidManifest.xml','--java',gen,'-o',work/'base.apk',*sorted(res.glob('*.flat')))
     sources=[*sorted((PROJECT/'app/src').rglob('*.java')),*sorted(gen.rglob('*.java'))]

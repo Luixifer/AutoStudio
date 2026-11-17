@@ -23,7 +23,7 @@ public final class SmokeInstrumentation extends Instrumentation {
             evidence.put("schema",1).put("mode",mode).put("scope","Android emulator UI and native decoder, not a physical Samsung test").put("physical_samsung_tested",false);
             Intent launch=new Intent(getTargetContext(),MainActivity.class);launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);MainActivity initial=(MainActivity)startActivitySync(launch);waitForIdleSync();shot("01-control.png");
             if(mode.equals("full")){
-                require(testToken!=null&&testToken.length()>20,"CI runtime credential missing");new GitHubClient(testToken).verifyConnection();evidence.put("native_github_api_verified",true);require(!new CredentialStore(getTargetContext()).connected(),"Expected an isolated fresh test profile");
+                require(testToken!=null&&testToken.length()>20,"CI runtime credential missing");new GitHubClient(testToken).verifyConnection();evidence.put("native_github_api_verified",true).put("runtime_credential_format_accepted",TokenFormat.acceptable(testToken));require(!new CredentialStore(getTargetContext()).connected(),"Expected an isolated fresh test profile");
                 ActivityMonitor sm=addMonitor(SettingsActivity.class.getName(),null,false);runOnMainSync(()->initial.findViewById(Ui.SETTINGS).performClick());SettingsActivity settings=(SettingsActivity)sm.waitForActivityWithTimeout(10000);require(settings!=null,"Settings did not open");
                 final String credential=testToken;runOnMainSync(()->{((EditText)settings.findViewById(Ui.TOKEN)).setText(credential);settings.findViewById(Ui.CONNECT).performClick();});
                 await(()->{
