@@ -9,16 +9,20 @@ import shutil
 from pathlib import Path
 
 from scripts.personal_studio import ALLOWED_IMAGE,PROFILES,secure_file
+from scripts.personal_camera import suggest_focal_point,visual_similarity_warnings
 
 MOVEMENT_SEQUENCE=("zoom_in","pan_right","focus","zoom_out","pan_left",
                    "zoom_in","pan_right","zoom_out","focus","pan_left")
 
-def camera_for(index,scene):
+def camera_for(index,scene,image_path=None):
     override=scene.get("camera")
     if override is not None:
         if not isinstance(override,dict):raise ValueError("Movimiento personalizado inválido.")
         return override
-    focal=scene.get("focal_point",[.5,.5])
+    focal=scene.get("focal_point")
+    if focal is None and image_path is not None:
+        focal=suggest_focal_point(image_path)["target"]
+    if focal is None:focal=[.5,.5]
     return {"movement":MOVEMENT_SEQUENCE[index%len(MOVEMENT_SEQUENCE)],
             "zoom":1.09,"target":focal}
 
@@ -43,6 +47,8 @@ def prepare(source_json,out,narrator=None):
         narrator=NeuralNarrator()
     out.mkdir(parents=True,exist_ok=True)
     result=[]
+    source_images=[]
+    camera_audits=[]
     seen=set()
     for i,scene in enumerate(scenes):
         if not isinstance(scene,dict):raise ValueError("Escena inválida.")
@@ -54,6 +60,13 @@ def prepare(source_json,out,narrator=None):
         checksum=sha256_file(original)
         if checksum in seen:raise ValueError("Fotografía o imagen repetida.")
         seen.add(checksum)
+        source_images.append(original)
+        if scene.get("focal_point") is None and scene.get("camera") is None:
+            audit=suggest_focal_point(original)
+        else:
+            audit={"target":scene.get("focal_point",scene.get("camera",{}).get("target")),
+                   "confidence":"user_supplied","method":"provided_target"}
+        camera_audits.append({"scene":i+1,**audit})
         picture=out/f"image_{i+1:03}{original.suffix.lower()}"
         shutil.copy2(original,picture)
         wav=out/f"voice_{i+1:03}.wav"
@@ -66,7 +79,7 @@ def prepare(source_json,out,narrator=None):
             "timed_words":voice["words"],
             "rights":scene.get("rights",{}),
             "source_type":scene.get("source_type","illustration"),
-            "camera":camera_for(i,scene),
+            "camera":camera_for(i,scene,original),
         })
     complete={
         "schema":2,"title":storyboard.get("title"),
@@ -75,6 +88,8 @@ def prepare(source_json,out,narrator=None):
         "editorial_approved":bool(storyboard.get("editorial_approved",False)),
         "youtube":{"enabled":False},
         "scenes":result,
+        "camera_audits":camera_audits,
+        "visual_similarity_warnings":visual_similarity_warnings(source_images),
     }
     path=out/"studio-ready.json"
     path.write_text(json.dumps(complete,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
