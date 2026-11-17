@@ -27,6 +27,14 @@ public final class GitHubClient {
     }
     public void verifyConnection() throws Exception{JSONObject repo=api("","GET",null);if(repo.optBoolean("private",true))throw new IOException("Esta edición solo produce en el repositorio público previsto; no activa runners de pago.");JSONObject flow=api("/actions/workflows/"+WORKFLOW,"GET",null);if(!flow.optString("state").equals("active"))throw new IOException("El workflow de producción no está activo.");}
     public void dispatch(String id,String topic) throws Exception{if(!validId(id))throw new IOException("Identificador inválido.");JSONObject inputs=new JSONObject().put("request_id",id).put("topic",topic);api("/actions/workflows/"+WORKFLOW+"/dispatches","POST",new JSONObject().put("ref","main").put("inputs",inputs));}
+    /** Launches the read-only research trial. This does not produce an MP4. */
+    public void dispatchResearch(String topic) throws Exception {
+        if (topic == null || topic.trim().length() < 3 || topic.trim().length() > 160
+            || topic.matches("(?s).*[\\p{Cntrl}].*")) throw new IOException("Tema no válido.");
+        JSONObject inputs = new JSONObject().put("topic", topic.trim());
+        api("/actions/workflows/investigar-tema.yml/dispatches", "POST",
+            new JSONObject().put("ref", "main").put("inputs", inputs));
+    }
     public JSONObject getRun(String id) throws Exception{if(id==null||!id.matches("[0-9]{1,20}"))throw new IOException("Ejecución inválida.");return api("/actions/runs/"+id,"GET",null);}
     public JSONObject findRun(String id) throws Exception{
         if(!validId(id))throw new IOException("Identificador inválido.");
