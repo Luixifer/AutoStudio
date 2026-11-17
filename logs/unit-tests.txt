@@ -1,0 +1,21 @@
+test_all_frames_change_and_keep_dimensions (test_pipeline.ScriptTests.test_all_frames_change_and_keep_dimensions) ... ok
+test_authored_story_loads (test_pipeline.ScriptTests.test_authored_story_loads) ... ok
+test_empty_narration_rejected (test_pipeline.ScriptTests.test_empty_narration_rejected) ... ok
+test_missing_sources_rejected (test_pipeline.ScriptTests.test_missing_sources_rejected) ... ok
+test_output_id_traversal_rejected (test_pipeline.ScriptTests.test_output_id_traversal_rejected) ... ok
+test_oversized_word_fails (test_pipeline.ScriptTests.test_oversized_word_fails) ... ok
+test_publisher_refuses_standalone_execution (test_pipeline.ScriptTests.test_publisher_refuses_standalone_execution) ... ok
+test_publisher_rejects_output_path_escape (test_pipeline.ScriptTests.test_publisher_rejects_output_path_escape) ... ok
+test_scene_budget (test_pipeline.ScriptTests.test_scene_budget) ... ok
+test_source_credentials_rejected (test_pipeline.ScriptTests.test_source_credentials_rejected) ... ok
+test_srt_rounding (test_pipeline.ScriptTests.test_srt_rounding) ... ok
+test_subtitle_coverage (test_pipeline.ScriptTests.test_subtitle_coverage) ... ok
+test_unicode_fits_pixels (test_pipeline.ScriptTests.test_unicode_fits_pixels) ... ok
+test_unknown_visual_rejected (test_pipeline.ScriptTests.test_unknown_visual_rejected) ... ok
+test_validator_rejects_missing_file (test_pipeline.ScriptTests.test_validator_rejects_missing_file) ... ok
+test_validator_rejects_real_silent_audio_fixture (test_pipeline.ScriptTests.test_validator_rejects_real_silent_audio_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.562s
+
+OK

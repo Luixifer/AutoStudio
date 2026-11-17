@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "managed_by": "autostudio-mvp",
+  "version": "0.2.0",
+  "title": "¿Cómo hay vida donde no llega la luz?",
+  "generated_utc": "2026-11-17T10:48:59.020175+00:00",
+  "execution": {
+    "context": "github-actions",
+    "github_repository": "Luixifer/AutoStudio",
+    "github_run_id": "44068185619",
+    "github_run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44068185619",
+    "git": {
+      "commit": "09592f1810bd294856b25a3f953e9b85d419a09c",
+      "worktree_dirty": false
+    },
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+  },
+  "video": {
+    "frames": 1027,
+    "fps": 25,
+    "duration_seconds": 41.08,
+    "size": [
+      720,
+      1280
+    ]
+  },
+  "narration": [
+    {
+      "engine": "eSpeak NG CLI",
+      "voice": "es",
+      "words_per_minute": 145,
+      "network_requests": 0
+    },
+    {
+      "engine": "eSpeak NG CLI",
+      "voice": "es",
+      "words_per_minute": 145,
+      "network_requests": 0
+    },
+    {
+      "engine": "eSpeak NG CLI",
+      "voice": "es",
+      "words_per_minute": 145,
+      "network_requests": 0
+    }
+  ],
+  "subtitle_timing": "Approximate chunk timing from text lengths, not forced alignment.",
+  "scenes": [
+    {
+      "scene": 1,
+      "visual": "ocean",
+      "voice_seconds": 10.104580498866213,
+      "video_seconds": 10.56,
+      "frames": 264,
+      "narration": "En el océano profundo, la luz del Sol deja de ser suficiente para la fotosíntesis. Pero la oscuridad no significa que no pueda haber vida."
+    },
+    {
+      "scene": 2,
+      "visual": "vent",
+      "voice_seconds": 12.86907029478458,
+      "video_seconds": 13.32,
+      "frames": 333,
+      "narration": "Cerca de ciertas fuentes hidrotermales, algunos microbios aprovechan la energía de reacciones químicas. Así producen materia orgánica. Este proceso se llama quimiosíntesis."
+    },
+    {
+      "scene": 3,
+      "visual": "microbes",
+      "voice_seconds": 16.738820861678004,
+      "video_seconds": 17.2,
+      "frames": 430,
+      "narration": "Estos microorganismos sostienen comunidades de animales. Eso no implica independencia total de la superficie. Algunas reacciones usan oxígeno producido por la fotosíntesis. Lo que ves son esquemas, no filmaciones submarinas."
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://oceanservice.noaa.gov/facts/vents.html",
+      "publisher": "NOAA Ocean Service",
+      "role": "Referencia aportada para fuentes hidrotermales y quimiosíntesis; comprobar editorialmente antes de publicar."
+    },
+    {
+      "url": "https://www.whoi.edu/know-your-ocean/ocean-topics/ocean-life/ecosystems/hydrothermal-vents/",
+      "publisher": "Woods Hole Oceanographic Institution",
+      "role": "Referencia aportada sobre ecosistemas hidrotermales; comprobar editorialmente antes de publicar."
+    }
+  ],
+  "source_verification": "Provided editorial references, not retrieved by the renderer; manual verification required before publication.",
+  "visual_disclosure": "Original animated diagrams, not real underwater footage or photorealistic AI video.",
+  "paid_api_requests": 0,
+  "youtube_publication": "disabled",
+  "elapsed_render_seconds": 10.34,
+  "script_sha256": "d9d93eb6b900f2ba25f196a4adc2781c9d373efce48d86c31d3d537dc0ade420",
+  "code_sha256": {
+    "narration.py": "cfd83547b3ab219beb3c6ee0529de0942db5f16d465e68e010fc820099b10edf",
+    "publish_result.py": "67a923cd09ebe630632a5bdcaa52b3455a89404a2ca7bcb9d1e5b090f9e97bf6",
+    "render.py": "090c29b6d99a92e0cb0c1ba3058695dd1375b289b5846fdde3c2186dd8d595e1",
+    "validate_video.py": "b46c8f6303cf9ecf876ebbe0dd2c3d94e9edac8fc663815cab8b985ece7fadc8",
+    "artwork.py": "986515c84ccf22cafb8969879cf324f4bea3a90f1d7dc04004e431f5b1d71669"
+  }
+}
