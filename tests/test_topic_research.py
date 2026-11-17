@@ -65,9 +65,9 @@ class ResearchTests(unittest.TestCase):
             urls.append(term)
             if len(urls) == 1:
                 return Response({"query": {"pages": [{
-                    "title": "Estrella compacta",
-                    "fullurl": "https://es.wikipedia.org/wiki/Estrella_compacta",
-                    "extract": "Las estrellas compactas son objetos astronómicos muy densos."}]}})
+                    "title": "Agujero negro",
+                    "fullurl": "https://es.wikipedia.org/wiki/Agujero_negro",
+                    "extract": "Los agujeros negros son objetos astronómicos muy densos."}]}})
             return Response({"query": {"pages": [{
                 "title": "Singularidad gravitacional",
                 "fullurl": "https://es.wikipedia.org/wiki/Singularidad_gravitacional",
@@ -77,6 +77,23 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertIn("horizonte", urls[1])
         self.assertEqual(results[1]["discovery_query"], urls[1])
+
+    def test_wikipedia_discovery_excludes_samsung_fiction_and_white_hole(self):
+        payload={"query":{"pages":[
+            {"title":"A Matter of Time (Stargate SG-1)",
+             "fullurl":"https://es.wikipedia.org/wiki/A_Matter_of_Time_(Stargate_SG-1)",
+             "extract":"La gravedad del agujero negro afecta al tiempo dentro del Comando Stargate."},
+            {"title":"Agujero blanco",
+             "fullurl":"https://es.wikipedia.org/wiki/Agujero_blanco",
+             "extract":"El agujero blanco es el reverso temporal de un agujero negro."},
+            {"title":"Horizonte de sucesos",
+             "fullurl":"https://es.wikipedia.org/wiki/Horizonte_de_sucesos",
+             "extract":"El horizonte de sucesos marca el límite de un agujero negro."},
+        ]}}
+        results=fetch_wikipedia_candidates(
+            "¿Qué ocurre dentro de un agujero negro?",
+            opener=lambda request,timeout: Response(payload))
+        self.assertEqual([entry["title"] for entry in results], ["Horizonte de sucesos"])
 
     def test_response_size_limit(self):
         class HugeResponse(Response):
