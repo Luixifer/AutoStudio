@@ -1,2 +1,3 @@
-REAL_VIDEO: /home/runner/work/AutoStudio/AutoStudio/output/ocean-20261117T104848Z-930767/short_ciencia_demo.mp4
-VALIDATED: e26c5500aaf0649db7c01ec3859a7ad68725e52d4c72a379443bee6dd70fbf6c SECONDS: 41.08 CONTEXT: github-actions
+[0;93m2026-11-17 11:29:08.091094892 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+REAL_VIDEO: /home/runner/work/AutoStudio/AutoStudio/output/ocean_v02-20261117T112908Z-5cd44b/short_ciencia_demo.mp4
+VALIDATED: 32d0735bc4a034d12c2f308cd50659d3b51ad09353e87ff9e98e3eb657fea8cd SECONDS: 34.44 CONTEXT: github-actions
