@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "errors": [],
+  "file": "short_ciencia_demo.mp4",
+  "bytes": 5292747,
+  "sha256": "dbe4e573f5cea50c34299ca667bb5ba812faa75b147d6259b1d4f48ff3e8ccd9",
+  "duration_seconds": 34.44,
+  "video": {
+    "codec": "h264",
+    "width": 720,
+    "height": 1280,
+    "pixel_format": "yuv420p",
+    "fps": "25/1",
+    "frames": "861"
+  },
+  "audio": {
+    "codec": "aac",
+    "channels": 2,
+    "sample_rate": 48000,
+    "decoded_rms_dbfs": -18.09,
+    "decoded_peak_dbfs": -1.41,
+    "active_100ms_windows_fraction": 0.8725,
+    "full_scale_samples_fraction": 0.0,
+    "scope": "Signal and decodability only; not speech recognition or an editorial quality approval."
+  },
+  "full_decode": "passed",
+  "fast_start": true,
+  "physical_samsung_tested": false
+}

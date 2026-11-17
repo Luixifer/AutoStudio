@@ -1,0 +1,108 @@
+{
+  "id": "ocean_v02",
+  "title": "Hay vida donde no llega el Sol",
+  "language": "es",
+  "editorial_status": "draft_requires_human_fact_check",
+  "sources": [
+    {
+      "url": "https://oceanservice.noaa.gov/facts/vents.html",
+      "publisher": "NOAA Ocean Service",
+      "role": "Referencia editorial aportada sobre fuentes hidrotermales y quimiosíntesis."
+    },
+    {
+      "url": "https://www.whoi.edu/know-your-ocean/ocean-topics/ocean-life/ecosystems/hydrothermal-vents/",
+      "publisher": "Woods Hole Oceanographic Institution",
+      "role": "Referencia editorial aportada sobre ecosistemas hidrotermales."
+    }
+  ],
+  "scenes": [
+    {
+      "visual": "ocean",
+      "asset": "seabed_wide",
+      "camera": "push",
+      "title": "Vida sin luz",
+      "caption": "La oscuridad no es un desierto.",
+      "voice": "Aquí no llega el Sol. Y, aun así, hay vida.",
+      "headline": "AQUÍ NO LLEGA EL SOL",
+      "scene_id": "s01"
+    },
+    {
+      "visual": "vent",
+      "asset": "closing",
+      "camera": "pan_left",
+      "title": "El océano profundo",
+      "caption": "Chimeneas en el fondo marino.",
+      "voice": "A miles de metros de profundidad, surgen chimeneas en el fondo marino.",
+      "scene_id": "s02"
+    },
+    {
+      "visual": "vent",
+      "asset": "vent_close",
+      "camera": "push",
+      "title": "Fuentes hidrotermales",
+      "caption": "Compuestos químicos, no llamas.",
+      "voice": "Expulsan agua caliente cargada de compuestos químicos.",
+      "scene_id": "s03"
+    },
+    {
+      "visual": "microbes",
+      "asset": "microbes",
+      "camera": "drift",
+      "title": "La energía invisible",
+      "caption": "Microbios y reacciones químicas.",
+      "voice": "Algunos microbios usan la energía de reacciones químicas para fabricar materia orgánica.",
+      "scene_id": "s04"
+    },
+    {
+      "visual": "microbes",
+      "asset": "microbes",
+      "camera": "pull",
+      "title": "Quimiosíntesis",
+      "caption": "Energía química.",
+      "voice": "Se llama quimiosíntesis.",
+      "headline": "QUIMIOSÍNTESIS",
+      "scene_id": "s05"
+    },
+    {
+      "visual": "ocean",
+      "asset": "community",
+      "camera": "pan_right",
+      "title": "Comunidades de animales",
+      "caption": "Una red alimentaria.",
+      "voice": "Sobre esa base crecen comunidades de animales.",
+      "scene_id": "s06"
+    },
+    {
+      "visual": "ocean",
+      "asset": "seabed_wide",
+      "camera": "pull",
+      "title": "Una conexión importante",
+      "caption": "El oxígeno de la superficie puede importar.",
+      "voice": "Pero no están completamente aisladas. Algunas reacciones necesitan oxígeno producido en la superficie.",
+      "scene_id": "s07"
+    },
+    {
+      "visual": "ocean",
+      "asset": "closing",
+      "camera": "push",
+      "title": "Otra forma de obtener energía",
+      "caption": "La oscuridad no implica ausencia de vida.",
+      "voice": "La oscuridad no es ausencia de vida. Es otra manera de obtener energía.",
+      "headline": "OTRA FORMA DE OBTENER ENERGÍA",
+      "scene_id": "s08"
+    }
+  ],
+  "provider": {
+    "id": "curated-local-v1",
+    "topic_id": "ocean-life",
+    "requested_topic": "Vida sin Sol en el fondo del mar",
+    "generative_ai": false
+  },
+  "production": {
+    "request_id": "c881d36b84bc46f0a1f574f8cc849d7d",
+    "topic": "Vida sin Sol en el fondo del mar",
+    "schema": 1,
+    "format": "short",
+    "script_provider": "curated-local-v1"
+  }
+}

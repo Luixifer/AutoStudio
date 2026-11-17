@@ -1,0 +1,4 @@
+[0;93m2026-11-17 13:50:51.104317227 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+REAL_VIDEO: /home/runner/work/AutoStudio/AutoStudio/output/ocean_v02-20261117T135051Z-c571d3/short_ciencia_demo.mp4
+VALIDATED: dbe4e573f5cea50c34299ca667bb5ba812faa75b147d6259b1d4f48ff3e8ccd9 SECONDS: 34.44 CONTEXT: github-actions
+PRODUCTION_REQUEST_CONFIRMED c881d36b84bc46f0a1f574f8cc849d7d

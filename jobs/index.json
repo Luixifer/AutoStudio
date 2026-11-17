@@ -1,6 +1,27 @@
 [
   {
     "schema": 1,
+    "request_id": "c881d36b84bc46f0a1f574f8cc849d7d",
+    "run_id": "44096684923",
+    "source_commit": "5d6c1b3c4924db01824b196cd3a27848eb5f48ea",
+    "repository": "Luixifer/AutoStudio",
+    "status": "completed",
+    "youtube_published": false,
+    "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44096684923",
+    "topic": "Vida sin Sol en el fondo del mar",
+    "title": "Hay vida donde no llega el Sol",
+    "video": {
+      "file": "short_ciencia_demo.mp4",
+      "sha256": "dbe4e573f5cea50c34299ca667bb5ba812faa75b147d6259b1d4f48ff3e8ccd9",
+      "bytes": 5292747,
+      "duration_seconds": 34.44,
+      "width": 720,
+      "height": 1280
+    },
+    "scene_plan": "scene-plan.json"
+  },
+  {
+    "schema": 1,
     "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
     "run_id": "44091290548",
     "source_commit": "a6fac97b13244f859193e2321a8e8a08b5b59b59",

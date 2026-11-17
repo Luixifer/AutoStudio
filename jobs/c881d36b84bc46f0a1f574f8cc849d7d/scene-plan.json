@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "request_id": "c881d36b84bc46f0a1f574f8cc849d7d",
+  "topic": "Vida sin Sol en el fondo del mar",
+  "format": "short",
+  "script_provider": "curated-local-v1",
+  "image_provider": "original-blender-library-v1",
+  "scenes": [
+    {
+      "id": "s01",
+      "narration": "Aquí no llega el Sol. Y, aun así, hay vida.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 3.12
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "seabed_wide",
+        "file": "assets/cinematic/seabed_wide.jpg",
+        "sha256": "921f39672ff60ee835b49d8642db4f5686dadf634dc3832dc579c8aae113ca8e"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0
+      },
+      "voice_seconds": 2.9879583333333333,
+      "timeline_start_seconds": 0
+    },
+    {
+      "id": "s02",
+      "narration": "A miles de metros de profundidad, surgen chimeneas en el fondo marino.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.52
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "closing",
+        "file": "assets/cinematic/closing.jpg",
+        "sha256": "b3d85229da4dfb7ff6fdd99ce469b8898170aae61e33d93c0dcc6f22b3ba3339"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_left",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 4.3966666666666665,
+      "timeline_start_seconds": 3.12
+    },
+    {
+      "id": "s03",
+      "narration": "Expulsan agua caliente cargada de compuestos químicos.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 3.68
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "vent_close",
+        "file": "assets/cinematic/vent_close.jpg",
+        "sha256": "630ee5c6282dcc150861e51759a16e111d20702a6318b9d6d3b7881c91709984"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 3.5532916666666665,
+      "timeline_start_seconds": 7.64
+    },
+    {
+      "id": "s04",
+      "narration": "Algunos microbios usan la energía de reacciones químicas para fabricar materia orgánica.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.64
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "microbes",
+        "file": "assets/cinematic/microbes.jpg",
+        "sha256": "9200ed451af1dcbdb187a7fc0e00c6100288ae87b85a7e6c12abf5a080682560"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 5.494625,
+      "timeline_start_seconds": 11.32
+    },
+    {
+      "id": "s05",
+      "narration": "Se llama quimiosíntesis.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 1.96
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "microbes",
+        "file": "assets/cinematic/microbes.jpg",
+        "sha256": "9200ed451af1dcbdb187a7fc0e00c6100288ae87b85a7e6c12abf5a080682560"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pull",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 1.8153333333333332,
+      "timeline_start_seconds": 16.96
+    },
+    {
+      "id": "s06",
+      "narration": "Sobre esa base crecen comunidades de animales.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 3.32
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "community",
+        "file": "assets/cinematic/community.jpg",
+        "sha256": "f76f1eb20236bbed10428d5b135b38c78f0566ef71ab7379487073e192debd33"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_right",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 3.1706666666666665,
+      "timeline_start_seconds": 18.92
+    },
+    {
+      "id": "s07",
+      "narration": "Pero no están completamente aisladas. Algunas reacciones necesitan oxígeno producido en la superficie.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 6.96
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "seabed_wide",
+        "file": "assets/cinematic/seabed_wide.jpg",
+        "sha256": "921f39672ff60ee835b49d8642db4f5686dadf634dc3832dc579c8aae113ca8e"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pull",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 6.84,
+      "timeline_start_seconds": 22.24
+    },
+    {
+      "id": "s08",
+      "narration": "La oscuridad no es ausencia de vida. Es otra manera de obtener energía.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.24
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "closing",
+        "file": "assets/cinematic/closing.jpg",
+        "sha256": "b3d85229da4dfb7ff6fdd99ce469b8898170aae61e33d93c0dcc6f22b3ba3339"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle"
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "voice_seconds": 4.608666666666666,
+      "timeline_start_seconds": 29.2
+    }
+  ],
+  "youtube": {
+    "enabled": false
+  },
+  "paid_api_allowed": false
+}
