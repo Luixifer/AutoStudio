@@ -1,0 +1,181 @@
+{
+  "id": "science_dna_v04",
+  "title": "Un mismo material genético, trabajos diferentes",
+  "language": "es",
+  "topic_id": "dna",
+  "science_domain": "Biología molecular",
+  "editorial_status": "authored_scientific_illustration_requires_human_review",
+  "asset_manifest": "assets/science_v04/dna/manifest.json",
+  "sources": [
+    {
+      "url": "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+      "publisher": "National Human Genome Research Institute",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    },
+    {
+      "url": "https://www.genome.gov/genetics-glossary/Gene-Expression",
+      "publisher": "NHGRI: expresión génica",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "s01",
+      "visual": "science",
+      "asset": "dna_01",
+      "camera": "push",
+      "title": "Mismas instrucciones, distintos trabajos",
+      "caption": "Mismas instrucciones, distintos trabajos",
+      "voice": "Muchas de tus células comparten las mismas instrucciones. Y hacen trabajos muy distintos.",
+      "animation": {
+        "topic": "dna",
+        "kind": "cell"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "headline": "UN MISMO ADN, DISTINTOS TRABAJOS"
+    },
+    {
+      "scene_id": "s02",
+      "visual": "science",
+      "asset": "dna_02",
+      "camera": "pan_right",
+      "title": "Una doble hélice",
+      "caption": "Una doble hélice",
+      "voice": "El material genético forma una doble hélice: dos cadenas con información en sus bases.",
+      "animation": {
+        "topic": "dna",
+        "kind": "helix"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s03",
+      "visual": "science",
+      "asset": "dna_03",
+      "camera": "drift",
+      "title": "Copiar antes de dividirse",
+      "caption": "Copiar antes de dividirse",
+      "voice": "Antes de dividirse, una célula duplica su material genético.",
+      "animation": {
+        "topic": "dna",
+        "kind": "replication"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s04",
+      "visual": "science",
+      "asset": "dna_04",
+      "camera": "push",
+      "title": "Una copia temporal",
+      "caption": "Una copia temporal",
+      "voice": "Para fabricar muchas proteínas, utiliza copias temporales de fragmentos de esa información.",
+      "animation": {
+        "topic": "dna",
+        "kind": "message"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s05",
+      "visual": "science",
+      "asset": "dna_05",
+      "camera": "pull",
+      "title": "De mensaje a proteína",
+      "caption": "De mensaje a proteína",
+      "voice": "Los ribosomas leen esos mensajes y ensamblan cadenas que formarán proteínas.",
+      "animation": {
+        "topic": "dna",
+        "kind": "protein"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s06",
+      "visual": "science",
+      "asset": "dna_06",
+      "camera": "pan_left",
+      "title": "Los genes se regulan",
+      "caption": "Los genes se regulan",
+      "voice": "No todos los genes se utilizan siempre. Las células regulan su actividad.",
+      "animation": {
+        "topic": "dna",
+        "kind": "regulation"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s07",
+      "visual": "science",
+      "asset": "dna_07",
+      "camera": "drift",
+      "title": "Distintas lecturas de la información",
+      "caption": "Distintas lecturas de la información",
+      "voice": "Cada tipo de célula activa genes diferentes, según sus señales y funciones.",
+      "animation": {
+        "topic": "dna",
+        "kind": "environment"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s08",
+      "visual": "science",
+      "asset": "dna_08",
+      "camera": "push",
+      "title": "Un libro, muchas lecturas",
+      "caption": "Un libro, muchas lecturas",
+      "voice": "Mismo libro de instrucciones. Lecturas diferentes para construir un organismo.",
+      "animation": {
+        "topic": "dna",
+        "kind": "finale"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "headline": "UN LIBRO, MUCHAS LECTURAS"
+    }
+  ],
+  "source_verification": {
+    "report": "research/source-check-20261117.json",
+    "retrieval_run_id": "44100546363",
+    "scope": "HTTP, page title and scientific text inspected; authored summary, not an automated truth guarantee.",
+    "human_editorial_approval": false
+  },
+  "provider": {
+    "id": "curated-local-v1",
+    "topic_id": "dna",
+    "requested_topic": "ADN: cómo usan las células sus instrucciones",
+    "generative_ai": false
+  },
+  "production": {
+    "request_id": "3f1f947696734d85976263f7228bfe0a",
+    "topic": "ADN: cómo usan las células sus instrucciones",
+    "schema": 1,
+    "format": "short",
+    "script_provider": "curated-local-v1",
+    "topic_id": "dna"
+  }
+}

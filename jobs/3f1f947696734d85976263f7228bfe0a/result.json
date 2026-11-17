@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "request_id": "3f1f947696734d85976263f7228bfe0a",
+  "run_id": "44106411816",
+  "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+  "repository": "Luixifer/AutoStudio",
+  "status": "completed",
+  "youtube_published": false,
+  "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44106411816",
+  "topic_id": "dna",
+  "topic": "ADN: cómo usan las células sus instrucciones",
+  "title": "Un mismo material genético, trabajos diferentes",
+  "video": {
+    "file": "short_ciencia_demo.mp4",
+    "sha256": "2f3c78e8dcdfb26834f8adc845396cfd363d9871d0d7adea38c154849fb2a62f",
+    "bytes": 4086584,
+    "duration_seconds": 42.64,
+    "width": 720,
+    "height": 1280
+  },
+  "scene_plan": "scene-plan.json"
+}

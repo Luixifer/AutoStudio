@@ -1,0 +1,335 @@
+{
+  "schema": 1,
+  "request_id": "3f1f947696734d85976263f7228bfe0a",
+  "topic": "ADN: cómo usan las células sus instrucciones",
+  "format": "short",
+  "script_provider": "curated-local-v1",
+  "image_provider": "original-blender-library-v1",
+  "scenes": [
+    {
+      "id": "s01",
+      "narration": "Muchas de tus células comparten las mismas instrucciones. Y hacen trabajos muy distintos.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.88
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_01",
+        "file": "assets/science_v04/dna/dna_01.jpg",
+        "sha256": "078aeb1a3f26794ac2f29b94e80aebe2e4ae0bdd1a1d6d6372f98067e835ba1c",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "cell"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 5.729291666666667,
+      "timeline_start_seconds": 0
+    },
+    {
+      "id": "s02",
+      "narration": "El material genético forma una doble hélice: dos cadenas con información en sus bases.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.88
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_02",
+        "file": "assets/science_v04/dna/dna_02.jpg",
+        "sha256": "72a31681b77cfed5fc00082e511ae63a1bfbfb8fff6bfb3ae526dadb3c1e3e11",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_right",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "helix"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 5.729291666666667,
+      "timeline_start_seconds": 5.88
+    },
+    {
+      "id": "s03",
+      "narration": "Antes de dividirse, una célula duplica su material genético.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.12
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_03",
+        "file": "assets/science_v04/dna/dna_03.jpg",
+        "sha256": "0de478cddf82d02cf58ff4cc32558ee7e1c54dcae21c6bc040971b0f935e62c9",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "replication"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 3.97,
+      "timeline_start_seconds": 11.76
+    },
+    {
+      "id": "s04",
+      "narration": "Para fabricar muchas proteínas, utiliza copias temporales de fragmentos de esa información.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 6.0
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_04",
+        "file": "assets/science_v04/dna/dna_04.jpg",
+        "sha256": "c8393af3b90f498cf9e1cc04025c06d9f13e47ecff2546f48768c17da846bfdc",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "message"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 5.857291666666667,
+      "timeline_start_seconds": 15.88
+    },
+    {
+      "id": "s05",
+      "narration": "Los ribosomas leen esos mensajes y ensamblan cadenas que formarán proteínas.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.16
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_05",
+        "file": "assets/science_v04/dna/dna_05.jpg",
+        "sha256": "f3cdd3809ff9498dc5d35941cd2b923bc9ed4fbb8a596c25a2b985b1897ae607",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pull",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "protein"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 5.015333333333333,
+      "timeline_start_seconds": 21.88
+    },
+    {
+      "id": "s06",
+      "narration": "No todos los genes se utilizan siempre. Las células regulan su actividad.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.84
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_06",
+        "file": "assets/science_v04/dna/dna_06.jpg",
+        "sha256": "f7ba2a9f5793227dac011c3c6d1bfd68e3758879da9e10239c9568d427c0d5f7",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_left",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "regulation"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 4.705291666666667,
+      "timeline_start_seconds": 27.04
+    },
+    {
+      "id": "s07",
+      "narration": "Cada tipo de célula activa genes diferentes, según sus señales y funciones.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.16
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_07",
+        "file": "assets/science_v04/dna/dna_07.jpg",
+        "sha256": "a246c85ffb13d89ead1afa24be0c7dd1a41b2e8dee85f84aca8b21f4d8a45a36",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "environment"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 5.003958333333333,
+      "timeline_start_seconds": 31.88
+    },
+    {
+      "id": "s08",
+      "narration": "Mismo libro de instrucciones. Lecturas diferentes para construir un organismo.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.6
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "dna_08",
+        "file": "assets/science_v04/dna/dna_08.jpg",
+        "sha256": "17852a96f1e84c69206213f9e570b7cff04115de67d6e1e6176653376b5d9a7e",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/dna_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "dna",
+          "kind": "finale"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "voice_seconds": 4.972666666666667,
+      "timeline_start_seconds": 37.04
+    }
+  ],
+  "youtube": {
+    "enabled": false
+  },
+  "paid_api_allowed": false,
+  "topic_id": "dna"
+}

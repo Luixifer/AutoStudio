@@ -1,0 +1,139 @@
+1
+00:00:00,079 --> 00:00:00,754
+Muchas de tus
+
+2
+00:00:00,804 --> 00:00:02,029
+células comparten las
+
+3
+00:00:02,079 --> 00:00:03,729
+mismas instrucciones.
+
+4
+00:00:03,804 --> 00:00:04,704
+Y hacen trabajos
+
+5
+00:00:04,754 --> 00:00:05,589
+muy distintos.
+
+6
+00:00:05,959 --> 00:00:07,184
+El material genético
+
+7
+00:00:07,309 --> 00:00:08,184
+forma una doble
+
+8
+00:00:08,209 --> 00:00:09,084
+hélice:
+
+9
+00:00:09,159 --> 00:00:09,984
+dos cadenas con
+
+10
+00:00:10,009 --> 00:00:10,959
+información en sus
+
+11
+00:00:11,009 --> 00:00:11,469
+bases.
+
+12
+00:00:11,839 --> 00:00:13,064
+Antes de dividirse,
+
+13
+00:00:13,114 --> 00:00:14,314
+una célula duplica
+
+14
+00:00:14,364 --> 00:00:15,600
+su material genético.
+
+15
+00:00:15,959 --> 00:00:17,159
+Para fabricar muchas
+
+16
+00:00:17,209 --> 00:00:19,184
+proteínas, utiliza copias
+
+17
+00:00:19,234 --> 00:00:20,584
+temporales de fragmentos
+
+18
+00:00:20,634 --> 00:00:21,597
+de esa información.
+
+19
+00:00:21,959 --> 00:00:23,159
+Los ribosomas leen
+
+20
+00:00:23,209 --> 00:00:24,459
+esos mensajes y
+
+21
+00:00:24,484 --> 00:00:25,659
+ensamblan cadenas que
+
+22
+00:00:25,709 --> 00:00:26,765
+formarán proteínas.
+
+23
+00:00:27,119 --> 00:00:27,744
+No todos los
+
+24
+00:00:27,794 --> 00:00:28,844
+genes se utilizan
+
+25
+00:00:28,894 --> 00:00:29,669
+siempre.
+
+26
+00:00:29,744 --> 00:00:30,869
+Las células regulan
+
+27
+00:00:30,919 --> 00:00:31,605
+su actividad.
+
+28
+00:00:31,959 --> 00:00:32,634
+Cada tipo de
+
+29
+00:00:32,709 --> 00:00:33,859
+célula activa genes
+
+30
+00:00:33,884 --> 00:00:35,434
+diferentes, según sus
+
+31
+00:00:35,484 --> 00:00:36,744
+señales y funciones.
+
+32
+00:00:37,119 --> 00:00:37,869
+Mismo libro de
+
+33
+00:00:37,894 --> 00:00:39,069
+instrucciones.
+
+34
+00:00:39,144 --> 00:00:40,494
+Lecturas diferentes para
+
+35
+00:00:40,544 --> 00:00:41,883
+construir un organismo.
