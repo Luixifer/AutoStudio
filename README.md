@@ -4,7 +4,11 @@ Fábrica experimental de vídeos científicos **sin APIs de pago ni publicación
 
 ## Usarlo desde tu Samsung, sin ordenador
 
-Cuando el código esté subido y GitHub Actions autorizado:
+El código ya está subido y la primera ejecución real de GitHub Actions ha terminado correctamente.
+
+[Descargar el MP4 verificado de 41,08 segundos](https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4) · [Ver ejecución real y sus pruebas](https://github.com/Luixifer/AutoStudio/actions/runs/44068185619)
+
+Para generar otro vídeo desde el móvil:
 
 1. Abre [Luixifer/AutoStudio](https://github.com/Luixifer/AutoStudio) en el navegador del móvil.
 2. En **Actions**, selecciona **Crear vídeo científico de prueba (sin YouTube)** → **Run workflow**.

@@ -31,9 +31,31 @@ Defectos detectados:
 
 Se ha generado y verificado un MP4 narrado real en el entorno Cloud de desarrollo. Eso no demuestra que GitHub Actions se haya ejecutado: las pruebas de GitHub se registrarán únicamente cuando una ejecución real pueda verificarse.
 
-El repositorio público `https://github.com/Luixifer/AutoStudio` existe y se ha leído su commit inicial. El intento de escritura por Git ha devuelto `Permission to Luixifer/AutoStudio.git denied to Luixifer` / HTTP 403. La API de GitHub también está bloqueada por la política de red del entorno. Son dos impedimentos distintos: lectura pública no equivale a permiso de escritura.
+El acceso de escritura se ha recuperado tras la actualización de permisos del usuario. Se recuperó el commit local `09592f1`, sin reconstruir ni sobrescribir el proyecto. Las 16 pruebas se repitieron antes de subirlo y pasaron.
 
-La autorización pendiente debe resolverse en la conexión GitHub de Codex, incluyendo el repositorio AutoStudio y permiso de escritura de su código y workflows. No se necesitan tokens pegados en el chat. La prueba se puede iniciar por etiqueta Git sin depender de la API cuando la escritura funcione.
+El código está en `main`. La etiqueta `render-recuperacion-20261117T104811Z` inició una ejecución real de GitHub Actions:
+
+- Ejecución: https://github.com/Luixifer/AutoStudio/actions/runs/44068185619
+- Commit de código ejecutado: `09592f1810bd294856b25a3f953e9b85d419a09c`.
+- Commit de resultados: `81eb7dfb0874b4483c86b45b1894f1a7bf1ff95b`, rama `video-preview`.
+- Las 16 pruebas también pasan en el runner real, según `video-preview/logs/unit-tests.txt`.
+- El workflow finalizó correctamente, incluida la publicación del resultado por Git.
+- Se descargó el MP4 público y se volvió a verificar su decodificación y hash fuera de Actions.
+
+La API de GitHub continúa bloqueada en este entorno; no ha impedido la ejecución: se activó por etiqueta Git y se verificó mediante la página pública y los archivos reales de la rama de resultados. El rechazo de escritura 403 anterior queda resuelto.
+
+### MP4 generado en GitHub
+
+- Duración: 41,08 segundos; 1027 fotogramas a 25 fps.
+- Imagen: H.264 / yuv420p, 720×1280.
+- Audio: eSpeak NG CLI, voz `es`, AAC estéreo de 48 kHz.
+- Tamaño: 1.642.620 bytes.
+- SHA-256: `e26c5500aaf0649db7c01ec3859a7ad68725e52d4c72a379443bee6dd70fbf6c`.
+- Audio decodificado: RMS −20,83 dBFS; pico −3,81 dBFS; sin muestras a escala completa; no es una evaluación semántica ni de naturalidad.
+- Descarga: https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4
+- Informes: https://github.com/Luixifer/AutoStudio/tree/video-preview
+
+La publicación en YouTube permanece desactivada. No se han utilizado servicios de IA facturados, GPU ni runners de pago. La prueba física y la valoración perceptiva en Samsung quedan a cargo del usuario.
 
 ## Evaluación de calidad
 
