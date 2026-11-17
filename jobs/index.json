@@ -1,6 +1,17 @@
 [
   {
     "schema": 1,
+    "request_id": "cd5513cf3da14e1c94dae0a8fbfe2fad",
+    "run_id": "44109110966",
+    "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+    "repository": "Luixifer/AutoStudio",
+    "status": "failed",
+    "youtube_published": false,
+    "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44109110966",
+    "message": "La generación no se completó. Revisa los registros de esta ejecución; no se mostrará otro vídeo como resultado."
+  },
+  {
+    "schema": 1,
     "request_id": "0bbc2f863ab14a00a647afe6d32d82d9",
     "run_id": "44108051606",
     "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
