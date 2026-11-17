@@ -62,4 +62,3 @@ jobs:
           print("BLACK_HOLE_RELEVANT_CANDIDATES:",len(candidates))
           print("BLACK_HOLE_STATUS:",report["narration_candidates"]["status"])
           PY
-          PY
