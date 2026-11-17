@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "request_id": "735925e6d8d94e50b45bc2b991c0df41",
+  "request_id": "f65676b0dced44008ff28e4dbe3b767d",
   "topic": "Auroras polares",
   "format": "short",
   "script_provider": "curated-local-v1",
@@ -11,7 +11,7 @@
       "narration": "El cielo no está ardiendo. Lo que ves son átomos emitiendo luz.",
       "duration": {
         "mode": "actual_audio_plus_pause",
-        "seconds": 4.4
+        "seconds": 4.44
       },
       "media": {
         "provider": "original-blender-library-v1",
@@ -43,7 +43,7 @@
         "https://spaceplace.nasa.gov/aurora/en/",
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
-      "voice_seconds": 4.269958333333333,
+      "voice_seconds": 4.28,
       "timeline_start_seconds": 0
     },
     {
@@ -84,7 +84,7 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 4.524666666666667,
-      "timeline_start_seconds": 4.4
+      "timeline_start_seconds": 4.44
     },
     {
       "id": "s03",
@@ -124,7 +124,7 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 5.399333333333334,
-      "timeline_start_seconds": 9.08
+      "timeline_start_seconds": 9.12
     },
     {
       "id": "s04",
@@ -164,7 +164,7 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 5.345291666666666,
-      "timeline_start_seconds": 14.6
+      "timeline_start_seconds": 14.64
     },
     {
       "id": "s05",
@@ -204,7 +204,7 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 4.129291666666667,
-      "timeline_start_seconds": 20.08
+      "timeline_start_seconds": 20.12
     },
     {
       "id": "s06",
@@ -244,14 +244,14 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 4.674,
-      "timeline_start_seconds": 24.36
+      "timeline_start_seconds": 24.4
     },
     {
       "id": "s07",
       "narration": "Por eso brillan cerca de los polos, donde el campo magnético guía muchas partículas.",
       "duration": {
         "mode": "actual_audio_plus_pause",
-        "seconds": 5.44
+        "seconds": 5.48
       },
       "media": {
         "provider": "original-blender-library-v1",
@@ -283,8 +283,8 @@
         "https://spaceplace.nasa.gov/aurora/en/",
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
-      "voice_seconds": 5.312625,
-      "timeline_start_seconds": 29.16
+      "voice_seconds": 5.352625,
+      "timeline_start_seconds": 29.2
     },
     {
       "id": "s08",
@@ -324,7 +324,7 @@
         "https://www.swpc.noaa.gov/phenomena/aurora"
       ],
       "voice_seconds": 4.261958333333333,
-      "timeline_start_seconds": 34.6
+      "timeline_start_seconds": 34.68
     }
   ],
   "youtube": {

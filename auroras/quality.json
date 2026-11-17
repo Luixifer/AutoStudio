@@ -2,13 +2,13 @@
   "profile": "cinematic",
   "shot_count": 8,
   "shot_duration_seconds": [
-    4.4,
+    4.44,
     4.68,
     5.52,
     5.48,
     4.28,
     4.8,
-    5.44,
+    5.48,
     4.88
   ],
   "short_dynamic_captions": true,
@@ -60,7 +60,7 @@
     {
       "scene": 7,
       "asset": "auroras_07",
-      "motion_mean_absolute_pixel_difference": 29.569,
+      "motion_mean_absolute_pixel_difference": 29.571,
       "caption_max_words": 3,
       "caption_max_lines": 1
     },

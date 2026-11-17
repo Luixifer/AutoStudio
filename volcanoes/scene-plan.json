@@ -1,0 +1,359 @@
+{
+  "schema": 1,
+  "request_id": "3e74587aa5bc4a34b81cdee0d260af1a",
+  "topic": "Volcanes: magma y lava",
+  "format": "short",
+  "script_provider": "curated-local-v1",
+  "image_provider": "original-blender-library-v1",
+  "scenes": [
+    {
+      "id": "s01",
+      "narration": "La Tierra no es una bola rellena de lava.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 2.96
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_01",
+        "file": "assets/science_v04/volcanoes/volcanoes_01.jpg",
+        "sha256": "3fd6bb2ff3fcf03340f8f72b08a906ecf78b9e1252084615cdd3e435e06d3338",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "landscape"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 2.818,
+      "timeline_start_seconds": 0
+    },
+    {
+      "id": "s02",
+      "narration": "La mayor parte del manto es roca sólida. Puede deformarse muy lentamente.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.16
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_02",
+        "file": "assets/science_v04/volcanoes/volcanoes_02.jpg",
+        "sha256": "3d79e0227e1b1c67d98d524a698e99f20282aff7d4eaad28523657852878d88c",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_right",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "mantle"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 5.025291666666667,
+      "timeline_start_seconds": 2.96
+    },
+    {
+      "id": "s03",
+      "narration": "En algunas zonas, una parte de esa roca se funde y forma magma.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.28
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_03",
+        "file": "assets/science_v04/volcanoes/volcanoes_03.jpg",
+        "sha256": "aae2d272ecf447c5ead14143be32188fe82e1a9f50679b3bb84c8729a942c2db",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "partial_melt"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 4.140666666666666,
+      "timeline_start_seconds": 8.12
+    },
+    {
+      "id": "s04",
+      "narration": "Si el magma asciende, la presión disminuye. Los gases pueden formar burbujas.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.48
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_04",
+        "file": "assets/science_v04/volcanoes/volcanoes_04.jpg",
+        "sha256": "e7ca9a60749a33277f2f49094fefc492caf335c7298c41e3cb0d543c76b72b5b",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "bubbles"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 5.335333333333334,
+      "timeline_start_seconds": 12.4
+    },
+    {
+      "id": "s05",
+      "narration": "Esas burbujas pueden expandirse y ayudar a impulsar una erupción.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.48
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_05",
+        "file": "assets/science_v04/volcanoes/volcanoes_05.jpg",
+        "sha256": "03c6d15eb2ba9e9b9b33e7d35e5c5d26e217b0fc06b882e8c428ef60408f5d68",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pull",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "eruption"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 4.332666666666666,
+      "timeline_start_seconds": 17.88
+    },
+    {
+      "id": "s06",
+      "narration": "Cuando el magma sale a la superficie, lo llamamos lava.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 3.6
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_06",
+        "file": "assets/science_v04/volcanoes/volcanoes_06.jpg",
+        "sha256": "9e119048826848222e44e4065b94dd0f82ca7574fa9e98f934d1f870679c52ba",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "pan_left",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "lava"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 3.469333333333333,
+      "timeline_start_seconds": 22.36
+    },
+    {
+      "id": "s07",
+      "narration": "La cantidad de gas y la viscosidad influyen en cómo ocurre la erupción.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 4.6
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_07",
+        "file": "assets/science_v04/volcanoes/volcanoes_07.jpg",
+        "sha256": "c5c14a936e8a38dea0d787770ca66a23833b3846d5159d6309ca3cb8b2a152e4",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "drift",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "viscosity"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 4.472,
+      "timeline_start_seconds": 25.96
+    },
+    {
+      "id": "s08",
+      "narration": "Un volcán no abre un océano de fuego. Revela procesos bajo tus pies.",
+      "duration": {
+        "mode": "actual_audio_plus_pause",
+        "seconds": 5.32
+      },
+      "media": {
+        "provider": "original-blender-library-v1",
+        "asset_id": "volcanoes_08",
+        "file": "assets/science_v04/volcanoes/volcanoes_08.jpg",
+        "sha256": "7aaa2426c42c9be89e083d222ca76f0623e2e3b47f83b4cbcd2a1ce264f6614a",
+        "license": "LicenseRef-AutoStudio-Original",
+        "credit": "Ilustración original AutoStudio",
+        "license_file": "assets/science_v04/LICENSE_ART.md",
+        "source": "sources/science_v04/volcanoes_master_v001.blend"
+      },
+      "subtitles": {
+        "mode": "model_word_durations",
+        "max_words": 3
+      },
+      "effects": {
+        "camera": "push",
+        "particles": "subtle",
+        "scientific_motion": {
+          "topic": "volcanoes",
+          "kind": "finale"
+        }
+      },
+      "transition": {
+        "type": "crossfade_from_previous",
+        "seconds": 0.18
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
+      ],
+      "voice_seconds": 4.718666666666667,
+      "timeline_start_seconds": 30.56
+    }
+  ],
+  "youtube": {
+    "enabled": false
+  },
+  "paid_api_allowed": false,
+  "topic_id": "volcanoes"
+}

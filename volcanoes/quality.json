@@ -1,0 +1,80 @@
+{
+  "profile": "cinematic",
+  "shot_count": 8,
+  "shot_duration_seconds": [
+    2.96,
+    5.16,
+    4.28,
+    5.48,
+    4.48,
+    3.6,
+    4.6,
+    5.32
+  ],
+  "short_dynamic_captions": true,
+  "max_words_per_caption": 3,
+  "timing_source": "same TTS inference phoneme durations",
+  "visual_checks": [
+    {
+      "scene": 1,
+      "asset": "volcanoes_01",
+      "motion_mean_absolute_pixel_difference": 5.02,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 2,
+      "asset": "volcanoes_02",
+      "motion_mean_absolute_pixel_difference": 27.935,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 3,
+      "asset": "volcanoes_03",
+      "motion_mean_absolute_pixel_difference": 61.916,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 4,
+      "asset": "volcanoes_04",
+      "motion_mean_absolute_pixel_difference": 32.497,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 5,
+      "asset": "volcanoes_05",
+      "motion_mean_absolute_pixel_difference": 12.656,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 6,
+      "asset": "volcanoes_06",
+      "motion_mean_absolute_pixel_difference": 13.1,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 7,
+      "asset": "volcanoes_07",
+      "motion_mean_absolute_pixel_difference": 13.329,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 8,
+      "asset": "volcanoes_08",
+      "motion_mean_absolute_pixel_difference": 5.649,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    }
+  ],
+  "caption_groups": 36,
+  "timed_words": 92,
+  "human_visual_or_voice_approval": false,
+  "word_coverage_passed": true,
+  "word_times_inside_audio": true
+}

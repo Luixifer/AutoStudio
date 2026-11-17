@@ -1,0 +1,80 @@
+{
+  "profile": "cinematic",
+  "shot_count": 8,
+  "shot_duration_seconds": [
+    5.88,
+    5.88,
+    4.12,
+    6.0,
+    5.16,
+    4.84,
+    5.16,
+    5.6
+  ],
+  "short_dynamic_captions": true,
+  "max_words_per_caption": 3,
+  "timing_source": "same TTS inference phoneme durations",
+  "visual_checks": [
+    {
+      "scene": 1,
+      "asset": "dna_01",
+      "motion_mean_absolute_pixel_difference": 26.395,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 2,
+      "asset": "dna_02",
+      "motion_mean_absolute_pixel_difference": 34.624,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 3,
+      "asset": "dna_03",
+      "motion_mean_absolute_pixel_difference": 49.577,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 4,
+      "asset": "dna_04",
+      "motion_mean_absolute_pixel_difference": 30.442,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    },
+    {
+      "scene": 5,
+      "asset": "dna_05",
+      "motion_mean_absolute_pixel_difference": 17.071,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    },
+    {
+      "scene": 6,
+      "asset": "dna_06",
+      "motion_mean_absolute_pixel_difference": 33.703,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 7,
+      "asset": "dna_07",
+      "motion_mean_absolute_pixel_difference": 29.868,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 8,
+      "asset": "dna_08",
+      "motion_mean_absolute_pixel_difference": 32.756,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    }
+  ],
+  "caption_groups": 35,
+  "timed_words": 93,
+  "human_visual_or_voice_approval": false,
+  "word_coverage_passed": true,
+  "word_times_inside_audio": true
+}
