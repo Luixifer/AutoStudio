@@ -19,52 +19,73 @@ MAX_BYTES = 500_000
 MAX_EXCERPT = 1200
 
 
+def focused_query(topic):
+    """Second search targeted to the user's *angle*, not a generic synonym dump."""
+    from scripts.narration_candidates import normalize
+    normalized = normalize(topic)
+    if not any(word in normalized.split() for word in ("dentro", "interior", "adentro")):
+        return None
+    # Ignore question syntax while preserving subject words.
+    words = [word for word in normalized.replace("¿", " ").replace("?", " ").split()
+             if word not in {"que", "ocurre", "pasa", "sucede", "en", "el", "la", "un", "una",
+                             "de", "del", "dentro", "interior", "adentro"}]
+    if not words:
+        return None
+    # For this type of question, an interior-focused query is more useful than
+    # a page merely mentioning masses, distances or nearby objects.
+    subject = " ".join(words[:7])
+    return subject + " interior horizonte"
+
+
 def fetch_wikipedia_candidates(topic, opener=urlopen):
-    """Collect up to three public page leads; links are NOT independent verification."""
-    params = {
-        "action": "query",
-        "generator": "search",
-        "gsrsearch": topic,
-        "gsrlimit": 3,
-        "prop": "extracts|info",
-        "exintro": "1",
-        "explaintext": "1",
-        "exchars": "1600",
-        "inprop": "url",
-        "format": "json",
-        "formatversion": "2",
-    }
-    url = WIKIPEDIA_API + "?" + urlencode(params)
-    request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
-    with opener(request, timeout=12) as response:
-        data = response.read(MAX_BYTES + 1)
-    if len(data) > MAX_BYTES:
-        raise ValueError("Respuesta de investigación demasiado grande.")
-    payload = json.loads(data.decode("utf-8"))
-    pages = payload.get("query", {}).get("pages", [])
-    if not isinstance(pages, list):
-        raise ValueError("Formato inesperado del proveedor de investigación.")
-    sources = []
-    for page in pages:
-        title = page.get("title")
-        link = page.get("fullurl")
-        excerpt = page.get("extract", "")
-        if not isinstance(title, str) or not isinstance(link, str) or not isinstance(excerpt, str):
-            continue
-        # Do not trust arbitrary URLs returned by an upstream service.
-        if not link.startswith("https://es.wikipedia.org/wiki/"):
-            continue
-        if not excerpt.strip():
-            continue
-        sources.append({
-            "provider": "Wikipedia en español",
-            "title": title[:200],
-            "url": link,
-            "excerpt": excerpt.strip()[:MAX_EXCERPT],
-            "evidence_level": "secondary_lead_only",
-            "license_note": "Resumen textual de Wikipedia: comprobar atribución y CC BY-SA antes de reutilizar.",
-        })
-    return sources
+    """Retrieve relevant encyclopaedia page leads; no independent verification."""
+    def query_pages(query):
+        params = {
+            "action": "query", "generator": "search", "gsrsearch": query,
+            "gsrlimit": 5, "prop": "extracts|info", "exintro": "1",
+            "explaintext": "1", "exchars": "1600", "inprop": "url",
+            "format": "json", "formatversion": "2",
+        }
+        url = WIKIPEDIA_API + "?" + urlencode(params)
+        request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+        with opener(request, timeout=12) as response:
+            data = response.read(MAX_BYTES + 1)
+        if len(data) > MAX_BYTES:
+            raise ValueError("Respuesta de investigación demasiado grande.")
+        payload = json.loads(data.decode("utf-8"))
+        pages = payload.get("query", {}).get("pages", [])
+        if not isinstance(pages, list):
+            raise ValueError("Formato inesperado del proveedor de investigación.")
+        return pages
+
+    # One extra public API query only for explicit 'inside' questions.
+    queries = [topic]
+    focused = focused_query(topic)
+    if focused:
+        queries.append(focused)
+    found = []
+    seen = set()
+    for query in queries:
+        for page in query_pages(query):
+            title = page.get("title")
+            link = page.get("fullurl")
+            excerpt = page.get("extract", "")
+            if not isinstance(title, str) or not isinstance(link, str) or not isinstance(excerpt, str):
+                continue
+            if not link.startswith("https://es.wikipedia.org/wiki/"):
+                continue
+            if link in seen or not excerpt.strip():
+                continue
+            seen.add(link)
+            found.append({
+                "provider": "Wikipedia en español",
+                "title": title[:200], "url": link,
+                "excerpt": excerpt.strip()[:MAX_EXCERPT],
+                "evidence_level": "secondary_lead_only",
+                "license_note": "Resumen de Wikipedia; comprobar CC BY-SA y atribución.",
+                "discovery_query": query,
+            })
+    return found[:8]
 
 
 def research_topic(topic, collector=fetch_wikipedia_candidates):
