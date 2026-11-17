@@ -1,5 +1,5 @@
 """Publish real debug APK + sanitized test evidence to a separate managed Git branch."""
-import hashlib,json,os,shutil,tempfile,zipfile
+import hashlib,json,os,re,shutil,tempfile,zipfile
 from pathlib import Path
 from urllib.parse import urlsplit
 from publish_result import ROOT,git
@@ -29,9 +29,12 @@ def main():
             with zipfile.ZipFile(stage/'AutoStudio-Control-0.3.0-lab.zip','w',zipfile.ZIP_DEFLATED) as z:
                 for name in [NAME,'SHA256SUMS']:z.write(stage/name,name)
         (stage/'reports').mkdir()
-        for name in ['unit-tests.txt','android-build.txt','android-instrumentation.txt','android-recovery.txt']:
+        for name in ['unit-tests.txt','android-build.txt','android-startup.txt','emulator.log','android-instrumentation.txt','android-recovery.txt']:
             f=ROOT/'reports'/name
-            if f.is_file():(stage/'reports'/name).write_text(f.read_text(errors='replace')[-100000:])
+            if f.is_file():
+                text=f.read_text(errors='replace')[-100000:]
+                text=re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)\b','[REDACTED]',text)
+                (stage/'reports'/name).write_text(text)
         if (ROOT/'reports/android-qa').is_dir():shutil.copytree(ROOT/'reports/android-qa',stage/'qa')
         exists=bool(git('ls-remote','--heads','origin','refs/heads/'+BRANCH,capture=True))
         if exists:
