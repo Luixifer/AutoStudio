@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: c84eae017b64d44e52c256c2ab63a5a03dd06815
+          ref: f5733af493136531acba015ed00d75809d1b391d
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -63,6 +63,25 @@ jobs:
           for source in dossier.get("sources", []):
               output.append(f"- **{safe(source.get('provider', 'Fuente'))}** · {safe(source.get('title', 'Sin título'))}: {safe(source.get('url', 'Sin enlace'))} ({safe(source.get('evidence_level', 'sin verificar'))})")
           output.extend(["", "**NASA:** enlaces seleccionados, sin extraer su contenido. **Crossref:** únicamente metadatos; la presencia de un DOI no verifica las afirmaciones ni garantiza revisión por pares."])
+          nasa = pkg.get("nasa_evidence", {})
+          output.extend([
+              "",
+              "### Pasajes localizados en páginas oficiales NASA (en inglés, sin verificar)",
+              f"**Pasajes recuperados:** {len(nasa.get('passages', []))}",
+              f"**Errores de lectura:** {len(nasa.get('errors', []))}",
+          ])
+          for item in nasa.get("passages", [])[:5]:
+              # Display a brief, explicitly incomplete snippet to avoid
+              # presenting truncated page content as a scientific conclusion.
+              excerpt = safe(item.get("excerpt_original_en", "")[:145])
+              output.append(
+                  f"- {safe(item.get('source_title', 'NASA'))}: "
+                  f"{safe(item.get('source_url', ''))} — "
+                  f"**Inicio del pasaje:** «{excerpt}…»"
+              )
+          if not nasa.get("passages"):
+              output.append("- No se han podido extraer pasajes pertinentes de las páginas consultadas.")
+          output.append("Los pasajes son pistas textuales sin comprobación editorial; no son un guion ni están aprobados para narración.")
           extractive = pkg.get("narration_candidates", {})
           output.extend(["", "### Fragmentos de narración extraídos de fuentes (NO es un guion original)"])
           for quote in extractive.get("candidates", []):
