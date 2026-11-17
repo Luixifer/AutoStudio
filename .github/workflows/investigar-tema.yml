@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 1bfddc06df046b4fe98477974ac4dea0f7309100
+          ref: aa5efec33cec0b24a279e74d86cddcba0eb04ce3
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -58,6 +58,23 @@ jobs:
           ]
           for source in dossier.get("sources", []):
               output.append(f"- {safe(source.get('title', 'Sin título'))}: {safe(source.get('url', 'Sin enlace'))}")
+          extractive = pkg.get("narration_candidates", {})
+          output.extend(["", "### Fragmentos de narración extraídos de fuentes (NO es un guion original)"])
+          for quote in extractive.get("candidates", []):
+              output.append(
+                  f"- **Cita textual pendiente de revisión:** «{safe(quote.get('source_excerpt_exact', ''))}» "
+                  f"— {safe(quote.get('source_title', 'Wikipedia'))}, "
+                  f"{safe(quote.get('source_url', ''))}"
+              )
+          if not extractive.get("candidates"):
+              output.append("- No se han localizado frases completas utilizables. No se inventará narración.")
+          output.extend([
+              "",
+              "Estas frases son extractos literales de Wikipedia, con sus respectivos enlaces,",
+              "sujetos a **[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.es)**",
+              "salvo condiciones diferentes indicadas en cada página. No son un guion original,",
+              "no se ha verificado su exactitud científica y **no están autorizadas para voz o publicación**.",
+          ])
           output.extend(["", "### Escenas previstas (borrador)"])
           for scene in pkg["storyboard"]["scenes"]:
               output.append(f"- {safe(scene['role'])}: {safe(scene['editorial_question'])}")
