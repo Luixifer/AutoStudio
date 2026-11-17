@@ -23,5 +23,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify new free-topic contracts without network or paid APIs
-        run: python -m unittest discover -s tests -p 'test_topic_*.py' -v
+        run: |
+          python -m unittest discover -s tests -p 'test_topic_*.py' -v
           python -m unittest discover -s tests -p 'test_storyboard_draft.py' -v
