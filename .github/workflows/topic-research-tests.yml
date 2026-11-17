@@ -10,6 +10,7 @@ on:
       - 'scripts/source_quality.py'
       - 'scripts/external_sources.py'
       - 'scripts/nasa_reading.py'
+      - 'scripts/spanish_draft.py'
       - 'tests/test_topic_intake.py'
       - 'tests/test_topic_research.py'
       - 'tests/test_storyboard_draft.py'
@@ -18,6 +19,7 @@ on:
       - 'tests/test_source_quality.py'
       - 'tests/test_external_sources.py'
       - 'tests/test_nasa_reading.py'
+      - 'tests/test_spanish_draft.py'
       - '.github/workflows/topic-research-tests.yml'
   workflow_dispatch:
 permissions:
@@ -41,6 +43,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_quality.py' -v
           python -m unittest discover -s tests -p 'test_external_sources.py' -v
           python -m unittest discover -s tests -p 'test_nasa_reading.py' -v
+          python -m unittest discover -s tests -p 'test_spanish_draft.py' -v
       - name: Probe public research access for a new topic (non-blocking)
         run: |
           python -m scripts.research_pipeline "¿Por qué vemos siempre la misma cara de la Luna?" --out-dir /tmp/autostudio-research
@@ -73,5 +76,10 @@ jobs:
           evidence=report["nasa_evidence"]
           print("BLACK_HOLE_NASA_PASSAGES:",len(evidence["passages"]))
           print("BLACK_HOLE_NASA_ERRORS:",len(evidence["errors"]))
+          draft=report["spanish_draft"]
+          print("BLACK_HOLE_SPANISH_DRAFT_SCENES:",len(draft["scenes"]))
+          print("BLACK_HOLE_SPANISH_DRAFT_WORDS:",draft["word_count"])
+          assert not draft["can_render"]
+          assert all(s["reference_url"].startswith("https://science.nasa.gov/") for s in draft["scenes"])
           assert all(not p["ready_for_narration"] for p in evidence["passages"])
           PY
