@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 import wave
 from pathlib import Path
+from scripts.preview_visuals import draw_scene_art, scene_visual_signature
 
 WIDTH, HEIGHT, FPS = 720, 1280, 25
 FONT_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -68,11 +69,8 @@ def frame(scene, index, count, output):
     heading=ImageFont.truetype(FONT_BOLD,47)
     small=ImageFont.truetype(FONT_REGULAR,24)
     badge=ImageFont.truetype(FONT_BOLD,23)
-    # Generic, original schematic; no NASA imagery and no claim of physical accuracy.
-    cx,cy=WIDTH//2,330
-    for radius,color in [(240,(18,46,73)),(196,(31,73,105)),(145,(47,95,131)),
-                         (104,(221,129,57)),(93,(245,190,102)),(76,(5,10,20))]:
-        d.ellipse((cx-radius,cy-radius,cx+radius,cy+radius),fill=color)
+    # Original diagrams tied to the scientific concept in each scene.
+    draw_scene_art(d,scene.get("role",""),width=WIDTH,top=95,bottom=585)
     d.text((48,40),"AUTOSTUDIO 0.4 · PRUEBA",font=badge,fill=(185,209,238))
     d.rounded_rectangle((32,575,WIDTH-32,1150),radius=24,fill=(14,30,54))
     y=610
@@ -117,7 +115,9 @@ def produce(package, directory):
         subprocess.run([
             "ffmpeg","-y","-loglevel","error",
             "-loop","1","-framerate",str(FPS),"-i",str(still),"-i",str(audio),
-            "-t",str(round(seconds,3)),"-c:v","libx264","-preset","veryfast",
+            "-t",str(round(seconds,3)),"-vf",
+            "zoompan=z='min(zoom+0.00024,1.085)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=720x1280:fps=25",
+            "-c:v","libx264","-preset","veryfast",
             "-pix_fmt","yuv420p","-c:a","aac","-b:a","96k",
             "-af","apad","-movflags","+faststart",str(video)
         ],check=True,timeout=120)
@@ -140,7 +140,8 @@ def produce(package, directory):
         "scientifically_approved":False,
         "youtube_enabled":False,
         "paid_inference":False,
-        "visuals":"Original non-scientific schematic cards, not footage or simulation",
+        "visuals":"Distinct conceptual schematic illustrations and slow zoom; not footage or simulation",
+        "visual_role_signatures":[scene_visual_signature(scene["role"]) for scene in scenes],
         "audio":"eSpeak NG offline Spanish (experimental quality)",
         "references":[s["reference_url"] for s in scenes],
     }
