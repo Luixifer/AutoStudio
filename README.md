@@ -2,6 +2,12 @@
 
 Fábrica experimental de vídeos científicos con programas libres y **sin APIs de pago ni publicación en YouTube**. Montaje reproducible en GitHub Actions, administrable desde el móvil. No es un generador cinematográfico autónomo terminado.
 
+## Prueba 0.2 ya ejecutada
+
+[**Descargar el nuevo MP4 de 34,44 segundos**](https://github.com/Luixifer/AutoStudio/raw/efed2972fdad05c364512744fdf45ef1e1776ec3/short_ciencia_demo.mp4) · [Actions: SUCCESS, 34 pruebas](https://github.com/Luixifer/AutoStudio/actions/runs/44074329488) · [Comparativa real](docs/images/02-before-after.jpg)
+
+Se descargó el resultado de Actions y se volvió a verificar. La nueva base mejora montaje y subtítulos; las ilustraciones siguen siendo estilizadas y la voz necesita tu evaluación. No se declara calidad cinematográfica final.
+
 ## Generar y descargar desde tu Samsung
 
 1. Abre [Actions](https://github.com/Luixifer/AutoStudio/actions/workflows/create-short.yml) → **Run workflow**.

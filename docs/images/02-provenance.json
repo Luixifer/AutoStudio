@@ -1,0 +1,18 @@
+{
+  "method": "FFmpeg frame extraction from the actual GitHub Actions MP4s, then identical downsampling for a contact sheet; no concept images",
+  "current_result_commit": "efed2972fdad05c364512744fdf45ef1e1776ec3",
+  "current_run": "44074329488",
+  "current_mp4_sha256": "32d0735bc4a034d12c2f308cd50659d3b51ad09353e87ff9e98e3eb657fea8cd",
+  "baseline_result_commit": "81eb7dfb0874b4483c86b45b1894f1a7bf1ff95b",
+  "before_after_time_seconds": 1.2,
+  "contact_sheet_times_seconds": [
+    1.2,
+    5,
+    9,
+    14,
+    18,
+    22,
+    27,
+    32
+  ]
+}
