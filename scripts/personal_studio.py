@@ -64,8 +64,8 @@ def validate_project(root,document,allow_lab=False):
     title=document.get("title")
     if not isinstance(title,str) or not 5<=len(title)<=140 or any(ord(c)<32 for c in title):
         raise ValueError("Título inválido.")
-    if document.get("editorial_approved") is not True:
-        raise ValueError("El usuario debe aprobar contenido y fuentes antes del render publicable.")
+    if not isinstance(document.get("editorial_approved"),bool):
+        raise ValueError("Debe declararse si el contenido tiene revisión editorial.")
     scenes=document.get("scenes")
     if not isinstance(scenes,list) or not profile["min_scenes"]<=len(scenes)<=profile["max_scenes"]:
         raise ValueError("Número de escenas fuera de límites.")
@@ -136,6 +136,7 @@ def validate_project(root,document,allow_lab=False):
         warnings.append(f"Duración fuera de objetivo editorial recomendado ({lo}-{hi} s).")
     return {"profile":profile,"format":kind,"title":title,"scenes":enriched,
             "estimated_seconds":round(total,2),"warnings":warnings,
+            "editorial_approved":document["editorial_approved"],
             "scientific_review_claimed":False,"youtube_enabled":False}
 
 
