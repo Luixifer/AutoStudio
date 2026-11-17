@@ -6,6 +6,7 @@
     <activity android:name="com.luixifer.autostudio.MainActivity" android:exported="true" android:screenOrientation="portrait"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
     <activity android:name="com.luixifer.autostudio.SettingsActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.ResearchActivity" android:exported="false"/>
+    <activity android:name="com.luixifer.autostudio.ResearchVideosActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.PlayerActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.LibraryActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.ScenesActivity" android:exported="false"/>
