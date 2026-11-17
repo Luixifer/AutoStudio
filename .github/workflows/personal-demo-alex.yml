@@ -7,6 +7,7 @@ on:
       - 'scripts/personal_studio.py'
       - 'scripts/personal_editor.py'
       - 'scripts/personal_quality.py'
+      - 'scripts/personal_youtube_pack.py'
       - '.github/workflows/personal-demo-alex.yml'
   workflow_dispatch:
 permissions:
@@ -43,8 +44,7 @@ jobs:
       - name: Preparar ficha editorial y miniatura sin publicar
         run: |
           python -m scripts.personal_youtube_pack \
-            /tmp/autostudio-aurora/input/auroras-personal.json
-            /tmp/autostudio-aurora/publication-draft/* \
+            /tmp/autostudio-aurora/input/auroras-personal.json \
             /tmp/autostudio-aurora/render/quality-report.json \
             --out /tmp/autostudio-aurora/publication-draft
           test -s /tmp/autostudio-aurora/publication-draft/youtube-draft.txt
@@ -58,5 +58,6 @@ jobs:
             /tmp/autostudio-aurora/render/captions.srt
             /tmp/autostudio-aurora/render/quality-report.json
             /tmp/autostudio-aurora/input/auroras-personal.json
+            /tmp/autostudio-aurora/publication-draft/*
           if-no-files-found: error
           retention-days: 7
