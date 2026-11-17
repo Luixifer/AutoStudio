@@ -1,0 +1,38 @@
+{
+  "auroras": {
+    "sources": [
+      {
+        "name": "NASA Space Place",
+        "url": "https://spaceplace.nasa.gov/aurora/en/"
+      },
+      {
+        "name": "NOAA Space Weather Prediction Center",
+        "url": "https://www.swpc.noaa.gov/phenomena/aurora"
+      }
+    ]
+  },
+  "dna": {
+    "sources": [
+      {
+        "name": "National Human Genome Research Institute",
+        "url": "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet"
+      },
+      {
+        "name": "NHGRI: expresión génica",
+        "url": "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      }
+    ]
+  },
+  "volcanoes": {
+    "sources": [
+      {
+        "name": "US Geological Survey",
+        "url": "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava"
+      },
+      {
+        "name": "British Geological Survey",
+        "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      }
+    ]
+  }
+}

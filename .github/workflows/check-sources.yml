@@ -1,0 +1,17 @@
+name: AutoStudio · Consultar fuentes científicas
+on:
+  workflow_dispatch:
+  push:
+    tags: ['sources-*']
+permissions:
+  contents: read
+jobs:
+  sources:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - run: python3 scripts/check_science_sources.py

@@ -1,11 +1,99 @@
 {
-  "schema":1,
-  "provider":"curated-local-v1",
-  "scope":"Guiones científicos locales revisados como borradores. No generación abierta ni investigación autónoma.",
-  "topics":[
-    {"id":"ocean-life","name":"Vida sin Sol en el fondo del mar","examples":["Vida sin Sol en el fondo del mar","Fuentes hidrotermales","Quimiosíntesis"],"keywords":["oceano","fondo del mar","vida sin sol","hidroterm","quimiosint","mar profundo","abisal"],"story":"scripts/ocean_v02.json"}
+  "schema": 2,
+  "provider": "curated-local-v1",
+  "scope": "Cuatro temas publicados con guiones redactados y arte original; no generación sobre temas arbitrarios.",
+  "topics": [
+    {
+      "id": "ocean-life",
+      "name": "Vida sin Sol en el fondo del mar",
+      "examples": [
+        "Vida sin Sol en el fondo del mar",
+        "Fuentes hidrotermales",
+        "Quimiosíntesis"
+      ],
+      "keywords": [
+        "oceano",
+        "fondo del mar",
+        "vida sin sol",
+        "hidroterm",
+        "quimiosint",
+        "mar profundo",
+        "abisal"
+      ],
+      "story": "scripts/ocean_v02.json",
+      "published": true
+    },
+    {
+      "id": "auroras",
+      "name": "Auroras polares",
+      "examples": [
+        "Auroras polares"
+      ],
+      "keywords": [
+        "auroras",
+        "aurora",
+        "aurora boreal",
+        "aurora polar",
+        "viento solar",
+        "luces polares"
+      ],
+      "story": "content/stories/auroras.json",
+      "asset_manifest": "assets/science_v04/auroras/manifest.json",
+      "published": true
+    },
+    {
+      "id": "dna",
+      "name": "El material genético no es un destino",
+      "examples": [
+        "El material genético no es un destino"
+      ],
+      "keywords": [
+        "adn",
+        "genetico",
+        "genetica",
+        "genes",
+        "doble helice"
+      ],
+      "story": "content/stories/dna.json",
+      "asset_manifest": "assets/science_v04/dna/manifest.json",
+      "published": true
+    },
+    {
+      "id": "volcanoes",
+      "name": "Volcanes: magma y lava",
+      "examples": [
+        "Volcanes: magma y lava"
+      ],
+      "keywords": [
+        "volcan",
+        "volcanes",
+        "magma",
+        "lava",
+        "manto terrestre"
+      ],
+      "story": "content/stories/volcanoes.json",
+      "asset_manifest": "assets/science_v04/volcanoes/manifest.json",
+      "published": true
+    }
   ],
-  "formats":{"short":{"enabled":true,"max_seconds":150},"documentary":{"enabled":false,"reason":"Requiere más contenido, validación editorial y presupuesto de ejecución; no disponible en este incremento."}},
-  "youtube":{"enabled":false},
-  "future_providers":{"chatgpt":{"enabled":false,"network_calls_allowed":false,"reason":"Integración de contrato únicamente; no hay cliente ni clave API."}}
+  "formats": {
+    "short": {
+      "enabled": true,
+      "max_seconds": 150
+    },
+    "documentary": {
+      "enabled": false,
+      "reason": "Requiere más contenido, validación editorial y presupuesto de ejecución; no disponible en este incremento."
+    }
+  },
+  "youtube": {
+    "enabled": false
+  },
+  "future_providers": {
+    "chatgpt": {
+      "enabled": false,
+      "network_calls_allowed": false,
+      "reason": "Integración de contrato únicamente; no hay cliente ni clave API."
+    }
+  }
 }

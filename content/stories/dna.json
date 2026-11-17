@@ -1,0 +1,161 @@
+{
+  "id": "science_dna_v04",
+  "title": "Tu material genético no es una profecía",
+  "language": "es",
+  "topic_id": "dna",
+  "science_domain": "Biología molecular",
+  "editorial_status": "authored_scientific_illustration_requires_human_review",
+  "asset_manifest": "assets/science_v04/dna/manifest.json",
+  "sources": [
+    {
+      "publisher": "National Human Genome Research Institute",
+      "url": "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+    },
+    {
+      "publisher": "NHGRI: expresión génica",
+      "url": "https://www.genome.gov/genetics-glossary/Gene-Expression",
+      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "s01",
+      "visual": "science",
+      "asset": "dna_01",
+      "camera": "push",
+      "title": "Instrucciones, no una profecía",
+      "caption": "Instrucciones, no una profecía",
+      "voice": "Llevas instrucciones en casi todas tus células. Pero no son una profecía.",
+      "animation": {
+        "topic": "dna",
+        "kind": "cell"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "headline": "TUS GENES NO SON UNA PROFECÍA"
+    },
+    {
+      "scene_id": "s02",
+      "visual": "science",
+      "asset": "dna_02",
+      "camera": "pan_right",
+      "title": "Una doble hélice",
+      "caption": "Una doble hélice",
+      "voice": "El material genético forma una doble hélice: dos cadenas con información en sus bases.",
+      "animation": {
+        "topic": "dna",
+        "kind": "helix"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s03",
+      "visual": "science",
+      "asset": "dna_03",
+      "camera": "drift",
+      "title": "Copiar antes de dividirse",
+      "caption": "Copiar antes de dividirse",
+      "voice": "Antes de dividirse, una célula duplica su material genético.",
+      "animation": {
+        "topic": "dna",
+        "kind": "replication"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s04",
+      "visual": "science",
+      "asset": "dna_04",
+      "camera": "push",
+      "title": "Una copia temporal",
+      "caption": "Una copia temporal",
+      "voice": "Para fabricar muchas proteínas, utiliza copias temporales de fragmentos de esa información.",
+      "animation": {
+        "topic": "dna",
+        "kind": "message"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s05",
+      "visual": "science",
+      "asset": "dna_05",
+      "camera": "pull",
+      "title": "De mensaje a proteína",
+      "caption": "De mensaje a proteína",
+      "voice": "Los ribosomas leen esos mensajes y ensamblan cadenas que formarán proteínas.",
+      "animation": {
+        "topic": "dna",
+        "kind": "protein"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s06",
+      "visual": "science",
+      "asset": "dna_06",
+      "camera": "pan_left",
+      "title": "Los genes se regulan",
+      "caption": "Los genes se regulan",
+      "voice": "No todos los genes se utilizan siempre. Las células regulan su actividad.",
+      "animation": {
+        "topic": "dna",
+        "kind": "regulation"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s07",
+      "visual": "science",
+      "asset": "dna_07",
+      "camera": "drift",
+      "title": "Genes y ambiente",
+      "caption": "Genes y ambiente",
+      "voice": "Tus variantes genéticas importan. También influyen el ambiente y la historia de tu organismo.",
+      "animation": {
+        "topic": "dna",
+        "kind": "environment"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ]
+    },
+    {
+      "scene_id": "s08",
+      "visual": "science",
+      "asset": "dna_08",
+      "camera": "push",
+      "title": "Información no es destino",
+      "caption": "Información no es destino",
+      "voice": "Por eso, tener un gen no significa tener un destino escrito.",
+      "animation": {
+        "topic": "dna",
+        "kind": "finale"
+      },
+      "sources": [
+        "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
+        "https://www.genome.gov/genetics-glossary/Gene-Expression"
+      ],
+      "headline": "INFORMACIÓN, NO DESTINO"
+    }
+  ]
+}

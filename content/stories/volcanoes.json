@@ -1,0 +1,161 @@
+{
+  "id": "science_volcanoes_v04",
+  "title": "La Tierra no está rellena de lava",
+  "language": "es",
+  "topic_id": "volcanoes",
+  "science_domain": "Geología y vulcanología",
+  "editorial_status": "authored_scientific_illustration_requires_human_review",
+  "asset_manifest": "assets/science_v04/volcanoes/manifest.json",
+  "sources": [
+    {
+      "publisher": "US Geological Survey",
+      "url": "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+    },
+    {
+      "publisher": "British Geological Survey",
+      "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/",
+      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "s01",
+      "visual": "science",
+      "asset": "volcanoes_01",
+      "camera": "push",
+      "title": "Una idea equivocada",
+      "caption": "Una idea equivocada",
+      "voice": "La Tierra no es una bola rellena de lava.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "landscape"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ],
+      "headline": "LA TIERRA NO ESTÁ RELLENA DE LAVA"
+    },
+    {
+      "scene_id": "s02",
+      "visual": "science",
+      "asset": "volcanoes_02",
+      "camera": "pan_right",
+      "title": "Roca sólida que se deforma",
+      "caption": "Roca sólida que se deforma",
+      "voice": "La mayor parte del manto es roca sólida. Puede deformarse muy lentamente.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "mantle"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s03",
+      "visual": "science",
+      "asset": "volcanoes_03",
+      "camera": "drift",
+      "title": "Fusión parcial",
+      "caption": "Fusión parcial",
+      "voice": "En algunas zonas, una parte de esa roca se funde y forma magma.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "partial_melt"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s04",
+      "visual": "science",
+      "asset": "volcanoes_04",
+      "camera": "push",
+      "title": "Gases y presión",
+      "caption": "Gases y presión",
+      "voice": "Si el magma asciende, la presión disminuye. Los gases pueden formar burbujas.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "bubbles"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s05",
+      "visual": "science",
+      "asset": "volcanoes_05",
+      "camera": "pull",
+      "title": "La expansión de los gases",
+      "caption": "La expansión de los gases",
+      "voice": "Esas burbujas pueden expandirse y ayudar a impulsar una erupción.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "eruption"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s06",
+      "visual": "science",
+      "asset": "volcanoes_06",
+      "camera": "pan_left",
+      "title": "Magma y lava",
+      "caption": "Magma y lava",
+      "voice": "Cuando el magma sale a la superficie, lo llamamos lava.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "lava"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s07",
+      "visual": "science",
+      "asset": "volcanoes_07",
+      "camera": "drift",
+      "title": "No todas las erupciones son iguales",
+      "caption": "No todas las erupciones son iguales",
+      "voice": "La cantidad de gas y la viscosidad influyen en cómo ocurre la erupción.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "viscosity"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ]
+    },
+    {
+      "scene_id": "s08",
+      "visual": "science",
+      "asset": "volcanoes_08",
+      "camera": "push",
+      "title": "Procesos bajo tus pies",
+      "caption": "Procesos bajo tus pies",
+      "voice": "Un volcán no abre un océano de fuego. Revela procesos bajo tus pies.",
+      "animation": {
+        "topic": "volcanoes",
+        "kind": "finale"
+      },
+      "sources": [
+        "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+      ],
+      "headline": "PROCESOS BAJO TUS PIES"
+    }
+  ]
+}
