@@ -5,7 +5,7 @@ ANDROID_HOME/ANDROID_SDK_ROOT and a full JDK 17+ are required. Debug signing onl
 import hashlib,json,os,shutil,subprocess,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];PROJECT=ROOT/'android';OUT=ROOT/'build/android'
-PACKAGE='com.luixifer.autostudio.lab05';APP_NAME='AutoStudio-Control-0.5.0-lab.apk'
+PACKAGE='com.luixifer.autostudio.lab06';APP_NAME='AutoStudio-Control-0.6.0-lab.apk'
 def run(*args):subprocess.run([str(x) for x in args],check=True)
 def main():
     sdk=Path(os.environ.get('ANDROID_HOME',os.environ.get('ANDROID_SDK_ROOT','/nonexistent')));java=Path(os.environ.get('JAVA_HOME','/nonexistent'))
@@ -40,7 +40,7 @@ def main():
         with zipfile.ZipFile(work/'test-base.apk','a') as z:
             for f in testdex.glob('*.dex'):z.write(f,f.name,compress_type=zipfile.ZIP_STORED)
         sign(work/'test-base.apk',OUT/'autostudio-instrumentation.apk')
-    info={'schema':1,'application_id':PACKAGE,'version_name':'0.5.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
+    info={'schema':1,'application_id':PACKAGE,'version_name':'0.6.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
     info['published_topic_ids']=[t['id'] for t in json.loads((ROOT/'content/catalog.json').read_text())['topics'] if t.get('published',True)]
     info['catalog_sha256']=hashlib.sha256((ROOT/'content/catalog.json').read_bytes()).hexdigest()
     (OUT/'apk-info.json').write_text(json.dumps(info,indent=2)+'\n');(OUT/'SHA256SUMS').write_text(info['sha256']+'  '+target.name+'\n');print('REAL_APK',target)
