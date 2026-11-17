@@ -174,7 +174,7 @@ def produce(manifest,out,allow_lab=False):
                "-t",f"{seconds:.4f}","-movflags","+faststart",segment,timeout=180)
         parts.append(segment)
         all_cues.extend([{"start":c["start"]+offset,"end":c["end"]+offset,"text":c["text"]} for c in cues])
-        shot_info.append({"scene":i,"image_sha256":entry["image_sha256"],
+        shot_info.append({"scene":i,"heading":raw.get("heading",project["title"]),"image_sha256":entry["image_sha256"],
                           "voice_sha256":entry["audio_sha256"],
                           "camera":entry["camera"],"seconds":seconds,
                           "caption_groups":len(cues)})
@@ -190,6 +190,14 @@ def produce(manifest,out,allow_lab=False):
         for i,c in enumerate(all_cues,1)),encoding="utf-8")
     from scripts.personal_quality import inspect_production
     report=inspect_production(final,project,shot_info,srt)
+    from scripts.personal_visual_audit import inspect_visuals
+    visual=inspect_visuals(final,shot_info,work,format_name=project["format"])
+    report["visual_audit"]=visual
+    report["warnings"].extend(visual["warnings"])
+    if visual["technical_errors"]:
+        report["errors"].extend(visual["technical_errors"])
+        report["technical_passed"]=False
+        report["status"]="rejected"
     (work/"quality-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if not report["technical_passed"]:
         raise RuntimeError("Vídeo rechazado por QA: "+str(report["errors"]))

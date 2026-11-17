@@ -23,6 +23,13 @@ class LiveRenderTests(unittest.TestCase):
             self.assertLess(report["seconds"],10)
             self.assertFalse(report["ready_to_publish"])
             self.assertFalse(report["youtube_enabled"])
+            self.assertTrue((output/"visual-audit.json").is_file())
+            self.assertTrue((output/"contacto-planos.jpg").is_file())
+            visual=report["visual_audit"]
+            self.assertEqual(visual["shots_checked"],2)
+            self.assertFalse(visual["technical_errors"])
+            self.assertFalse(visual["visual_human_reviewed"])
+            self.assertEqual(len(visual["sample_timestamps"]),2)
             self.assertTrue((output/"captions.srt").is_file())
             self.assertTrue((output/"autostudio-personal-REVIEW.mp4").is_file())
             self.assertEqual(len(report["sha256"]),64)
