@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from scripts.topic_intake import prepare_topic
+from scripts.source_quality import valid_science_lead
 
 WIKIPEDIA_API = "https://es.wikipedia.org/w/api.php"
 USER_AGENT = "AutoStudio-Research/0.4 (educational; GitHub Luixifer/AutoStudio)"
@@ -75,6 +76,8 @@ def fetch_wikipedia_candidates(topic, opener=urlopen):
             if not link.startswith("https://es.wikipedia.org/wiki/"):
                 continue
             if link in seen or not excerpt.strip():
+                continue
+            if not valid_science_lead(topic, title, excerpt):
                 continue
             seen.add(link)
             found.append({
