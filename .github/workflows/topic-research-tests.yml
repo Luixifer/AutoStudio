@@ -29,3 +29,17 @@ jobs:
           python -m unittest discover -s tests -p 'test_topic_*.py' -v
           python -m unittest discover -s tests -p 'test_storyboard_draft.py' -v
           python -m unittest discover -s tests -p 'test_research_pipeline.py' -v
+      - name: Probe public research access for a new topic (non-blocking)
+        run: |
+          python -m scripts.research_pipeline "¿Por qué vemos siempre la misma cara de la Luna?" --out-dir /tmp/autostudio-research
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          items=list(Path("/tmp/autostudio-research").glob("*.json"))
+          assert len(items)==1
+          result=json.loads(items[0].read_text(encoding="utf-8"))
+          assert result["safe_for_render"] is False, "Un tema sin guion aprobado no debe renderizarse"
+          print("PUBLIC_RESEARCH_STATUS:",result["dossier"].get("research",{}).get("status"))
+          print("PUBLIC_RESEARCH_LEADS:",len(result["dossier"].get("sources",[])))
+          print("No se ha generado ninguna narración, imagen ni MP4.")
+          PY
