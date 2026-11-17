@@ -1,0 +1,40 @@
+name: AutoStudio · Validar tres Shorts de Fase A
+on:
+  workflow_dispatch:
+  push:
+    tags: ['science-review-*']
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-phase-a-review
+  cancel-in-progress: false
+jobs:
+  review:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas y regresiones
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          mkdir -p reports
+          .venv/bin/python -m unittest discover -s tests -v > reports/unit-tests.txt 2>&1
+      - name: Ejecutar cada tema real y descargar sus MP4
+        env:
+          GH_REVIEW_TOKEN: ${{ github.token }}
+        run: .venv/bin/python -u scripts/review_phase_a.py
+      - name: Conservar evidencia real de los tres resultados
+        if: ${{ always() }}
+        env:
+          AUTOSTUDIO_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/publish_phase_a_review.py

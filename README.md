@@ -2,6 +2,12 @@
 
 Fábrica experimental de vídeos científicos con programas libres y **sin APIs de pago ni publicación en YouTube**. Montaje reproducible en GitHub Actions, administrable desde el móvil. No es un generador cinematográfico autónomo terminado.
 
+## AutoStudio 0.4 — Fase A en revisión
+
+Tres temas nuevos fuera del océano: auroras polares, ADN y expresión celular, volcanes. Hay guiones, 24 ilustraciones originales, maestros Blender y un selector de catálogo en una APK 0.4 independiente. [Alcance y límites](docs/PHASE_A_04.md) · [Pruebas reales de los tres temas](https://github.com/Luixifer/AutoStudio/actions/workflows/review-phase-a.yml).
+
+Los enlaces verificados de vídeos y APK se añadirán después de las ejecuciones, no por tener el código preparado. La cola y el tema libre no están implementados. La versión 0.3 estable permanece debajo.
+
 ## Aplicación Android de control — incremento 0.3
 
 [Guía de instalación, conexión y prueba desde Samsung](android/README.md) · [Arquitectura y límites](docs/ANDROID_ARCHITECTURE.md)

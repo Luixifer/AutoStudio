@@ -7,13 +7,15 @@ import android.widget.*;
 import org.json.*;
 
 public final class MainActivity extends Activity implements JobController.Listener {
-    private EditText topic;private TextView status,connection;private Button generate,play,scenes,logs;private JobController jobs;
+    private Spinner topic;private TextView status,connection;private Button generate,play,scenes,logs;private JobController jobs;
     @Override public void onCreate(Bundle saved){super.onCreate(saved);jobs=((AutoStudioApp)getApplication()).jobs();LinearLayout body=Ui.scroll(this,Ui.root(this,"AutoStudio"));
-        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.3\nVídeos en la nube, sin ordenador ni APIs de pago.");
+        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.4\nVídeos en la nube, sin ordenador ni APIs de pago.");
         LinearLayout c=Ui.card(body);connection=Ui.para(c,"");connection.setId(Ui.CONNECTION);Ui.button(c,"Conectar / ajustes de GitHub",Ui.SETTINGS,false).setOnClickListener(v->startActivity(new Intent(this,SettingsActivity.class)));
-        LinearLayout form=Ui.card(body);form.addView(Ui.text(this,"¿Qué vamos a contar?",20,true));Ui.para(form,"Esta primera versión utiliza el guion y arte gratuitos del océano profundo. Ejemplos: fuentes hidrotermales, quimiosíntesis o vida sin Sol. Otros temas y documentales aún no están habilitados.");
-        topic=new EditText(this);topic.setId(Ui.TOPIC);topic.setTextSize(17);topic.setText("Vida sin Sol en el fondo del mar");topic.setHint("Tema del Short");topic.setSingleLine(true);topic.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);topic.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(160)});form.addView(topic,new LinearLayout.LayoutParams(-1,Ui.dp(this,58)));
-        generate=Ui.button(form,"Generar Short",Ui.GENERATE,true);generate.setOnClickListener(v->{try{jobs.start(topic.getText().toString());}catch(Exception e){Ui.error(this,e.getMessage());}});
+        LinearLayout form=Ui.card(body);form.addView(Ui.text(this,"¿Qué vamos a contar?",20,true));Ui.para(form,"Elige un tema publicado. Cada uno tiene su propio guion e ilustraciones. La generación sobre temas arbitrarios, los documentales y la cola aún no están habilitados.");
+        topic=new Spinner(this);topic.setId(Ui.TOPIC);
+        try{java.util.List<TopicCatalog.Topic> choices=TopicCatalog.load(this);ArrayAdapter<TopicCatalog.Topic> adapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,choices);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);topic.setAdapter(adapter);}catch(Exception e){Ui.error(this,"No se pudo cargar el catálogo publicado. No se enviará ningún trabajo.");}
+        form.addView(topic,new LinearLayout.LayoutParams(-1,Ui.dp(this,60)));
+        generate=Ui.button(form,"Generar Short",Ui.GENERATE,true);generate.setOnClickListener(v->{try{if(topic.getSelectedItem()==null)throw new Exception("No hay un tema disponible.");jobs.start(((TopicCatalog.Topic)topic.getSelectedItem()).name);}catch(Exception e){Ui.error(this,e.getMessage());}});
         Ui.para(form,"El tema, guion, vídeo y registros se guardan en el repositorio público Luixifer/AutoStudio. No introduzcas información privada. YouTube permanece desactivado.");
         LinearLayout progress=Ui.card(body);progress.addView(Ui.text(this,"Tu producción",20,true));status=Ui.para(progress,"Todavía no hay una producción.");status.setId(Ui.STATUS);
         Ui.button(progress,"Consultar estado",1010,false).setOnClickListener(v->jobs.refresh());

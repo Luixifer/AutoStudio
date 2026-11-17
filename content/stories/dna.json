@@ -1,6 +1,6 @@
 {
   "id": "science_dna_v04",
-  "title": "Tu material genético no es una profecía",
+  "title": "Un mismo material genético, trabajos diferentes",
   "language": "es",
   "topic_id": "dna",
   "science_domain": "Biología molecular",
@@ -8,14 +8,14 @@
   "asset_manifest": "assets/science_v04/dna/manifest.json",
   "sources": [
     {
-      "publisher": "National Human Genome Research Institute",
       "url": "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "publisher": "National Human Genome Research Institute",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     },
     {
-      "publisher": "NHGRI: expresión génica",
       "url": "https://www.genome.gov/genetics-glossary/Gene-Expression",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "publisher": "NHGRI: expresión génica",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     }
   ],
   "scenes": [
@@ -24,9 +24,9 @@
       "visual": "science",
       "asset": "dna_01",
       "camera": "push",
-      "title": "Instrucciones, no una profecía",
-      "caption": "Instrucciones, no una profecía",
-      "voice": "Llevas instrucciones en casi todas tus células. Pero no son una profecía.",
+      "title": "Mismas instrucciones, distintos trabajos",
+      "caption": "Mismas instrucciones, distintos trabajos",
+      "voice": "Muchas de tus células comparten las mismas instrucciones. Y hacen trabajos muy distintos.",
       "animation": {
         "topic": "dna",
         "kind": "cell"
@@ -35,7 +35,7 @@
         "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
         "https://www.genome.gov/genetics-glossary/Gene-Expression"
       ],
-      "headline": "TUS GENES NO SON UNA PROFECÍA"
+      "headline": "MISMAS INSTRUCCIONES, DISTINTOS TRABAJOS"
     },
     {
       "scene_id": "s02",
@@ -127,9 +127,9 @@
       "visual": "science",
       "asset": "dna_07",
       "camera": "drift",
-      "title": "Genes y ambiente",
-      "caption": "Genes y ambiente",
-      "voice": "Tus variantes genéticas importan. También influyen el ambiente y la historia de tu organismo.",
+      "title": "Distintas lecturas de la información",
+      "caption": "Distintas lecturas de la información",
+      "voice": "Cada tipo de célula activa genes diferentes, según sus señales y funciones.",
       "animation": {
         "topic": "dna",
         "kind": "environment"
@@ -144,9 +144,9 @@
       "visual": "science",
       "asset": "dna_08",
       "camera": "push",
-      "title": "Información no es destino",
-      "caption": "Información no es destino",
-      "voice": "Por eso, tener un gen no significa tener un destino escrito.",
+      "title": "Un libro, muchas lecturas",
+      "caption": "Un libro, muchas lecturas",
+      "voice": "Mismo libro de instrucciones. Lecturas diferentes para construir un organismo.",
       "animation": {
         "topic": "dna",
         "kind": "finale"
@@ -155,7 +155,13 @@
         "https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet",
         "https://www.genome.gov/genetics-glossary/Gene-Expression"
       ],
-      "headline": "INFORMACIÓN, NO DESTINO"
+      "headline": "UN LIBRO, MUCHAS LECTURAS"
     }
-  ]
+  ],
+  "source_verification": {
+    "report": "research/source-check-20261117.json",
+    "retrieval_run_id": "44100546363",
+    "scope": "HTTP, page title and scientific text inspected; authored summary, not an automated truth guarantee.",
+    "human_editorial_approval": false
+  }
 }

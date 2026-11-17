@@ -8,14 +8,14 @@
   "asset_manifest": "assets/science_v04/auroras/manifest.json",
   "sources": [
     {
-      "publisher": "NASA Space Place",
       "url": "https://spaceplace.nasa.gov/aurora/en/",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "publisher": "NASA Space Place",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     },
     {
-      "publisher": "NOAA Space Weather Prediction Center",
       "url": "https://www.swpc.noaa.gov/phenomena/aurora",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "publisher": "NOAA Space Weather Prediction Center",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     }
   ],
   "scenes": [
@@ -157,5 +157,11 @@
       ],
       "headline": "ENERGÍA CONVERTIDA EN COLOR"
     }
-  ]
+  ],
+  "source_verification": {
+    "report": "research/source-check-20261117.json",
+    "retrieval_run_id": "44100546363",
+    "scope": "HTTP, page title and scientific text inspected; authored summary, not an automated truth guarantee.",
+    "human_editorial_approval": false
+  }
 }

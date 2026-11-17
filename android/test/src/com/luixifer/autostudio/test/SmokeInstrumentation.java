@@ -35,10 +35,17 @@ public final class SmokeInstrumentation extends Instrumentation {
                 },60,"Real GitHub connection could not be saved");
                 require(!getTargetContext().getSharedPreferences("private_connection",0).getAll().toString().contains(testToken),"Credential found in plaintext preferences");evidence.put("credential_encrypted",true);
                 await(settings::isFinishing,5,"Settings did not return");waitForIdleSync();
-                runOnMainSync(()->{((EditText)initial.findViewById(Ui.TOPIC)).setText("Quimiosíntesis: vida sin Sol en el océano profundo");initial.findViewById(Ui.GENERATE).performClick();});
+                runOnMainSync(()->{
+                    Spinner selector=(Spinner)initial.findViewById(Ui.TOPIC);int found=-1;
+                    for(int i=0;i<selector.getCount();i++)if(((TopicCatalog.Topic)selector.getItemAtPosition(i)).id.equals("auroras"))found=i;
+                    if(found<0)throw new AssertionError("Published auroras topic missing from real selector");selector.setSelection(found);
+                });
+                waitForIdleSync();runOnMainSync(()->initial.findViewById(Ui.GENERATE).performClick());
+                evidence.put("selected_topic_id","auroras").put("bundled_published_topics",TopicCatalog.load(getTargetContext()).size());
                 JobController jobs=((AutoStudioApp)initial.getApplication()).jobs();await(()->jobs.snapshot().has("request_id"),10,"No request was persisted");String id=jobs.snapshot().getString("request_id");require(GitHubClient.validId(id),"Invalid persisted request ID");
                 ActivityMonitor recreated=addMonitor(MainActivity.class.getName(),null,false);runOnMainSync(initial::recreate);MainActivity replacement=(MainActivity)recreated.waitForActivityWithTimeout(10000);require(replacement!=null,"Activity recreation failed");require(jobs.snapshot().getString("request_id").equals(id),"Request changed across recreation");evidence.put("activity_recreation_preserved_request",true);
                 await(()->{String status=jobs.snapshot().optString("status");if(status.equals("FAILED"))throw new Exception("Production failed: "+jobs.snapshot().optString("message")+" "+jobs.snapshot().optString("run_url"));return status.equals("READY");},600,"Cloud production did not become READY within 10 minutes");
+                require(jobs.snapshot().getJSONObject("result").optString("topic_id").equals("auroras"),"Selected topic did not match actual production");
                 evidence.put("request_id",id).put("run_id",jobs.snapshot().optString("run_id")).put("run_url",jobs.snapshot().optString("run_url"));checkPlayback(replacement,jobs,id);
             }else{
                 JobController jobs=((AutoStudioApp)initial.getApplication()).jobs();JSONObject restored=jobs.snapshot();require(restored.optString("status").equals("READY"),"Result not restored after process stop");require(new CredentialStore(getTargetContext()).connected(),"Encrypted connection not restored after process stop");require(jobs.history().length()==1,"Unexpected duplicate production history");String id=restored.getString("request_id");evidence.put("request_id",id).put("process_restart_preserved_result",true);checkPlayback(initial,jobs,id);

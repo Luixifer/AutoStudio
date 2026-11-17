@@ -35,6 +35,6 @@ def main():
         time.sleep(2)
     else:raise RuntimeError('Android did not finish booting within five minutes.')
     for args in [('wm','size','450x800'),('wm','density','160'),('settings','put','global','window_animation_scale','0'),('settings','put','global','transition_animation_scale','0'),('settings','put','global','animator_duration_scale','0'),('input','keyevent','82')]:run('adb','shell',*args)
-    run('adb','install','build/android/AutoStudio-Control-0.3.0-lab.apk');run('adb','install','build/android/autostudio-instrumentation.apk')
+    run('adb','install','build/android/AutoStudio-Control-0.4.0-lab.apk');run('adb','install','build/android/autostudio-instrumentation.apk')
     print('Actual Android 15 booted and both APKs installed.',flush=True)
 if __name__=='__main__':main()

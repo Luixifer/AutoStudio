@@ -1,4 +1,4 @@
-name: AutoStudio · APK Android y prueba integral
+name: AutoStudio · APK Android 0.4 y prueba integral
 run-name: AutoStudio · Android LAB · ${{ github.ref_name }}
 on:
   workflow_dispatch:
@@ -55,22 +55,22 @@ jobs:
         env:
           ANDROID_TEST_GITHUB_TOKEN: ${{ github.token }}
         run: |
-          adb shell am instrument -w -r -e mode full -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.lab.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-instrumentation.txt
+          adb shell am instrument -w -r -e mode full -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.lab04.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-instrumentation.txt
           echo "ANDROID_USER_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
           echo "ANDROID_AVD_HOME=$RUNNER_TEMP/autostudio-android/avd" >> "$GITHUB_ENV"
           echo "ANDROID_EMULATOR_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
           mkdir -p reports/android-qa/full
-          for name in full.json 01-control.png 02-ready.png 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab cat "files/qa/full/$name" > "reports/android-qa/full/$name"; done
+          for name in full.json 01-control.png 02-ready.png 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab04 cat "files/qa/full/$name" > "reports/android-qa/full/$name"; done
           python -c 'import json; r=json.load(open("reports/android-qa/full/full.json")); print(json.dumps(r,indent=2)); assert r["passed"] and r["native_video_frame_rendered"]'
       - name: Reiniciar proceso y comprobar conservación sin otro render
         run: |
-          adb shell am force-stop com.luixifer.autostudio.lab
-          adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.lab.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-recovery.txt
+          adb shell am force-stop com.luixifer.autostudio.lab04
+          adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.lab04.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-recovery.txt
           echo "ANDROID_USER_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
           echo "ANDROID_AVD_HOME=$RUNNER_TEMP/autostudio-android/avd" >> "$GITHUB_ENV"
           echo "ANDROID_EMULATOR_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
           mkdir -p reports/android-qa/recovery
-          for name in recovery.json 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab cat "files/qa/recovery/$name" > "reports/android-qa/recovery/$name"; done
+          for name in recovery.json 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab04 cat "files/qa/recovery/$name" > "reports/android-qa/recovery/$name"; done
           python -c 'import json; r=json.load(open("reports/android-qa/recovery/recovery.json")); print(json.dumps(r,indent=2)); assert r["passed"] and r["process_restart_preserved_result"]'
       - name: Publicar APK e informe de esta ejecución
         if: ${{ always() }}

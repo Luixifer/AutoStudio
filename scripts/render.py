@@ -27,7 +27,7 @@ def load_story(path):
         url=urlsplit(source.get('url',''))
         if url.scheme!='https' or not url.hostname or url.username or url.password:raise ValueError('Sources must be HTTPS references without credentials.')
     for s in scenes:
-        if not isinstance(s,dict) or s.get('visual') not in {'ocean','vent','microbes'}:raise ValueError('Unknown schematic.')
+        if not isinstance(s,dict) or s.get('visual') not in {'ocean','vent','microbes','science'}:raise ValueError('Unknown schematic.')
         for key,limit in [('title',120),('caption',180),('voice',4000)]:
             if not isinstance(s.get(key),str) or not s[key].strip() or len(s[key])>limit:raise ValueError('Invalid '+key)
     return data
@@ -53,6 +53,7 @@ def main():
     for tool in ['ffmpeg','ffprobe']:
         if not shutil.which(tool):raise RuntimeError('Missing required free program: '+tool)
     args.script=args.script or ROOT/('scripts/ocean_v02.json' if args.profile=='cinematic' else 'scripts/ocean.json');data=load_story(args.script);stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ');out=args.out/(data['id']+'-'+stamp+'-'+uuid.uuid4().hex[:6]);out.mkdir(parents=True)
+    if args.profile=='classic' and any(s['visual']=='science' for s in data['scenes']):raise ValueError('Scientific stories require their cinematic assets; no classic/ocean fallback.')
     started=time.monotonic();segments=[];scene_info=[];all_cues=[];all_words=[];samples_per_scene=[];total_frames=0;voice_info=[];previous_visual=None;visual_checks=[]
     cinematic=args.profile=='cinematic';narrator=None;assets=None
     if cinematic:
@@ -60,7 +61,7 @@ def main():
         from scripts.neural_narration import NeuralNarrator
         from scripts.cinematic import CinematicArtwork,verify_assets
         from scripts.subtitles import group_words,caption_at
-        narrator=NeuralNarrator();assets=verify_assets()
+        narrator=NeuralNarrator();assets=verify_assets(data.get('asset_manifest'))
     for number,scene in enumerate(data['scenes'],1):
         wav=out/f'scene_{number:02d}.wav';voice_info.append(narrator.synthesize(scene['voice'],wav) if cinematic else synthesize(scene['voice'],wav))
         with wave.open(str(wav),'rb') as audio:
@@ -108,7 +109,7 @@ def main():
         from scripts.soundscape import write_ambience
         ambience=out/'ambience.wav';cursor=0;cuts=[]
         for item in scene_info[:-1]:cursor+=item['video_seconds'];cuts.append(cursor)
-        sound_info=write_ambience(ambience,total_frames/FPS,cuts)
+        sound_info=write_ambience(ambience,total_frames/FPS,cuts,theme=data.get('topic_id','ocean'))
         cmd=['ffmpeg','-y','-v','error','-f','concat','-safe','0','-i',str(listing),'-i',str(voice),'-i',str(ambience),'-filter_complex','[1:a]aformat=channel_layouts=stereo,apad,loudnorm=I=-16:LRA=7:TP=-1.5[v];[2:a]volume=0.42[b];[v][b]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.84:level=false[a]','-map','0:v:0','-map','[a]','-c:v','copy','-c:a','aac','-b:a','128k','-ar','48000','-ac','2','-t',str(total_frames/FPS),'-movflags','+faststart',str(final)]
     else:
         cmd=['ffmpeg','-y','-v','error','-f','concat','-safe','0','-i',str(listing),'-i',str(voice),'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','128k','-ar','48000','-ac','2','-af','apad,loudnorm=I=-16:LRA=7:TP=-1.5','-t',str(total_frames/FPS),'-movflags','+faststart',str(final)]
@@ -122,7 +123,11 @@ def main():
         if len(all_words)!=sum(len(s['voice'].split()) for s in data['scenes']):raise ValueError('Caption transcript word coverage mismatch.')
         if any(w['end']<=w['start'] for w in all_words) or all_words[-1]['end']>total_frames/FPS:raise ValueError('Timed words outside mux timeline.')
         quality['word_coverage_passed']=True;quality['word_times_inside_audio']=True
-        metadata['asset_manifest_sha256']=hashlib.sha256((ROOT/'assets/cinematic/manifest.json').read_bytes()).hexdigest()
+        metadata['asset_manifest_sha256']=hashlib.sha256((ROOT/(data.get('asset_manifest') or 'assets/cinematic/manifest.json')).read_bytes()).hexdigest()
+        if data.get('topic_id'):
+            metadata['visual_disclosure']='Original scientific illustrations; qualitative and not to scale. Not real recordings, measured molecular structures or a physical simulation.'
+            metadata['topic_id']=data['topic_id']
+            metadata['source_verification']=data.get('source_verification','Editorial references require review.')
     (out/'quality.json').write_text(json.dumps(quality,ensure_ascii=False,indent=2)+'\n')
     (out/'word-timings.json').write_text(json.dumps({'method':quality['timing_source'],'words':all_words,'human_verified':False},ensure_ascii=False,indent=2)+'\n')
     (out/'metadata.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

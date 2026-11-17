@@ -8,14 +8,29 @@
   "asset_manifest": "assets/science_v04/volcanoes/manifest.json",
   "sources": [
     {
-      "publisher": "US Geological Survey",
       "url": "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "publisher": "USGS: magma and lava",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     },
     {
-      "publisher": "British Geological Survey",
-      "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/",
-      "role": "Referencia científica para revisión editorial; no se utilizan imágenes de esta fuente."
+      "url": "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+      "publisher": "USGS: eruption mechanisms",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    },
+    {
+      "url": "https://pubs.usgs.gov/gip/dynamic/inside.html",
+      "publisher": "USGS: inside the Earth",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    },
+    {
+      "url": "https://pubs.usgs.gov/gip/volc/eruptions.html",
+      "publisher": "USGS: eruptions",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
+    },
+    {
+      "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/",
+      "publisher": "BGS volcanoes overview",
+      "role": "Referencia científica consultada mediante Actions; no se utilizan imágenes externas."
     }
   ],
   "scenes": [
@@ -33,7 +48,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ],
       "headline": "LA TIERRA NO ESTÁ RELLENA DE LAVA"
     },
@@ -51,7 +69,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -68,7 +89,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -85,7 +109,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -102,7 +129,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -119,7 +149,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -136,7 +169,10 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ]
     },
     {
@@ -153,9 +189,18 @@
       },
       "sources": [
         "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava",
-        "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "https://www.usgs.gov/faqs/how-do-volcanoes-erupt",
+        "https://pubs.usgs.gov/gip/dynamic/inside.html",
+        "https://pubs.usgs.gov/gip/volc/eruptions.html",
+        "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       ],
       "headline": "PROCESOS BAJO TUS PIES"
     }
-  ]
+  ],
+  "source_verification": {
+    "report": "research/source-check-20261117.json",
+    "retrieval_run_id": "44100546363",
+    "scope": "HTTP, page title and scientific text inspected; authored summary, not an automated truth guarantee.",
+    "human_editorial_approval": false
+  }
 }

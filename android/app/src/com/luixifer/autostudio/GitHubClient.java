@@ -15,7 +15,7 @@ public final class GitHubClient {
     private static HttpURLConnection connection(String url,boolean authenticated,String token) throws Exception{
         URL u=new URL(url);String host=u.getHost();
         if(!u.getProtocol().equals("https")||u.getPort()!=-1||!(authenticated?host.equals("api.github.com"):host.equals("raw.githubusercontent.com")))throw new IOException("Destino de red no autorizado.");
-        HttpURLConnection c=(HttpURLConnection)u.openConnection();c.setConnectTimeout(15000);c.setReadTimeout(45000);c.setInstanceFollowRedirects(false);c.setRequestProperty("User-Agent","AutoStudio-Android-Control/0.3");c.setRequestProperty("Cache-Control","no-cache");
+        HttpURLConnection c=(HttpURLConnection)u.openConnection();c.setConnectTimeout(15000);c.setReadTimeout(45000);c.setInstanceFollowRedirects(false);c.setRequestProperty("User-Agent","AutoStudio-Android-Control/0.4");c.setRequestProperty("Cache-Control","no-cache");
         if(authenticated){if(token==null||token.isEmpty())throw new IOException("Conecta GitHub antes de producir.");c.setRequestProperty("Authorization","Bearer "+token);c.setRequestProperty("Accept","application/vnd.github+json");c.setRequestProperty("X-GitHub-Api-Version","2022-11-28");}return c;
     }
     private static String read(InputStream input,int max) throws Exception{try(InputStream in=input;ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1){if(out.size()+n>max)throw new IOException("Respuesta demasiado grande.");out.write(b,0,n);}return out.toString("UTF-8");}}

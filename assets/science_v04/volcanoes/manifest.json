@@ -1,0 +1,1115 @@
+{
+  "schema": 1,
+  "topic_id": "volcanoes",
+  "assets": [
+    {
+      "id": "volcanoes_01",
+      "file": "assets/science_v04/volcanoes/volcanoes_01.jpg",
+      "sha256": "3fd6bb2ff3fcf03340f8f72b08a906ecf78b9e1252084615cdd3e435e06d3338",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": []
+    },
+    {
+      "id": "volcanoes_02",
+      "file": "assets/science_v04/volcanoes/volcanoes_02.jpg",
+      "sha256": "3d79e0227e1b1c67d98d524a698e99f20282aff7d4eaad28523657852878d88c",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": []
+    },
+    {
+      "id": "volcanoes_03",
+      "file": "assets/science_v04/volcanoes/volcanoes_03.jpg",
+      "sha256": "aae2d272ecf447c5ead14143be32188fe82e1a9f50679b3bb84c8729a942c2db",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": []
+    },
+    {
+      "id": "volcanoes_04",
+      "file": "assets/science_v04/volcanoes/volcanoes_04.jpg",
+      "sha256": "e7ca9a60749a33277f2f49094fefc492caf335c7298c41e3cb0d543c76b72b5b",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": [
+        {
+          "name": "Magma ascent schematic",
+          "points": [
+            [
+              0.462644,
+              0.661423
+            ],
+            [
+              0.481524,
+              0.65124
+            ],
+            [
+              0.498283,
+              0.640767
+            ],
+            [
+              0.510814,
+              0.629853
+            ],
+            [
+              0.517503,
+              0.618405
+            ],
+            [
+              0.517462,
+              0.60639
+            ],
+            [
+              0.510652,
+              0.593845
+            ],
+            [
+              0.497898,
+              0.580865
+            ],
+            [
+              0.480772,
+              0.567589
+            ],
+            [
+              0.461377,
+              0.554176
+            ],
+            [
+              0.442068,
+              0.540787
+            ],
+            [
+              0.42516,
+              0.527561
+            ],
+            [
+              0.412654,
+              0.5146
+            ],
+            [
+              0.40602,
+              0.50196
+            ],
+            [
+              0.406043,
+              0.489648
+            ],
+            [
+              0.41274,
+              0.477625
+            ],
+            [
+              0.425358,
+              0.465811
+            ],
+            [
+              0.442444,
+              0.454101
+            ],
+            [
+              0.461985,
+              0.442372
+            ],
+            [
+              0.481628,
+              0.430505
+            ],
+            [
+              0.498953,
+              0.418398
+            ],
+            [
+              0.511776,
+              0.405977
+            ],
+            [
+              0.51844,
+              0.393206
+            ],
+            [
+              0.518052,
+              0.380092
+            ],
+            [
+              0.510616,
+              0.366679
+            ],
+            [
+              0.497034,
+              0.35304
+            ],
+            [
+              0.478981,
+              0.339262
+            ],
+            [
+              0.458674,
+              0.325435
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "volcanoes_05",
+      "file": "assets/science_v04/volcanoes/volcanoes_05.jpg",
+      "sha256": "03c6d15eb2ba9e9b9b33e7d35e5c5d26e217b0fc06b882e8c428ef60408f5d68",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": [
+        {
+          "name": "Ejected glowing fragment",
+          "points": [
+            [
+              0.519161,
+              0.42907
+            ],
+            [
+              0.579432,
+              0.331264
+            ],
+            [
+              0.691218,
+              0.408166
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.001",
+          "points": [
+            [
+              0.521938,
+              0.428151
+            ],
+            [
+              0.589938,
+              0.328923
+            ],
+            [
+              0.712161,
+              0.400002
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.002",
+          "points": [
+            [
+              0.521362,
+              0.427187
+            ],
+            [
+              0.586575,
+              0.32652
+            ],
+            [
+              0.700106,
+              0.391958
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.003",
+          "points": [
+            [
+              0.517557,
+              0.426324
+            ],
+            [
+              0.570433,
+              0.324415
+            ],
+            [
+              0.659965,
+              0.385172
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.004",
+          "points": [
+            [
+              0.511124,
+              0.42569
+            ],
+            [
+              0.544294,
+              0.322895
+            ],
+            [
+              0.599352,
+              0.380418
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.005",
+          "points": [
+            [
+              0.503037,
+              0.425377
+            ],
+            [
+              0.512048,
+              0.322154
+            ],
+            [
+              0.526861,
+              0.378144
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.006",
+          "points": [
+            [
+              0.4945,
+              0.425431
+            ],
+            [
+              0.478164,
+              0.322283
+            ],
+            [
+              0.451265,
+              0.378536
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.007",
+          "points": [
+            [
+              0.486778,
+              0.425845
+            ],
+            [
+              0.447256,
+              0.323265
+            ],
+            [
+              0.381335,
+              0.381564
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.008",
+          "points": [
+            [
+              0.481026,
+              0.426557
+            ],
+            [
+              0.423672,
+              0.32498
+            ],
+            [
+              0.325832,
+              0.386971
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.009",
+          "points": [
+            [
+              0.478122,
+              0.427465
+            ],
+            [
+              0.411037,
+              0.327206
+            ],
+            [
+              0.293183,
+              0.39422
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.010",
+          "points": [
+            [
+              0.478535,
+              0.428431
+            ],
+            [
+              0.4117,
+              0.32963
+            ],
+            [
+              0.290433,
+              0.402432
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "Ejected glowing fragment.011",
+          "points": [
+            [
+              0.482238,
+              0.429308
+            ],
+            [
+              0.426153,
+              0.331881
+            ],
+            [
+              0.321262,
+              0.410373
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "volcanoes_06",
+      "file": "assets/science_v04/volcanoes/volcanoes_06.jpg",
+      "sha256": "9e119048826848222e44e4065b94dd0f82ca7574fa9e98f934d1f870679c52ba",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": [
+        {
+          "name": "Incandescent lava channel",
+          "points": [
+            [
+              0.464957,
+              0.43381
+            ],
+            [
+              0.46241,
+              0.445496
+            ],
+            [
+              0.459304,
+              0.457127
+            ],
+            [
+              0.455149,
+              0.468675
+            ],
+            [
+              0.449535,
+              0.480108
+            ],
+            [
+              0.442176,
+              0.491397
+            ],
+            [
+              0.432935,
+              0.502518
+            ],
+            [
+              0.421838,
+              0.513452
+            ],
+            [
+              0.409074,
+              0.524192
+            ],
+            [
+              0.394979,
+              0.534744
+            ],
+            [
+              0.379996,
+              0.545122
+            ],
+            [
+              0.364642,
+              0.555352
+            ],
+            [
+              0.349455,
+              0.56547
+            ],
+            [
+              0.334947,
+              0.575512
+            ],
+            [
+              0.321558,
+              0.585517
+            ],
+            [
+              0.309621,
+              0.595521
+            ],
+            [
+              0.299334,
+              0.60555
+            ],
+            [
+              0.290743,
+              0.615621
+            ],
+            [
+              0.283735,
+              0.625734
+            ],
+            [
+              0.278049,
+              0.635875
+            ],
+            [
+              0.273295,
+              0.646015
+            ],
+            [
+              0.268984,
+              0.656106
+            ],
+            [
+              0.264565,
+              0.666093
+            ],
+            [
+              0.259481,
+              0.675908
+            ],
+            [
+              0.253208,
+              0.685483
+            ],
+            [
+              0.245316,
+              0.694753
+            ],
+            [
+              0.2355,
+              0.703661
+            ],
+            [
+              0.223619,
+              0.712167
+            ],
+            [
+              0.209706,
+              0.720246
+            ],
+            [
+              0.193967,
+              0.727898
+            ],
+            [
+              0.176763,
+              0.735139
+            ],
+            [
+              0.15857,
+              0.742006
+            ],
+            [
+              0.139937,
+              0.748545
+            ],
+            [
+              0.121432,
+              0.754809
+            ],
+            [
+              0.103595,
+              0.760846
+            ],
+            [
+              0.086886,
+              0.766694
+            ],
+            [
+              0.071647,
+              0.772363
+            ],
+            [
+              0.058075,
+              0.777829
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "volcanoes_07",
+      "file": "assets/science_v04/volcanoes/volcanoes_07.jpg",
+      "sha256": "c5c14a936e8a38dea0d787770ca66a23833b3846d5159d6309ca3cb8b2a152e4",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": [
+        {
+          "name": "More mobile flow illustration",
+          "points": [
+            [
+              0.223691,
+              0.474587
+            ],
+            [
+              0.224273,
+              0.48608
+            ],
+            [
+              0.219097,
+              0.497025
+            ],
+            [
+              0.205808,
+              0.507162
+            ],
+            [
+              0.186951,
+              0.516657
+            ],
+            [
+              0.168396,
+              0.526017
+            ],
+            [
+              0.155736,
+              0.535777
+            ],
+            [
+              0.15094,
+              0.546168
+            ],
+            [
+              0.151178,
+              0.556948
+            ],
+            [
+              0.150428,
+              0.567515
+            ],
+            [
+              0.143063,
+              0.577247
+            ],
+            [
+              0.127349,
+              0.585892
+            ],
+            [
+              0.106569,
+              0.593731
+            ],
+            [
+              0.086989,
+              0.601415
+            ],
+            [
+              0.074017,
+              0.609538
+            ],
+            [
+              0.068982,
+              0.61825
+            ],
+            [
+              0.068308,
+              0.627094
+            ],
+            [
+              0.065541,
+              0.635174
+            ],
+            [
+              0.055162,
+              0.641414
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "More viscous flow illustration",
+          "points": [
+            [
+              0.812335,
+              0.522703
+            ],
+            [
+              0.813976,
+              0.537606
+            ],
+            [
+              0.812633,
+              0.551863
+            ],
+            [
+              0.806667,
+              0.565281
+            ],
+            [
+              0.796641,
+              0.577855
+            ],
+            [
+              0.785052,
+              0.589766
+            ],
+            [
+              0.775138,
+              0.601288
+            ],
+            [
+              0.769361,
+              0.612646
+            ],
+            [
+              0.768273,
+              0.623874
+            ],
+            [
+              0.770257,
+              0.634771
+            ],
+            [
+              0.772256,
+              0.644937
+            ],
+            [
+              0.771191,
+              0.653901
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "volcanoes_08",
+      "file": "assets/science_v04/volcanoes/volcanoes_08.jpg",
+      "sha256": "7aaa2426c42c9be89e083d222ca76f0623e2e3b47f83b4cbcd2a1ce264f6614a",
+      "width": 864,
+      "height": 1536,
+      "topic_id": "volcanoes",
+      "type": "Original 3D scientific illustration, not actual footage",
+      "origin": "scripts/create_science_art.py, Blender 4.3.2 CPU",
+      "source": "sources/science_v04/volcanoes_master_v001.blend",
+      "license": "LicenseRef-AutoStudio-Original",
+      "license_file": "assets/science_v04/LICENSE_ART.md",
+      "credit": "Ilustración original AutoStudio",
+      "scale_disclosure": "Qualitative illustration, not to scale; no measured simulation or biological data",
+      "motion_paths": [
+        {
+          "name": "Incandescent lava channel.001",
+          "points": [
+            [
+              0.472424,
+              0.451562
+            ],
+            [
+              0.470451,
+              0.461385
+            ],
+            [
+              0.468043,
+              0.471142
+            ],
+            [
+              0.464816,
+              0.480796
+            ],
+            [
+              0.460453,
+              0.490314
+            ],
+            [
+              0.454731,
+              0.499664
+            ],
+            [
+              0.447548,
+              0.508824
+            ],
+            [
+              0.438926,
+              0.517781
+            ],
+            [
+              0.429019,
+              0.526537
+            ],
+            [
+              0.418089,
+              0.535102
+            ],
+            [
+              0.406486,
+              0.543503
+            ],
+            [
+              0.394614,
+              0.551773
+            ],
+            [
+              0.382891,
+              0.559956
+            ],
+            [
+              0.371716,
+              0.568095
+            ],
+            [
+              0.361431,
+              0.576232
+            ],
+            [
+              0.352293,
+              0.584406
+            ],
+            [
+              0.344452,
+              0.592642
+            ],
+            [
+              0.337942,
+              0.600956
+            ],
+            [
+              0.332673,
+              0.609347
+            ],
+            [
+              0.328438,
+              0.617796
+            ],
+            [
+              0.324933,
+              0.626271
+            ],
+            [
+              0.321777,
+              0.634723
+            ],
+            [
+              0.318543,
+              0.643094
+            ],
+            [
+              0.314801,
+              0.651319
+            ],
+            [
+              0.310148,
+              0.659332
+            ],
+            [
+              0.304253,
+              0.66707
+            ],
+            [
+              0.296883,
+              0.674484
+            ],
+            [
+              0.287932,
+              0.681539
+            ],
+            [
+              0.277429,
+              0.688219
+            ],
+            [
+              0.265533,
+              0.694531
+            ],
+            [
+              0.252523,
+              0.700499
+            ],
+            [
+              0.238766,
+              0.706165
+            ],
+            [
+              0.224684,
+              0.711583
+            ],
+            [
+              0.210715,
+              0.71681
+            ],
+            [
+              0.197271,
+              0.721903
+            ],
+            [
+              0.184704,
+              0.726904
+            ],
+            [
+              0.173277,
+              0.731838
+            ],
+            [
+              0.163137,
+              0.736695
+            ]
+          ],
+          "visible": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    }
+  ],
+  "generator": "scripts/create_science_art.py",
+  "real_footage": false
+}

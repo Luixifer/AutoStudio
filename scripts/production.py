@@ -18,9 +18,10 @@ def build_plan(topic,identifier,provider='curated-local-v1',format='short'):
     for i,s in enumerate(story['scenes'],1):
         asset=images.resolve(s['asset']);sid=f's{i:02}'
         s['scene_id']=sid
-        scenes.append({'id':sid,'narration':s['voice'],'duration':{'mode':'actual_audio_plus_pause','seconds':None},'media':{'provider':images.id,'asset_id':s['asset'],'file':asset['file'],'sha256':asset['sha256']},'subtitles':{'mode':'model_word_durations','max_words':3},'effects':{'camera':s['camera'],'particles':'subtle'},'transition':{'type':'crossfade_from_previous','seconds':.18 if i>1 else 0}})
+        scenes.append({'id':sid,'narration':s['voice'],'duration':{'mode':'actual_audio_plus_pause','seconds':None},'media':{'provider':images.id,'asset_id':s['asset'],'file':asset['file'],'sha256':asset['sha256'],'license':asset.get('license'),'credit':asset.get('credit','Ilustración original AutoStudio'),'license_file':asset.get('license_file'),'source':asset.get('source',asset.get('origin'))},'subtitles':{'mode':'model_word_durations','max_words':3},'effects':{'camera':s['camera'],'particles':'subtle','scientific_motion':s.get('animation')},'transition':{'type':'crossfade_from_previous','seconds':.18 if i>1 else 0},'sources':s.get('sources',[p['url'] for p in story['sources']])})
     plan={'schema':1,'request_id':identifier,'topic':topic.strip(),'format':'short','script_provider':provider,'image_provider':images.id,'scenes':scenes,'youtube':{'enabled':False},'paid_api_allowed':False}
-    story['production']={'request_id':identifier,'topic':topic.strip(),'schema':1,'format':'short','script_provider':provider}
+    story['production']={'request_id':identifier,'topic':topic.strip(),'schema':1,'format':'short','script_provider':provider,'topic_id':story.get('provider',{}).get('topic_id')}
+    plan['topic_id']=story['production']['topic_id']
     return story,plan
 
 def main():

@@ -7,10 +7,14 @@ from PIL import Image,ImageDraw,ImageEnhance,ImageFilter
 from .artwork import font,wrap_pixels,WIDTH,HEIGHT
 ROOT=Path(__file__).resolve().parents[1]
 
-def verify_assets():
-    manifest=json.loads((ROOT/'assets/cinematic/manifest.json').read_text());found={}
+def verify_assets(manifest_path=None):
+    path=(ROOT/(manifest_path or 'assets/cinematic/manifest.json')).resolve()
+    if not path.is_relative_to((ROOT/'assets').resolve()):raise ValueError('Asset manifest escapes the library.')
+    manifest=json.loads(path.read_text());found={}
     for asset in manifest['assets']:
-        path=ROOT/asset['file']
+        path=(ROOT/asset['file']).resolve()
+        if not path.is_relative_to((ROOT/'assets').resolve()):raise ValueError('Resource escapes the asset library.')
+        if asset['id'] in found:raise ValueError('Duplicate asset ID in manifest.')
         if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()!=asset['sha256']:raise ValueError('Original illustration missing or changed: '+asset['id'])
         with Image.open(path) as im:
             if im.size!=(864,1536):raise ValueError('Unexpected source resolution.')
@@ -33,10 +37,12 @@ class CinematicArtwork:
         self.scene,self.number,self.count=scene,number,count;assets=assets or verify_assets()
         if scene.get('camera') not in {'push','pull','pan_left','pan_right','drift'}:raise ValueError('Unknown camera motion.')
         if scene.get('asset') not in assets:raise ValueError('Unknown cinematic asset.')
-        path=ROOT/assets[scene['asset']]['file']
+        self.asset=assets[scene['asset']]
+        path=ROOT/self.asset['file']
         with Image.open(path) as im:self.source=im.convert('RGB')
         self.source=ImageEnhance.Color(self.source).enhance(1.07)
         self.source=ImageEnhance.Contrast(self.source).enhance(1.04)
+        self.science_source=self.source.convert('RGBA') if scene.get('visual')=='science' else None
         self.face=font(46,True);self.small=font(17,True)
         self.shade=Image.new('RGBA',(WIDTH,HEIGHT));d=ImageDraw.Draw(self.shade)
         for y in range(HEIGHT):
@@ -53,7 +59,11 @@ class CinematicArtwork:
         if mode=='pan_right':px=.15+.70*ease
         if mode=='drift':px=.25+.5*ease;py=.35+.3*ease
         sw,sh=self.source.size;cw=sw/zoom;ch=sh/zoom;left=(sw-cw)*px;top=(sh-ch)*py
-        image=self.source.transform((WIDTH,HEIGHT),Image.Transform.AFFINE,(cw/WIDTH,0,left,0,ch/HEIGHT,top),resample=Image.Resampling.BICUBIC).convert('RGBA')
+        source=self.source
+        if self.science_source is not None:
+            from .science_motion import overlay
+            source=overlay(self.science_source,t,self.scene['animation']['topic'],self.asset.get('motion_paths',[]))
+        image=source.transform((WIDTH,HEIGHT),Image.Transform.AFFINE,(cw/WIDTH,0,left,0,ch/HEIGHT,top),resample=Image.Resampling.BICUBIC).convert('RGBA')
         p=Image.new('RGBA',(WIDTH,HEIGHT));d=ImageDraw.Draw(p)
         for x,y,r,speed in self.particles:
             xx=(x+.012*math.sin(t*.23+y*8))*WIDTH;yy=((y-t*speed)%1)*HEIGHT;alpha=45 if r<1 else 65
@@ -65,7 +75,7 @@ class CinematicArtwork:
         if previous_visual is not None and t<.18:base=Image.blend(previous_visual,base,min(1,t/.18))
         image=Image.alpha_composite(base.convert('RGBA'),self.shade);d=ImageDraw.Draw(image)
         d.text((44,48),'AUTOSTUDIO',font=self.small,fill=(214,236,241,210),stroke_width=1,stroke_fill=(0,0,0,100))
-        label='ILUSTRACIÓN 3D';d.text((WIDTH-44-self.small.getlength(label),48),label,font=self.small,fill=(214,236,241,205),stroke_width=1,stroke_fill=(0,0,0,100))
+        label='ILUSTRACIÓN 3D' if self.scene.get('visual')!='science' else 'ILUSTRACIÓN · NO A ESCALA';d.text((WIDTH-44-self.small.getlength(label),48),label,font=self.small,fill=(214,236,241,205),stroke_width=1,stroke_fill=(0,0,0,100))
         headline=self.scene.get('headline')
         if headline and t<min(2.2,duration):
             face=font(54,True);lines=wrap_pixels(headline,face,620)

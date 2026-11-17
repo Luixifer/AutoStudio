@@ -15,7 +15,7 @@ def make_result(identifier,run,commit,repository,status,bundle=None):
     if bundle:
         meta=json.loads((bundle/'metadata.json').read_text());validation=json.loads((bundle/'validation.json').read_text())
         if meta.get('production',{}).get('request_id')!=identifier:raise ValueError('Production request does not match the rendered MP4.')
-        result.update(topic=meta['production']['topic'],title=meta['title'],video={'file':'short_ciencia_demo.mp4','sha256':validation['sha256'],'bytes':validation['bytes'],'duration_seconds':validation['duration_seconds'],'width':720,'height':1280},scene_plan='scene-plan.json')
+        result.update(topic_id=meta['production'].get('topic_id'),topic=meta['production']['topic'],title=meta['title'],video={'file':'short_ciencia_demo.mp4','sha256':validation['sha256'],'bytes':validation['bytes'],'duration_seconds':validation['duration_seconds'],'width':720,'height':1280},scene_plan='scene-plan.json')
     else:result['message']='La generación no se completó. Revisa los registros de esta ejecución; no se mostrará otro vídeo como resultado.'
     return result
 

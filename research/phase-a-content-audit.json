@@ -1,0 +1,65 @@
+{
+  "scope": "Authored content and original media identities, not an aesthetic approval or actual run report",
+  "topics": {
+    "ocean-life": {
+      "title": "Hay vida donde no llega el Sol",
+      "narration_words": 77,
+      "asset_ids": [
+        "seabed_wide",
+        "closing",
+        "vent_close",
+        "microbes",
+        "microbes",
+        "community",
+        "seabed_wide",
+        "closing"
+      ],
+      "script_sha256": "fa68d2b8a21ec25e6bcd88ef8399aa140caa7c9edd340c254cd5999a105b52c6"
+    },
+    "auroras": {
+      "title": "Auroras: cuando la energía se convierte en color",
+      "narration_words": 97,
+      "asset_ids": [
+        "auroras_01",
+        "auroras_02",
+        "auroras_03",
+        "auroras_04",
+        "auroras_05",
+        "auroras_06",
+        "auroras_07",
+        "auroras_08"
+      ],
+      "script_sha256": "0b0ca7894d00f2ebc1ab8893f8f0b21da51c999cf66755b1fe684902896cfb0f"
+    },
+    "dna": {
+      "title": "Un mismo material genético, trabajos diferentes",
+      "narration_words": 93,
+      "asset_ids": [
+        "dna_01",
+        "dna_02",
+        "dna_03",
+        "dna_04",
+        "dna_05",
+        "dna_06",
+        "dna_07",
+        "dna_08"
+      ],
+      "script_sha256": "3b0ab056e32b2f91d18fbc14bd50286a4c89106332070f2a1e8023b3251053b0"
+    },
+    "volcanoes": {
+      "title": "La Tierra no está rellena de lava",
+      "narration_words": 92,
+      "asset_ids": [
+        "volcanoes_01",
+        "volcanoes_02",
+        "volcanoes_03",
+        "volcanoes_04",
+        "volcanoes_05",
+        "volcanoes_06",
+        "volcanoes_07",
+        "volcanoes_08"
+      ],
+      "script_sha256": "e49c531089925243f1e20b66720e574fcfdfe30fbd920330b1e8bac5bb3bfa2a"
+    }
+  }
+}

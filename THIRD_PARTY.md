@@ -25,3 +25,7 @@ Las referencias científicas NOAA/WHOI siguen siendo enlaces editoriales. Su acc
 ## Control Android 0.3
 
 Aplicación nativa original en Java, sin bibliotecas Android externas. Se compila con el SDK oficial Android (aapt2, D8, zipalign, apksigner y plataforma 35; términos oficiales de Android SDK) y OpenJDK 17/Temurin (GPL con Classpath Exception). El repositorio no redistribuye los SDK, JDK, imágenes de emulador ni claves privadas de firma. El APK contiene el código de la aplicación y recursos propios; usa el reproductor del sistema Android. GitHub REST y el token de acceso del usuario autorizan Actions: no son APIs de IA ni servicios facturados por tokens.
+
+## Contenido científico 0.4
+
+24 ilustraciones 3D y tres maestros Blender originales, sin fotografías, texturas ni modelos externos. Procedencia y derechos en `assets/science_v04/LICENSE_ART.md` y manifiestos por tema. Animación ligera original siguiendo trayectorias del maestro, sin simulación física a escala. No hay nuevas dependencias de pago. Las páginas NASA/NOAA/NHGRI/USGS se consultan como referencias científicas, no se descargan sus imágenes; el informe de recuperación conserva URLs, títulos, hashes y extractos limitados para revisión editorial.
