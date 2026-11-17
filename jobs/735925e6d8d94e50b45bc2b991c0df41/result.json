@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "request_id": "735925e6d8d94e50b45bc2b991c0df41",
+  "run_id": "44104396148",
+  "source_commit": "515b5b6c28b5e5d298fb739c5b9f5a91f075d106",
+  "repository": "Luixifer/AutoStudio",
+  "status": "completed",
+  "youtube_published": false,
+  "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44104396148",
+  "topic_id": "auroras",
+  "topic": "Auroras polares",
+  "title": "Auroras: cuando la energía se convierte en color",
+  "video": {
+    "file": "short_ciencia_demo.mp4",
+    "sha256": "0f0fea1fc77b4f524b364ffd1eb5356b82fec6e713c4833fc79ad190829434dd",
+    "bytes": 2802335,
+    "duration_seconds": 39.48,
+    "width": 720,
+    "height": 1280
+  },
+  "scene_plan": "scene-plan.json"
+}
