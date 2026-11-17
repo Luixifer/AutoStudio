@@ -33,6 +33,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_personal_prepare.py' -v
           python -m unittest discover -s tests -p 'test_personal_youtube_pack.py' -v
           python -m unittest discover -s tests -p 'test_personal_visual_audit.py' -v
+          python -m unittest discover -s tests -p 'test_personal_camera.py' -v
       - name: Reproducción real de vídeo, subtítulos y análisis de fotogramas
         run: python -m unittest discover -s tests -p 'test_personal_video_real.py' -v
       - name: Reporte
