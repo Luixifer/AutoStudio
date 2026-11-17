@@ -1,0 +1,65 @@
+name: AutoStudio PERSONAL · Aurora cinematic v30
+on:
+  push:
+    branches: [feature/quality-gate-30]
+    paths:
+      - 'scripts/personal_*.py'
+      - '.github/workflows/personal-demo-quality30.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aurora30-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  full-neural-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Instalar motor audiovisual gratuito y Kokoro
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Crear videoclip con Álex y analizar las imágenes reales
+        run: |
+          python -m scripts.personal_demo --out /tmp/aurora30
+          python -m scripts.personal_youtube_pack \
+            /tmp/aurora30/input/auroras-personal.json \
+            /tmp/aurora30/render/quality-report.json \
+            --out /tmp/aurora30/publication-draft
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/aurora30/render/quality-report.json")
+          q=json.loads(p.read_text(encoding="utf-8"))
+          v=q["visual_audit"]
+          assert q["technical_passed"]
+          assert q["size"]==[720,1280]
+          assert len(q["shots"])==8
+          assert v["shots_checked"]==8
+          assert not v["technical_errors"]
+          assert not q["ready_to_publish"]
+          print("AUTOSTUDIO_AURORA30_SECONDS",q["seconds"])
+          print("AUTOSTUDIO_AURORA30_SHA256",q["sha256"])
+          print("AUTOSTUDIO_AURORA30_VISUAL_WARNINGS",v["warnings"])
+          PY
+      - name: Publicar ZIP privado de revisión (no YouTube)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Auroras-Alex-Quality30-REVIEW
+          path: |
+            /tmp/aurora30/render/autostudio-personal-REVIEW.mp4
+            /tmp/aurora30/render/captions.srt
+            /tmp/aurora30/render/quality-report.json
+            /tmp/aurora30/render/visual-audit.json
+            /tmp/aurora30/render/contacto-planos.jpg
+            /tmp/aurora30/input/auroras-personal.json
+            /tmp/aurora30/publication-draft/*
+          if-no-files-found: error
+          retention-days: 7
