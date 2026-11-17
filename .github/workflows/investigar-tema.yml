@@ -23,7 +23,7 @@ jobs:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 71fc58abe70059e1ada020ec16d0d5dc98034a30
+          ref: fdfd99b9de90f6fbeb0276b0ba9154d57c402bb9
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
