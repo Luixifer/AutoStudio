@@ -1,0 +1,40 @@
+name: AutoStudio PERSONAL · Quality Gate 30
+on:
+  push:
+    branches: [feature/quality-gate-30]
+    paths:
+      - 'scripts/personal_*.py'
+      - 'tests/test_personal_*.py'
+      - '.github/workflows/quality-gate-30.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: quality30-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  full-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar codecs y dependencias
+        run: |
+          ffmpeg -version | head -1
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Seguridad de storyboard, voz, licencias y panorámica
+        run: |
+          python -m unittest discover -s tests -p 'test_personal_studio.py' -v
+          python -m unittest discover -s tests -p 'test_personal_prepare.py' -v
+          python -m unittest discover -s tests -p 'test_personal_youtube_pack.py' -v
+          python -m unittest discover -s tests -p 'test_personal_visual_audit.py' -v
+      - name: Reproducción real de vídeo, subtítulos y análisis de fotogramas
+        run: python -m unittest discover -s tests -p 'test_personal_video_real.py' -v
+      - name: Reporte
+        if: always()
+        run: |
+          echo "Quality Gate 30: codecs, visual audit, rights, storyboard, captions and video." >> "$GITHUB_STEP_SUMMARY"
+          echo "Passing tests do not certify naturalness or scientific fact checking." >> "$GITHUB_STEP_SUMMARY"
