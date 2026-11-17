@@ -1,0 +1,23 @@
+[
+  {
+    "schema": 1,
+    "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+    "run_id": "44091290548",
+    "source_commit": "a6fac97b13244f859193e2321a8e8a08b5b59b59",
+    "repository": "Luixifer/AutoStudio",
+    "status": "completed",
+    "youtube_published": false,
+    "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44091290548",
+    "topic": "Quimiosíntesis: vida sin Sol en el océano profundo",
+    "title": "Hay vida donde no llega el Sol",
+    "video": {
+      "file": "short_ciencia_demo.mp4",
+      "sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+      "bytes": 5278833,
+      "duration_seconds": 34.4,
+      "width": 720,
+      "height": 1280
+    },
+    "scene_plan": "scene-plan.json"
+  }
+]

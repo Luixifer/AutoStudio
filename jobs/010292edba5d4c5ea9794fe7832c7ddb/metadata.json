@@ -1,0 +1,695 @@
+{
+  "schema": 1,
+  "managed_by": "autostudio-mvp",
+  "version": "0.2-cinematic.1",
+  "profile": "cinematic",
+  "title": "Hay vida donde no llega el Sol",
+  "generated_utc": "2026-11-17T13:20:07.367258+00:00",
+  "execution": {
+    "context": "github-actions",
+    "github_repository": "Luixifer/AutoStudio",
+    "github_run_id": "44091290548",
+    "github_run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44091290548",
+    "git": {
+      "commit": "a6fac97b13244f859193e2321a8e8a08b5b59b59",
+      "worktree_dirty": false
+    },
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+  },
+  "video": {
+    "frames": 860,
+    "fps": 25,
+    "duration_seconds": 34.4,
+    "size": [
+      720,
+      1280
+    ]
+  },
+  "narration": [
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Aquí",
+          "start": 0.07933333333333334,
+          "end": 0.3293333333333333
+        },
+        {
+          "word": "no",
+          "start": 0.37933333333333336,
+          "end": 0.5043333333333333
+        },
+        {
+          "word": "llega",
+          "start": 0.5543333333333333,
+          "end": 0.7793333333333333
+        },
+        {
+          "word": "el",
+          "start": 0.8043333333333333,
+          "end": 0.9043333333333333
+        },
+        {
+          "word": "Sol.",
+          "start": 0.9793333333333333,
+          "end": 1.4293333333333333
+        },
+        {
+          "word": "Y,",
+          "start": 1.6643333333333332,
+          "end": 1.7393333333333332
+        },
+        {
+          "word": "aun",
+          "start": 1.7893333333333332,
+          "end": 1.9643333333333333
+        },
+        {
+          "word": "así,",
+          "start": 2.0143333333333335,
+          "end": 2.2893333333333334
+        },
+        {
+          "word": "hay",
+          "start": 2.3143333333333334,
+          "end": 2.3893333333333335
+        },
+        {
+          "word": "vida.",
+          "start": 2.4393333333333334,
+          "end": 2.8480000000000003
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "A",
+          "start": 0.07933333333333334,
+          "end": 0.12933333333333333
+        },
+        {
+          "word": "miles",
+          "start": 0.17933333333333334,
+          "end": 0.4543333333333333
+        },
+        {
+          "word": "de",
+          "start": 0.47933333333333333,
+          "end": 0.5543333333333333
+        },
+        {
+          "word": "metros",
+          "start": 0.6043333333333333,
+          "end": 0.9293333333333333
+        },
+        {
+          "word": "de",
+          "start": 0.9543333333333334,
+          "end": 1.0043333333333333
+        },
+        {
+          "word": "profundidad,",
+          "start": 1.0543333333333333,
+          "end": 2.054333333333333
+        },
+        {
+          "word": "surgen",
+          "start": 2.1293333333333333,
+          "end": 2.5043333333333333
+        },
+        {
+          "word": "chimeneas",
+          "start": 2.554333333333333,
+          "end": 3.154333333333333
+        },
+        {
+          "word": "en",
+          "start": 3.2043333333333335,
+          "end": 3.279333333333333
+        },
+        {
+          "word": "el",
+          "start": 3.304333333333333,
+          "end": 3.404333333333333
+        },
+        {
+          "word": "fondo",
+          "start": 3.4543333333333335,
+          "end": 3.7543333333333333
+        },
+        {
+          "word": "marino.",
+          "start": 3.804333333333333,
+          "end": 4.266666666666667
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Expulsan",
+          "start": 0.07933333333333334,
+          "end": 0.7793333333333333
+        },
+        {
+          "word": "agua",
+          "start": 0.8543333333333333,
+          "end": 1.1543333333333334
+        },
+        {
+          "word": "caliente",
+          "start": 1.2043333333333333,
+          "end": 1.6543333333333334
+        },
+        {
+          "word": "cargada",
+          "start": 1.7043333333333333,
+          "end": 2.1293333333333333
+        },
+        {
+          "word": "de",
+          "start": 2.154333333333333,
+          "end": 2.2043333333333335
+        },
+        {
+          "word": "compuestos",
+          "start": 2.2543333333333333,
+          "end": 2.804333333333333
+        },
+        {
+          "word": "químicos.",
+          "start": 2.8543333333333334,
+          "end": 3.4133333333333336
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Algunos",
+          "start": 0.07933333333333334,
+          "end": 0.47933333333333333
+        },
+        {
+          "word": "microbios",
+          "start": 0.5293333333333333,
+          "end": 1.3293333333333333
+        },
+        {
+          "word": "usan",
+          "start": 1.4293333333333333,
+          "end": 1.7543333333333333
+        },
+        {
+          "word": "la",
+          "start": 1.7793333333333334,
+          "end": 1.8293333333333333
+        },
+        {
+          "word": "energía",
+          "start": 1.8543333333333334,
+          "end": 2.304333333333333
+        },
+        {
+          "word": "de",
+          "start": 2.3293333333333335,
+          "end": 2.3793333333333333
+        },
+        {
+          "word": "reacciones",
+          "start": 2.429333333333333,
+          "end": 2.929333333333333
+        },
+        {
+          "word": "químicas",
+          "start": 2.9793333333333334,
+          "end": 3.529333333333333
+        },
+        {
+          "word": "para",
+          "start": 3.5793333333333335,
+          "end": 3.7543333333333333
+        },
+        {
+          "word": "fabricar",
+          "start": 3.804333333333333,
+          "end": 4.279333333333334
+        },
+        {
+          "word": "materia",
+          "start": 4.3293333333333335,
+          "end": 4.729333333333333
+        },
+        {
+          "word": "orgánica.",
+          "start": 4.754333333333333,
+          "end": 5.354666666666667
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Se",
+          "start": 0.10066666666666667,
+          "end": 0.25066666666666665
+        },
+        {
+          "word": "llama",
+          "start": 0.32566666666666666,
+          "end": 0.6506666666666666
+        },
+        {
+          "word": "quimiosíntesis.",
+          "start": 0.7006666666666667,
+          "end": 1.6853333333333333
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Sobre",
+          "start": 0.07933333333333334,
+          "end": 0.3293333333333333
+        },
+        {
+          "word": "esa",
+          "start": 0.35433333333333333,
+          "end": 0.6293333333333333
+        },
+        {
+          "word": "base",
+          "start": 0.6793333333333333,
+          "end": 1.1793333333333333
+        },
+        {
+          "word": "crecen",
+          "start": 1.2793333333333334,
+          "end": 1.7293333333333334
+        },
+        {
+          "word": "comunidades",
+          "start": 1.7793333333333334,
+          "end": 2.404333333333333
+        },
+        {
+          "word": "de",
+          "start": 2.429333333333333,
+          "end": 2.4793333333333334
+        },
+        {
+          "word": "animales.",
+          "start": 2.5043333333333333,
+          "end": 3.050666666666667
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "Pero",
+          "start": 0.07933333333333334,
+          "end": 0.2793333333333333
+        },
+        {
+          "word": "no",
+          "start": 0.3293333333333333,
+          "end": 0.4043333333333333
+        },
+        {
+          "word": "están",
+          "start": 0.42933333333333334,
+          "end": 0.7543333333333333
+        },
+        {
+          "word": "completamente",
+          "start": 0.8043333333333333,
+          "end": 1.6793333333333333
+        },
+        {
+          "word": "aisladas.",
+          "start": 1.7293333333333334,
+          "end": 2.7543333333333333
+        },
+        {
+          "word": "Algunas",
+          "start": 2.8293333333333335,
+          "end": 3.2043333333333335
+        },
+        {
+          "word": "reacciones",
+          "start": 3.2543333333333333,
+          "end": 3.8543333333333334
+        },
+        {
+          "word": "necesitan",
+          "start": 3.904333333333333,
+          "end": 4.554333333333333
+        },
+        {
+          "word": "oxígeno",
+          "start": 4.604333333333333,
+          "end": 5.129333333333333
+        },
+        {
+          "word": "producido",
+          "start": 5.179333333333333,
+          "end": 5.754333333333333
+        },
+        {
+          "word": "en",
+          "start": 5.779333333333334,
+          "end": 5.8293333333333335
+        },
+        {
+          "word": "la",
+          "start": 5.854333333333333,
+          "end": 5.9543333333333335
+        },
+        {
+          "word": "superficie.",
+          "start": 6.004333333333333,
+          "end": 6.72
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    },
+    {
+      "engine": "Kokoro ONNX 0.6.1, local CPU",
+      "model": "Kokoro 82M v1.0",
+      "voice": "ef_dora",
+      "locale_requested": "es-ES",
+      "phonemizer_language": "es (Castilian Spanish)",
+      "speed": 0.88,
+      "sample_rate": 24000,
+      "timing_method": "model phoneme durations mapped at explicit word boundaries",
+      "words": [
+        {
+          "word": "La",
+          "start": 0.07933333333333334,
+          "end": 0.12933333333333333
+        },
+        {
+          "word": "oscuridad",
+          "start": 0.15433333333333332,
+          "end": 0.8043333333333333
+        },
+        {
+          "word": "no",
+          "start": 0.9043333333333333,
+          "end": 1.0293333333333334
+        },
+        {
+          "word": "es",
+          "start": 1.0543333333333333,
+          "end": 1.1793333333333333
+        },
+        {
+          "word": "ausencia",
+          "start": 1.2293333333333334,
+          "end": 1.7543333333333333
+        },
+        {
+          "word": "de",
+          "start": 1.7793333333333334,
+          "end": 1.8293333333333333
+        },
+        {
+          "word": "vida.",
+          "start": 1.8543333333333334,
+          "end": 2.529333333333333
+        },
+        {
+          "word": "Es",
+          "start": 2.5793333333333335,
+          "end": 2.7543333333333333
+        },
+        {
+          "word": "otra",
+          "start": 2.804333333333333,
+          "end": 3.054333333333333
+        },
+        {
+          "word": "manera",
+          "start": 3.0793333333333335,
+          "end": 3.429333333333333
+        },
+        {
+          "word": "de",
+          "start": 3.4543333333333335,
+          "end": 3.5043333333333333
+        },
+        {
+          "word": "obtener",
+          "start": 3.529333333333333,
+          "end": 3.8793333333333333
+        },
+        {
+          "word": "energía.",
+          "start": 3.904333333333333,
+          "end": 4.458666666666667
+        }
+      ],
+      "model_sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "accent_reviewed_by_human": false,
+      "paid_inference_api": false
+    }
+  ],
+  "subtitle_timing": "Kokoro phoneme duration output mapped at explicit word boundaries; short dynamic word-highlighted captions. Not an independent human/ASR alignment review.",
+  "soundscape": {
+    "origin": "Original deterministic synthetic water-like ambience",
+    "real_field_recording": false,
+    "music_asset_downloaded": false,
+    "mix_volume": 0.42,
+    "seed": 202602
+  },
+  "scenes": [
+    {
+      "scene": 1,
+      "visual": "ocean",
+      "voice_seconds": 2.9879583333333333,
+      "video_seconds": 3.12,
+      "frames": 78,
+      "narration": "Aquí no llega el Sol. Y, aun así, hay vida.",
+      "asset": "seabed_wide",
+      "camera": "push"
+    },
+    {
+      "scene": 2,
+      "visual": "vent",
+      "voice_seconds": 4.3966666666666665,
+      "video_seconds": 4.52,
+      "frames": 113,
+      "narration": "A miles de metros de profundidad, surgen chimeneas en el fondo marino.",
+      "asset": "closing",
+      "camera": "pan_left"
+    },
+    {
+      "scene": 3,
+      "visual": "vent",
+      "voice_seconds": 3.5532916666666665,
+      "video_seconds": 3.68,
+      "frames": 92,
+      "narration": "Expulsan agua caliente cargada de compuestos químicos.",
+      "asset": "vent_close",
+      "camera": "push"
+    },
+    {
+      "scene": 4,
+      "visual": "microbes",
+      "voice_seconds": 5.494625,
+      "video_seconds": 5.64,
+      "frames": 141,
+      "narration": "Algunos microbios usan la energía de reacciones químicas para fabricar materia orgánica.",
+      "asset": "microbes",
+      "camera": "drift"
+    },
+    {
+      "scene": 5,
+      "visual": "microbes",
+      "voice_seconds": 1.8153333333333332,
+      "video_seconds": 1.96,
+      "frames": 49,
+      "narration": "Se llama quimiosíntesis.",
+      "asset": "microbes",
+      "camera": "pull"
+    },
+    {
+      "scene": 6,
+      "visual": "ocean",
+      "voice_seconds": 3.1706666666666665,
+      "video_seconds": 3.32,
+      "frames": 83,
+      "narration": "Sobre esa base crecen comunidades de animales.",
+      "asset": "community",
+      "camera": "pan_right"
+    },
+    {
+      "scene": 7,
+      "visual": "ocean",
+      "voice_seconds": 6.84,
+      "video_seconds": 6.96,
+      "frames": 174,
+      "narration": "Pero no están completamente aisladas. Algunas reacciones necesitan oxígeno producido en la superficie.",
+      "asset": "seabed_wide",
+      "camera": "pull"
+    },
+    {
+      "scene": 8,
+      "visual": "ocean",
+      "voice_seconds": 4.598625,
+      "video_seconds": 5.2,
+      "frames": 130,
+      "narration": "La oscuridad no es ausencia de vida. Es otra manera de obtener energía.",
+      "asset": "closing",
+      "camera": "push"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://oceanservice.noaa.gov/facts/vents.html",
+      "publisher": "NOAA Ocean Service",
+      "role": "Referencia editorial aportada sobre fuentes hidrotermales y quimiosíntesis."
+    },
+    {
+      "url": "https://www.whoi.edu/know-your-ocean/ocean-topics/ocean-life/ecosystems/hydrothermal-vents/",
+      "publisher": "Woods Hole Oceanographic Institution",
+      "role": "Referencia editorial aportada sobre ecosistemas hidrotermales."
+    }
+  ],
+  "source_verification": "Provided editorial references, not retrieved by the renderer; manual verification required before publication.",
+  "visual_disclosure": "Original Blender illustrations with animated camera crops and particles; not real underwater footage or full fluid simulation.",
+  "paid_api_requests": 0,
+  "youtube_publication": "disabled",
+  "elapsed_render_seconds": 59.87,
+  "script_sha256": "47a580e264d9a2472c69f6e4973cc983b61a3d2d2084aad193459c6cceb36457",
+  "code_sha256": {
+    "soundscape.py": "e4ba41a9b30270252b3ea62e1e696fd3e8c0517c838048ebd7655a9911c0ef7a",
+    "fetch_voice.py": "98842bf320955ff2249a73b4def4912031491f924033aca857081b27e06b54ef",
+    "publish_result.py": "f4b74f15398fbf18298430bfe9a1688829632df2d41bfc88b4bd51f630cee329",
+    "create_cinematic_assets.py": "6556bf68127b5aaedb2cc64b3bc2ddac347af7bece25deeac447dddf1678818b",
+    "narration.py": "cfd83547b3ab219beb3c6ee0529de0942db5f16d465e68e010fc820099b10edf",
+    "validate_video.py": "b46c8f6303cf9ecf876ebbe0dd2c3d94e9edac8fc663815cab8b985ece7fadc8",
+    "publish_android.py": "137e14083ab0d2ae3da72abf661cba73fdcf2ec510e439e5def33f7971d336fc",
+    "neural_narration.py": "3e592f0f1be5d93413c95022c6c79c771b6688879c776bcb962f5cd561f11240",
+    "subtitles.py": "8a00a195ccf045ad2a61a26226d559f1050780058b02cc28034eabe8d2eb5d41",
+    "finish_assets.py": "87d25b8c7ed182b260dfd80143ed6607273f664eed3bedb4923926a69463c18d",
+    "diagnose_android_ci.py": "fbb6fafad6c9683d7c6fc0cb24f1f9e8f1e69281a7b0e7b389052db73047733e",
+    "publish_job.py": "c0e764a8b118f71774867bd96e4092c3fa1de99be9d057449a71757ed030b385",
+    "production.py": "617bb7d6dbbc302cb643f314a96ecc91468fd30834f9c14bbeb43ef7c80d9779",
+    "cinematic.py": "6c6df878d395331130d50266b1f69e21abfdfd80897f4aaf008db03207951d4a",
+    "artwork.py": "986515c84ccf22cafb8969879cf324f4bea3a90f1d7dc04004e431f5b1d71669",
+    "render.py": "0500d44ca50ad1603e30d1c57835cba4a85e875bed158cb8735ace34e3f1d395"
+  },
+  "production": {
+    "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+    "topic": "Quimiosíntesis: vida sin Sol en el océano profundo",
+    "schema": 1,
+    "format": "short",
+    "script_provider": "curated-local-v1"
+  },
+  "asset_manifest_sha256": "e5b6accff5a9c50a237739853f6434567f861fff08e392aa2275bb1d84a2520d"
+}

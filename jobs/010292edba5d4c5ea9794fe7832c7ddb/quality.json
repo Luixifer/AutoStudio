@@ -1,0 +1,80 @@
+{
+  "profile": "cinematic",
+  "shot_count": 8,
+  "shot_duration_seconds": [
+    3.12,
+    4.52,
+    3.68,
+    5.64,
+    1.96,
+    3.32,
+    6.96,
+    5.2
+  ],
+  "short_dynamic_captions": true,
+  "max_words_per_caption": 3,
+  "timing_source": "same TTS inference phoneme durations",
+  "visual_checks": [
+    {
+      "scene": 1,
+      "asset": "seabed_wide",
+      "motion_mean_absolute_pixel_difference": 9.527,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 2,
+      "asset": "closing",
+      "motion_mean_absolute_pixel_difference": 14.91,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 3,
+      "asset": "vent_close",
+      "motion_mean_absolute_pixel_difference": 10.598,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 4,
+      "asset": "microbes",
+      "motion_mean_absolute_pixel_difference": 21.49,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    },
+    {
+      "scene": 5,
+      "asset": "microbes",
+      "motion_mean_absolute_pixel_difference": 14.264,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    },
+    {
+      "scene": 6,
+      "asset": "community",
+      "motion_mean_absolute_pixel_difference": 45.081,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    },
+    {
+      "scene": 7,
+      "asset": "seabed_wide",
+      "motion_mean_absolute_pixel_difference": 9.54,
+      "caption_max_words": 3,
+      "caption_max_lines": 2
+    },
+    {
+      "scene": 8,
+      "asset": "closing",
+      "motion_mean_absolute_pixel_difference": 9.326,
+      "caption_max_words": 3,
+      "caption_max_lines": 1
+    }
+  ],
+  "caption_groups": 29,
+  "timed_words": 77,
+  "human_visual_or_voice_approval": false,
+  "word_coverage_passed": true,
+  "word_times_inside_audio": true
+}
