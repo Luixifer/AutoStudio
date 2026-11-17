@@ -29,6 +29,8 @@ public final class ResearchActivity extends Activity {
         submit = Ui.button(card, "Investigar tema", 1032, true);
         status = Ui.para(card, "El título y las fuentes de la investigación serán públicos en GitHub. No introduzcas datos privados.");
         submit.setOnClickListener(v -> submitTopic());
+        Ui.button(body, "Mis vídeos · reproducir borradores", 1200, true)
+          .setOnClickListener(v -> startActivity(new android.content.Intent(this, ResearchVideosActivity.class)));
         Ui.button(body, "Ver investigaciones en GitHub", 1033, false)
           .setOnClickListener(v -> Ui.browser(this,
             "https://github.com/" + GitHubClient.REPO + "/actions/workflows/investigar-tema.yml"));
