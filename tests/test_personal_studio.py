@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image
 from scripts.personal_studio import validate_project,secure_file
-from scripts.personal_editor import caption_groups,zoom_filter,srt_time,ass_time
+from scripts.personal_editor import caption_groups,zoom_filter,srt_time,ass_time,write_ass
 
 
 def make_sample(root,kind="lab",count=2,seconds=3.2):
@@ -106,6 +106,20 @@ class PersonalContractTests(unittest.TestCase):
                 filter_text=zoom_filter(scene,120,resolution)
                 self.assertIn(f"s={resolution[0]}x{resolution[1]}",filter_text)
                 self.assertIn("format=yuv420p",filter_text)
+
+    def test_ass_events_are_separate_lines_and_fixed_over_image(self):
+        with tempfile.TemporaryDirectory() as root:
+            path=Path(root)/"caption.ass"
+            cues=[{"start":.25,"end":1.1,"text":"Una aurora"},
+                  {"start":1.3,"end":2.6,"text":"muy brillante"}]
+            write_ass(path,cues,[720,1280],"AURORA BOREAL",3.2)
+            lines=path.read_text(encoding="utf-8").splitlines()
+            events=[line for line in lines if line.startswith("Dialogue: ")]
+            self.assertEqual(len(events),4)
+            self.assertTrue(any(",Heading," in line for line in events))
+            self.assertTrue(any(",Disclosure," in line for line in events))
+            self.assertTrue(any("Una aurora" in line for line in events))
+            self.assertFalse(any("\\\\nDialogue:" in line for line in events))
 
     def test_timecode_correct(self):
         self.assertEqual(srt_time(63.123),"00:01:03,123")
