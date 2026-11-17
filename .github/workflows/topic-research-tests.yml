@@ -11,6 +11,7 @@ on:
       - 'scripts/external_sources.py'
       - 'scripts/nasa_reading.py'
       - 'scripts/spanish_draft.py'
+      - 'scripts/research_preview.py'
       - 'tests/test_topic_intake.py'
       - 'tests/test_topic_research.py'
       - 'tests/test_storyboard_draft.py'
@@ -20,6 +21,7 @@ on:
       - 'tests/test_external_sources.py'
       - 'tests/test_nasa_reading.py'
       - 'tests/test_spanish_draft.py'
+      - 'tests/test_research_preview.py'
       - '.github/workflows/topic-research-tests.yml'
   workflow_dispatch:
 permissions:
@@ -44,6 +46,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_external_sources.py' -v
           python -m unittest discover -s tests -p 'test_nasa_reading.py' -v
           python -m unittest discover -s tests -p 'test_spanish_draft.py' -v
+          python -m unittest discover -s tests -p 'test_research_preview.py' -v
       - name: Probe public research access for a new topic (non-blocking)
         run: |
           python -m scripts.research_pipeline "¿Por qué vemos siempre la misma cara de la Luna?" --out-dir /tmp/autostudio-research
