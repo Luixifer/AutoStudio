@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "request_id": "042d9b434e9746678be274d9df4e26a0",
+  "run_id": "44112115793",
+  "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+  "repository": "Luixifer/AutoStudio",
+  "status": "failed",
+  "youtube_published": false,
+  "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44112115793",
+  "message": "La generación no se completó. Revisa los registros de esta ejecución; no se mostrará otro vídeo como resultado."
+}
