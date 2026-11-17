@@ -47,6 +47,17 @@ class SpanishDraftTests(unittest.TestCase):
         result=draft_spanish_narration(QUESTION,{"passages":[weak]})
         self.assertFalse(any(s["role"]=="Luz" for s in result["scenes"]))
 
+    def test_does_not_answer_different_black_hole_questions_with_interior_script(self):
+        evidence={"passages":[source("The event horizon of a black hole is the boundary of no return.")]}
+        for question in ("¿Cómo se forman los agujeros negros?",
+                         "¿Cuánto pesa un agujero negro?",
+                         "¿De qué tamaño es un agujero negro?"):
+            with self.subTest(question=question):
+                result=draft_spanish_narration(question,evidence)
+                self.assertEqual(result["status"],"unsupported_question_angle")
+                self.assertEqual(result["scenes"],[])
+                self.assertFalse(result["can_render"])
+
     def test_does_not_invent_general_subject(self):
         result=draft_spanish_narration("¿Qué es el ADN?",{"passages":[source("event horizon black hole")]})
         self.assertEqual(result["status"],"unsupported_subject")
