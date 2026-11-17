@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "apk_result_commit": "d0e5bfbede04afecc9abd561137bbe0d1d547087",
+  "build_run": "https://github.com/Luixifer/AutoStudio/actions/runs/44090864966",
+  "production_run": "https://github.com/Luixifer/AutoStudio/actions/runs/44091290548",
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.lab",
+    "version_name": "0.3.0-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Control-0.3.0-lab.apk",
+    "bytes": 66018,
+    "sha256": "8d6d4c214471a109fef11ad7e81e1590052700d44cfde1d0058f52da61a341e7",
+    "source_commit": "a6fac97b13244f859193e2321a8e8a08b5b59b59",
+    "github_run_id": "44090864966",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false
+  },
+  "signature_verified_after_download": {
+    "scheme_v2": true,
+    "scheme_v3": true,
+    "certificate_sha256": "474a8ab7cbd44d887fed6ff28ae04994dc9cb6e4407b8c611ea4a97160ac92d7",
+    "debug_only": true
+  },
+  "python_regressions_passed": 57,
+  "jvm_format_checks_passed": 12,
+  "full_android_emulator_test": {
+    "schema": 1,
+    "mode": "full",
+    "scope": "Android emulator UI and native decoder, not a physical Samsung test",
+    "physical_samsung_tested": false,
+    "native_network_probes": 1,
+    "native_github_api_verified": true,
+    "runtime_credential_format_accepted": true,
+    "credential_encrypted": true,
+    "activity_recreation_preserved_request": true,
+    "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+    "run_id": "44091290548",
+    "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44091290548",
+    "video_sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+    "video_bytes": 5278833,
+    "native_video_frame_rendered": true,
+    "playback_position_ms": 1167,
+    "passed": true
+  },
+  "process_recovery_test": {
+    "schema": 1,
+    "mode": "recovery",
+    "scope": "Android emulator UI and native decoder, not a physical Samsung test",
+    "physical_samsung_tested": false,
+    "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+    "process_restart_preserved_result": true,
+    "video_sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+    "video_bytes": 5278833,
+    "native_video_frame_rendered": true,
+    "playback_position_ms": 1077,
+    "passed": true
+  },
+  "external_mp4_decode_validation": {
+    "passed": true,
+    "errors": [],
+    "file": "cloud-short.mp4",
+    "bytes": 5278833,
+    "sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+    "duration_seconds": 34.4,
+    "video": {
+      "codec": "h264",
+      "width": 720,
+      "height": 1280,
+      "pixel_format": "yuv420p",
+      "fps": "25/1",
+      "frames": "860"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "sample_rate": 48000,
+      "decoded_rms_dbfs": -18.09,
+      "decoded_peak_dbfs": -1.45,
+      "active_100ms_windows_fraction": 0.8725,
+      "full_scale_samples_fraction": 0.0,
+      "scope": "Signal and decodability only; not speech recognition or an editorial quality approval."
+    },
+    "full_decode": "passed",
+    "fast_start": true,
+    "physical_samsung_tested": false
+  },
+  "personal_user_token_tested": false,
+  "physical_samsung_tested": false,
+  "paid_inference_used": false,
+  "youtube_publication": false
+}

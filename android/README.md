@@ -4,9 +4,13 @@ Primera aplicación nativa de control. No es todavía el centro de producción c
 
 ## Descargar e instalar desde el móvil
 
-[Descargar APK de laboratorio](https://github.com/Luixifer/AutoStudio/raw/refs/heads/android-preview/AutoStudio-Control-0.3.0-lab.apk) · [ZIP alternativo](https://github.com/Luixifer/AutoStudio/raw/refs/heads/android-preview/AutoStudio-Control-0.3.0-lab.zip)
+[**Descargar APK verificada de LAB 0.3**](https://github.com/Luixifer/AutoStudio/raw/d0e5bfbede04afecc9abd561137bbe0d1d547087/AutoStudio-Control-0.3.0-lab.apk) · [ZIP alternativo verificado](https://github.com/Luixifer/AutoStudio/raw/d0e5bfbede04afecc9abd561137bbe0d1d547087/AutoStudio-Control-0.3.0-lab.zip)
 
-Los enlaces estarán disponibles tras la primera compilación publicada. Revisa `android-preview/attempt.json`, `apk-info.json` y `SHA256SUMS`: distinguen APK compilada, prueba integral en emulador y prueba física pendiente.
+La ejecución [44090864966](https://github.com/Luixifer/AutoStudio/actions/runs/44090864966) terminó correctamente: 57 regresiones Python, 12 comprobaciones JVM y recorrido completo real en Android 15 emulado. El APK publicado se descargó y verificó externamente (SHA-256 y firmas v2/v3). Estos enlaces están fijados a ese resultado para evitar descargar otro intento por error. Consulta [el informe y las limitaciones](VALIDATION.md).
+
+SHA-256 del APK (66.018 bytes): `8d6d4c214471a109fef11ad7e81e1590052700d44cfde1d0058f52da61a341e7`.
+
+La prueba usó una credencial temporal de GitHub Actions inyectada al test en ejecución; no forma parte del APK. **Tu cuenta personal y el S25 Ultra todavía requieren la configuración y la prueba descritas abajo.**
 
 Abre el APK descargado desde Mis archivos. Si Android solicita permiso, autoriza la instalación desde el navegador o gestor de archivos que estés utilizando. Es una compilación de depuración, no una publicación en Google Play. Su identificador es `com.luixifer.autostudio.lab`: no utiliza datos de otros juegos ni aplicaciones anteriores.
 
