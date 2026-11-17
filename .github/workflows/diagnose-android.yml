@@ -18,5 +18,5 @@ jobs:
       - name: Recuperar registros exactos y redactar credenciales
         env:
           GH_DIAGNOSTIC_TOKEN: ${{ github.token }}
-          DIAGNOSTIC_RUN_IDS: '44085521884,44086726077'
+          DIAGNOSTIC_RUN_IDS: '44086768350'
         run: python3 scripts/diagnose_android_ci.py
