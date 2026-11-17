@@ -1,0 +1,33 @@
+﻿2026-11-17T12:52:48.9956096Z ##[group]Run if [ ! -e /dev/kvm ]; then echo 'No hay KVM para validar Android. No se simulará una prueba física.'; exit 1; fi
+2026-11-17T12:52:48.9956775Z [36;1mif [ ! -e /dev/kvm ]; then echo 'No hay KVM para validar Android. No se simulará una prueba física.'; exit 1; fi[0m
+2026-11-17T12:52:48.9957584Z [36;1msudo setfacl -m "u:$USER:rw" /dev/kvm[0m
+2026-11-17T12:52:48.9958092Z [36;1mecho no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name AutoStudio --package "$ANDROID_IMAGE" --device pixel_6[0m
+2026-11-17T12:52:48.9959039Z [36;1m"$ANDROID_HOME/emulator/emulator" -avd AutoStudio -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none -camera-front none -memory 2048 -cores 2 -accel on > reports/emulator.log 2>&1 &[0m
+2026-11-17T12:52:48.9959732Z [36;1madb wait-for-device[0m
+2026-11-17T12:52:48.9960112Z [36;1mtimeout 240 bash -c 'until [ "$(adb shell getprop sys.boot_completed | tr -d "\r")" = "1" ]; do sleep 2; done'[0m
+2026-11-17T12:52:48.9960719Z [36;1madb shell wm size 450x800[0m
+2026-11-17T12:52:48.9960940Z [36;1madb shell wm density 160[0m
+2026-11-17T12:52:48.9961200Z [36;1madb shell settings put global window_animation_scale 0[0m
+2026-11-17T12:52:48.9961529Z [36;1madb shell settings put global transition_animation_scale 0[0m
+2026-11-17T12:52:48.9962327Z [36;1madb shell settings put global animator_duration_scale 0[0m
+2026-11-17T12:52:48.9962620Z [36;1madb shell input keyevent 82[0m
+2026-11-17T12:52:48.9962901Z [36;1madb install build/android/AutoStudio-Control-0.3.0-lab.apk[0m
+2026-11-17T12:52:48.9963241Z [36;1madb install build/android/autostudio-instrumentation.apk[0m
+2026-11-17T12:52:48.9981673Z shell: /usr/bin/bash -e {0}
+2026-11-17T12:52:48.9981967Z env:
+2026-11-17T12:52:48.9982189Z   ANDROID_IMAGE: system-images;android-35;google_apis;x86_64
+2026-11-17T12:52:48.9982517Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-17T12:52:48.9982871Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-17T12:52:48.9983213Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-17T12:52:48.9983506Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-17T12:52:48.9983802Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-17T12:52:48.9984163Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-17T12:52:48.9984444Z   JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
+2026-11-17T12:52:48.9984675Z ##[endgroup]
+2026-11-17T12:52:49.6053538Z Loading local repository...                                                     
+2026-11-17T12:52:49.6054789Z [=========                              ] 25% Loading local repository...       
+2026-11-17T12:52:49.6055433Z [=========                              ] 25% Fetch remote repository...        
+2026-11-17T12:52:49.6056895Z [=======================================] 100% Fetch remote repository...       
+2026-11-17T12:52:49.6441936Z Auto-selecting single ABI x86_64
+2026-11-17T12:52:50.1729878Z /home/runner/work/_temp/20727227-d93e-4e8e-be37-4f84776adf9d.sh: line 5: adb: command not found
+2026-11-17T12:52:50.1746357Z ##[error]Process completed with exit code 127.
