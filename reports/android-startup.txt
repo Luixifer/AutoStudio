@@ -14,10 +14,10 @@ Serving...
 All files should be loaded. Notifying the device.
 Performing Incremental Install
 Success
-Install command complete in 2252 ms
+Install command complete in 944 ms
 Serving...
 All files should be loaded. Notifying the device.
 Performing Incremental Install
 Success
-Install command complete in 2343 ms
+Install command complete in 1303 ms
 Actual Android 15 booted and both APKs installed.

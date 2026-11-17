@@ -57,6 +57,6 @@ test_unknown_theme_does_not_silently_use_ocean (test_production.ProductionTests.
 test_unknown_visual_resource_rejected (test_production.ProductionTests.test_unknown_visual_resource_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 57 tests in 1.923s
+Ran 57 tests in 1.642s
 
 OK

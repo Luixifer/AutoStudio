@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "mode": "recovery",
+  "scope": "Android emulator UI and native decoder, not a physical Samsung test",
+  "physical_samsung_tested": false,
+  "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+  "process_restart_preserved_result": true,
+  "video_sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+  "video_bytes": 5278833,
+  "native_video_frame_rendered": true,
+  "playback_position_ms": 1077,
+  "passed": true
+}

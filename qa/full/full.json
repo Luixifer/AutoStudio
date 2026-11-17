@@ -3,6 +3,17 @@
   "mode": "full",
   "scope": "Android emulator UI and native decoder, not a physical Samsung test",
   "physical_samsung_tested": false,
-  "passed": false,
-  "failure": "UnknownHostException: Unable to resolve host \"api.github.com\": No address associated with hostname"
+  "native_network_probes": 1,
+  "native_github_api_verified": true,
+  "runtime_credential_format_accepted": true,
+  "credential_encrypted": true,
+  "activity_recreation_preserved_request": true,
+  "request_id": "010292edba5d4c5ea9794fe7832c7ddb",
+  "run_id": "44091290548",
+  "run_url": "https:\/\/github.com\/Luixifer\/AutoStudio\/actions\/runs\/44091290548",
+  "video_sha256": "c64d4af5f1fe151bfe6682d30c7d55cd6b84564bf5f1fefdc75aa2a35416c2ac",
+  "video_bytes": 5278833,
+  "native_video_frame_rendered": true,
+  "playback_position_ms": 1167,
+  "passed": true
 }
