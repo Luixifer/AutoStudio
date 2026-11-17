@@ -24,7 +24,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
-          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
       - name: Preparar tema real con enlaces NASA
         run: |
           python -m scripts.research_pipeline "¿Qué ocurre dentro de un agujero negro?" --out-dir /tmp/autostudio-lab-research
@@ -40,6 +41,8 @@ jobs:
           assert result["scene_count"]>=3
           assert result["scientifically_approved"] is False
           assert result["youtube_enabled"] is False
+          assert len(result["audio_checks"])==result["scene_count"]
+          assert all(c["timed_words"]>0 and c["engine"].startswith("Kokoro") for c in result["audio_checks"])
           print("PREVIEW_MP4_SHA256:",result["sha256"])
           print("PREVIEW_SCENES:",result["scene_count"])
           print("PREVIEW_SECONDS_ESTIMATE:",result["estimated_seconds"])
