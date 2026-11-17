@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "managed_by": "autostudio-phase-a-review",
+  "repository": "Luixifer/AutoStudio",
+  "source_commit": "515b5b6c28b5e5d298fb739c5b9f5a91f075d106",
+  "github_run_id": "44104263614",
+  "passed": false,
+  "topics": [
+    {
+      "topic_id": "auroras",
+      "topic": "Auroras polares",
+      "request_id": "735925e6d8d94e50b45bc2b991c0df41",
+      "status": "validated",
+      "run_id": "44104396148",
+      "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44104396148",
+      "video_url": "https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/jobs/735925e6d8d94e50b45bc2b991c0df41/short_ciencia_demo.mp4",
+      "raw_video_url": "https://raw.githubusercontent.com/Luixifer/AutoStudio/video-preview/jobs/735925e6d8d94e50b45bc2b991c0df41/short_ciencia_demo.mp4",
+      "duration_seconds": 39.48,
+      "bytes": 2802335,
+      "sha256": "0f0fea1fc77b4f524b364ffd1eb5356b82fec6e713c4833fc79ad190829434dd",
+      "scene_count": 8,
+      "word_count": 97,
+      "story_sha256": "0b0ca7894d00f2ebc1ab8893f8f0b21da51c999cf66755b1fe684902896cfb0f",
+      "asset_hashes": [
+        "9ed9086bf765f439c51f23810cdd578ac8187178b7ff3516bd76467d80572c90",
+        "3047f89f6bb125ed522c21d52660519d73254fdcc721248f50ac66948169360d",
+        "2b8d0df273565d92432d454588bfb41fe0fe80cd22e25ab267f76a50c28778d3",
+        "5860d62692f18504bfa213fef203a1a6fce3cf4b27b241bac450f9dc6d7382e5",
+        "ff8b70b3828ba060a73c3abce4a11e1b7fd592f91807f69d581c4f227d7cd007",
+        "fdd2082ab9a3c71ae2eb3ea79bf2bc572b5275a13581490d66581e211e3d2b8c",
+        "8fb748e737a46a366037b6d92af2ef944f21ee2720571cf322a5dd383f946152",
+        "2068b3aa64b1a3a2028605b4c7e1d6cc3082c5fa2f995dd66068ee6025b7c42b"
+      ]
+    },
+    {
+      "topic_id": "dna",
+      "topic": "ADN: cómo usan las células sus instrucciones",
+      "request_id": "03ffb764858c47af867c03c9ce5ac306",
+      "status": "completed",
+      "run_id": "44104974312",
+      "run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44104974312"
+    }
+  ],
+  "physical_samsung_tested": false,
+  "youtube_published": false,
+  "error": "RuntimeError: Actual production failed for dna at https://github.com/Luixifer/AutoStudio/actions/runs/44104974312",
+  "job_status": "failure",
+  "review_run_url": "https://github.com/Luixifer/AutoStudio/actions/runs/44104263614"
+}

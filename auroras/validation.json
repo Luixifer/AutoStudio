@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "errors": [],
+  "file": "auroras.mp4",
+  "bytes": 2802335,
+  "sha256": "0f0fea1fc77b4f524b364ffd1eb5356b82fec6e713c4833fc79ad190829434dd",
+  "duration_seconds": 39.48,
+  "video": {
+    "codec": "h264",
+    "width": 720,
+    "height": 1280,
+    "pixel_format": "yuv420p",
+    "fps": "25/1",
+    "frames": "987"
+  },
+  "audio": {
+    "codec": "aac",
+    "channels": 2,
+    "sample_rate": 48000,
+    "decoded_rms_dbfs": -17.98,
+    "decoded_peak_dbfs": -1.42,
+    "active_100ms_windows_fraction": 0.8785,
+    "full_scale_samples_fraction": 0.0,
+    "scope": "Signal and decodability only; not speech recognition or an editorial quality approval."
+  },
+  "full_decode": "passed",
+  "fast_start": true,
+  "physical_samsung_tested": false
+}
