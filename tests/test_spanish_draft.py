@@ -36,6 +36,17 @@ class SpanishDraftTests(unittest.TestCase):
         bad["source_url"]="https://fake-science.nasa.gov.evil.org/"
         self.assertFalse(draft_spanish_narration(QUESTION,{"passages":[bad]})["scenes"])
 
+    def test_spoofed_nasa_prefix_is_not_accepted(self):
+        fake=source("The event horizon is the boundary of a black hole.",
+                    url="https://science.nasa.gov.evil.org/universe")
+        result=draft_spanish_narration(QUESTION,{"passages":[fake]})
+        self.assertEqual(result["scenes"],[])
+
+    def test_light_requires_explicit_escape_evidence(self):
+        weak=source("A black hole has light near an event horizon and changes how we see it.")
+        result=draft_spanish_narration(QUESTION,{"passages":[weak]})
+        self.assertFalse(any(s["role"]=="Luz" for s in result["scenes"]))
+
     def test_does_not_invent_general_subject(self):
         result=draft_spanish_narration("¿Qué es el ADN?",{"passages":[source("event horizon black hole")]})
         self.assertEqual(result["status"],"unsupported_subject")
