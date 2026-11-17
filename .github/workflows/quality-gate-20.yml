@@ -1,0 +1,38 @@
+name: AutoStudio PERSONAL · Quality Gate 20
+on:
+  push:
+    branches: [feature/quality-gate-20]
+    paths:
+      - 'scripts/personal_studio.py'
+      - 'scripts/personal_editor.py'
+      - 'scripts/personal_quality.py'
+      - 'tests/test_personal_studio.py'
+      - 'tests/test_personal_video_real.py'
+      - '.github/workflows/quality-gate-20.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts-and-real-render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar FFmpeg y Pillow sin APIs
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Pruebas de seguridad y formatos
+        run: python -m unittest discover -s tests -p 'test_personal_studio.py' -v
+      - name: Compilación MP4 real sin fingir voz neuronal
+        run: python -m unittest discover -s tests -p 'test_personal_video_real.py' -v
+      - name: Guardar informe de pruebas
+        if: always()
+        run: |
+          echo "### Quality Gate 20" >> "$GITHUB_STEP_SUMMARY"
+          echo "Modo LAB prueba movimientos, subtítulos, codecs y QA; la voz sintética de prueba no representa la voz Álex." >> "$GITHUB_STEP_SUMMARY"
+          echo "No publica en YouTube. Los formatos documentales requieren contenido y prueba de duración propios." >> "$GITHUB_STEP_SUMMARY"
