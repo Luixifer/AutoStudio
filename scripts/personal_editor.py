@@ -78,7 +78,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for cue in cues:
         events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
     result=header+"".join(events)
-    if result.count("\\nDialogue:") != len(cues)+2:
+    if result.count("\nDialogue:") != len(cues)+2:
         raise ValueError("Malformed ASS event separators; refusing visual corruption.")
     Path(path).write_text(result,encoding="utf-8")
 
