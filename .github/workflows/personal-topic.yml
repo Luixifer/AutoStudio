@@ -1,0 +1,67 @@
+name: AutoStudio PERSONAL · Generar tema científico
+run-name: AutoStudio personal · ${{ inputs.topic }}
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Tema disponible (catálogo inicial)"
+        required: true
+        type: choice
+        options:
+          - auroras
+          - dna
+          - volcanoes
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-personal-${{ github.actor }}
+  cancel-in-progress: false
+jobs:
+  make-video:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Cargar código verificado y catálogos originales
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 46152fe6a850a7531c8880b2e32b4c53182bcdba
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas locales gratuitas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Render de un tema con Álex y auditoría audiovisual
+        env:
+          TOPIC: ${{ inputs.topic }}
+        run: |
+          python -m scripts.personal_catalog "$TOPIC" --out /tmp/autostudio-personal --render
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("/tmp/autostudio-personal/render/quality-report.json").read_text(encoding="utf8"))
+          assert r["technical_passed"] and not r["ready_to_publish"]
+          assert not r["youtube_enabled"]
+          assert r["visual_audit"]["shots_checked"]==8
+          assert not r["visual_audit"]["technical_errors"]
+          assert len(r["sha256"])==64
+          print("AUTOSTUDIO_PERSONAL_MP4_SHA256",r["sha256"])
+          print("AUTOSTUDIO_PERSONAL_SECONDS",r["seconds"])
+          PY
+      - name: Adjuntar MP4 para la biblioteca de la APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Personal-${{ inputs.topic }}-Alex-REVIEW
+          path: |
+            /tmp/autostudio-personal/render/autostudio-personal-REVIEW.mp4
+            /tmp/autostudio-personal/render/quality-report.json
+            /tmp/autostudio-personal/render/visual-audit.json
+            /tmp/autostudio-personal/render/contacto-planos.jpg
+            /tmp/autostudio-personal/render/captions.srt
+            /tmp/autostudio-personal/storyboard/storyboard.json
+          if-no-files-found: error
+          retention-days: 7
