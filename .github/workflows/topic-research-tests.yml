@@ -9,6 +9,7 @@ on:
       - 'scripts/narration_candidates.py'
       - 'scripts/source_quality.py'
       - 'scripts/external_sources.py'
+      - 'scripts/nasa_reading.py'
       - 'tests/test_topic_intake.py'
       - 'tests/test_topic_research.py'
       - 'tests/test_storyboard_draft.py'
@@ -16,6 +17,7 @@ on:
       - 'tests/test_narration_candidates.py'
       - 'tests/test_source_quality.py'
       - 'tests/test_external_sources.py'
+      - 'tests/test_nasa_reading.py'
       - '.github/workflows/topic-research-tests.yml'
   workflow_dispatch:
 permissions:
@@ -38,6 +40,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_narration_candidates.py' -v
           python -m unittest discover -s tests -p 'test_source_quality.py' -v
           python -m unittest discover -s tests -p 'test_external_sources.py' -v
+          python -m unittest discover -s tests -p 'test_nasa_reading.py' -v
       - name: Probe public research access for a new topic (non-blocking)
         run: |
           python -m scripts.research_pipeline "¿Por qué vemos siempre la misma cara de la Luna?" --out-dir /tmp/autostudio-research
@@ -67,4 +70,8 @@ jobs:
           print("BLACK_HOLE_SOURCE_LEADS:",len(report["dossier"].get("sources",[])))
           print("BLACK_HOLE_RELEVANT_CANDIDATES:",len(candidates))
           print("BLACK_HOLE_STATUS:",report["narration_candidates"]["status"])
+          evidence=report["nasa_evidence"]
+          print("BLACK_HOLE_NASA_PASSAGES:",len(evidence["passages"]))
+          print("BLACK_HOLE_NASA_ERRORS:",len(evidence["errors"]))
+          assert all(not p["ready_for_narration"] for p in evidence["passages"])
           PY
