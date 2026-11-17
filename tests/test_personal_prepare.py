@@ -14,9 +14,9 @@ from scripts.personal_studio import load_project
 class TestNarrator:
     def synthesize(self,text,target):
         rate=16000;seconds=6.2
-        with wave.open(str(target),"wb") as output:
+        tone=14+(sum(ord(c) for c in text)%13)\n        with wave.open(str(target),"wb") as output:
             output.setnchannels(1);output.setsampwidth(2);output.setframerate(rate)
-            output.writeframes(b"".join(struct.pack("<h",int(2500*math.sin(i/20)))
+            output.writeframes(b"".join(struct.pack("<h",int(2500*math.sin(i/tone)))
                                         for i in range(int(rate*seconds))))
         words=text.split()
         return {"voice":"em_alex","words":[
@@ -35,7 +35,7 @@ class SingleClickTests(unittest.TestCase):
                 scenes.append({
                     "image":pic.name,
                     "heading":"PLANETA EXTREMO",
-                    "narration":"Un planeta extraordinario puede sorprendernos desde una galaxia muy lejana.",
+                    "narration":"Un planeta extraordinario puede sorprendernos desde una galaxia muy lejana. Escena número "+str(i+1)+".",
                     "rights":{"license":"original_user"}
                 })
             data={"schema":3,"format":"short","language":"es","youtube":{"enabled":False},
