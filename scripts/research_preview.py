@@ -1,6 +1,6 @@
 """Create a clearly labeled non-publishable 9:16 research preview video.
 
-Uses ONLY locally rendered schematic diagrams and eSpeak NG speech. This is
+Uses ONLY locally rendered schematic diagrams and neural Kokoro ONNX speech. This is
 not cinematic footage, source-verified science or a YouTube-ready product.
 Never reuses visuals from a different scientific topic.
 """
@@ -90,7 +90,7 @@ def frame(scene, index, count, output):
 
 def produce(package, directory):
     scenes=validate_preview(package)
-    for binary in ("ffmpeg","ffprobe","espeak-ng"):
+    for binary in ("ffmpeg","ffprobe"):
         if not shutil.which(binary):
             raise RuntimeError("Falta una herramienta gratuita: "+binary)
     try:
@@ -99,15 +99,20 @@ def produce(package, directory):
         raise RuntimeError("Pillow no está instalado.") from exc
     directory=Path(directory)
     directory.mkdir(parents=True,exist_ok=True)
+    from scripts.neural_narration import NeuralNarrator
+    narrator=NeuralNarrator()
     parts=[]
     durations=[]
+    audio_checks=[]
     for i,scene in enumerate(scenes,1):
         still=directory/f"scene_{i:02}.png"
         audio=directory/f"scene_{i:02}.wav"
         video=directory/f"scene_{i:02}.mp4"
         frame(scene,i,len(scenes),still)
-        subprocess.run(["espeak-ng","-v","es","-s","148","-w",str(audio),"--stdin"],
-                       input=scene["narration_draft_es"],text=True,check=True,timeout=60)
+        synthesis=narrator.synthesize(scene["narration_draft_es"],audio)
+        if synthesis.get("engine")!="Kokoro ONNX 0.6.1, local CPU" or not synthesis.get("words"):
+            raise ValueError("Voz neuronal o duraciones de palabras no verificadas.")
+        audio_checks.append({"scene":i,"engine":synthesis["engine"],"timed_words":len(synthesis["words"])})
         with wave.open(str(audio),"rb") as wav:
             seconds=wav.getnframes()/wav.getframerate()+.5
         if not 1<=seconds<=35:
@@ -142,7 +147,8 @@ def produce(package, directory):
         "paid_inference":False,
         "visuals":"Distinct conceptual schematic illustrations and slow zoom; not footage or simulation",
         "visual_role_signatures":[scene_visual_signature(scene["role"]) for scene in scenes],
-        "audio":"eSpeak NG offline Spanish (experimental quality)",
+        "audio":"Kokoro ONNX offline, ef_dora (sin validación humana de naturalidad)",
+        "audio_checks":audio_checks,
         "references":[s["reference_url"] for s in scenes],
     }
     (directory/"preview-report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
