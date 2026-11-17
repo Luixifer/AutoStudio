@@ -14,7 +14,8 @@ from scripts.personal_studio import load_project
 class TestNarrator:
     def synthesize(self,text,target):
         rate=16000;seconds=6.2
-        tone=14+(sum(ord(c) for c in text)%13)\n        with wave.open(str(target),"wb") as output:
+        tone=14+(sum(ord(c) for c in text)%13)
+        with wave.open(str(target),"wb") as output:
             output.setnchannels(1);output.setsampwidth(2);output.setframerate(rate)
             output.writeframes(b"".join(struct.pack("<h",int(2500*math.sin(i/tone)))
                                         for i in range(int(rate*seconds))))
