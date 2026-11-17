@@ -16,14 +16,14 @@ jobs:
   research:
     if: ${{ github.event.repository.private == false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     env:
       AUTOSTUDIO_TOPIC: ${{ inputs.topic }}
     steps:
       - name: Obtener versión de investigación 0.4 validada
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: fdfd99b9de90f6fbeb0276b0ba9154d57c402bb9
+          ref: 1641b12b49b5abc34f9a7f870e8ee5afd68471ef
           persist-credentials: false
       - name: Configurar Python 3.12
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -126,3 +126,40 @@ jobs:
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as file:
               file.write("\n".join(output) + "\n")
           PY
+      - name: Preparar herramientas locales para MP4 de demostración
+        if: ${{ inputs.topic == '¿Qué ocurre dentro de un agujero negro?' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Generar vista previa narrada sin revisión editorial
+        if: ${{ inputs.topic == '¿Qué ocurre dentro de un agujero negro?' }}
+        env:
+          REPORT_DIR: ${{ runner.temp }}/autostudio-research
+          PREVIEW_DIR: ${{ runner.temp }}/autostudio-preview
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from scripts.research_preview import produce
+          packages=list(Path(os.environ["REPORT_DIR"]).glob("*.json"))
+          assert len(packages)==1
+          report=produce(json.loads(packages[0].read_text(encoding="utf-8")),Path(os.environ["PREVIEW_DIR"]))
+          assert report["scientifically_approved"] is False
+          assert report["youtube_enabled"] is False
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as out:
+              out.write("\n## MP4 experimental disponible\n")
+              out.write("Descarga el ZIP **AutoStudio-Research-UNREVIEWED-MP4** en Artifacts.\n")
+              out.write("⚠️ **BORRADOR NO REVISADO · gráficos esquemáticos · voz de prueba · NO PUBLICAR**.\n")
+              out.write(f"Duración aproximada: {report['estimated_seconds']} s.\n")
+          PY
+      - name: Adjuntar MP4 experimental descargable
+        if: ${{ inputs.topic == '¿Qué ocurre dentro de un agujero negro?' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Research-UNREVIEWED-MP4
+          path: |
+            ${{ runner.temp }}/autostudio-preview/autostudio-black-hole-REVIEW-ONLY.mp4
+            ${{ runner.temp }}/autostudio-preview/preview-report.json
+          if-no-files-found: error
+          retention-days: 7
