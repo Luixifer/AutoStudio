@@ -24,7 +24,8 @@ public final class MainActivity extends Activity implements JobController.Listen
         scenes=Ui.button(progress,"Ver escenas de este vídeo",Ui.SCENES,false);scenes.setOnClickListener(v->startActivity(new Intent(this,ScenesActivity.class).putExtra("request_id",jobs.snapshot().optString("request_id"))));
         logs=Ui.button(progress,"Ver ejecución en GitHub",1011,false);logs.setOnClickListener(v->Ui.browser(this,jobs.snapshot().optString("run_url","https://github.com/"+GitHubClient.REPO+"/actions")));
         Ui.para(progress,"Puedes cerrar la aplicación: la generación continúa en GitHub. Al volver, se consulta la misma solicitud. El móvil no renderiza el vídeo.");
-        Ui.button(body,"Mis vídeos · incluidos borradores",1210,true).setOnClickListener(v->startActivity(new Intent(this,ResearchVideosActivity.class)));
+        Ui.button(body,"Crear vídeo personal · auroras, ADN o volcanes",2210,true).setOnClickListener(v->startActivity(new Intent(this,PersonalVideosActivity.class)));
+        Ui.button(body,"Investigaciones anteriores y sus borradores",1210,false).setOnClickListener(v->startActivity(new Intent(this,ResearchVideosActivity.class)));
         Ui.button(body,"Biblioteca de Shorts anteriores",1012,false).setOnClickListener(v->startActivity(new Intent(this,LibraryActivity.class)));
         Ui.para(body,"Sin publicación en YouTube. Documentales, producción por lotes y edición de escenas están pendientes de validar tras este primer recorrido.");
     }
