@@ -27,6 +27,14 @@ public final class GitHubClient {
     }
     public void verifyConnection() throws Exception{JSONObject repo=api("","GET",null);if(repo.optBoolean("private",true))throw new IOException("Esta edición solo produce en el repositorio público previsto; no activa runners de pago.");JSONObject flow=api("/actions/workflows/"+WORKFLOW,"GET",null);if(!flow.optString("state").equals("active"))throw new IOException("El workflow de producción no está activo.");}
     public void dispatch(String id,String topic) throws Exception{if(!validId(id))throw new IOException("Identificador inválido.");JSONObject inputs=new JSONObject().put("request_id",id).put("topic",topic);api("/actions/workflows/"+WORKFLOW+"/dispatches","POST",new JSONObject().put("ref","main").put("inputs",inputs));}
+    /** Dispatches one of three reviewed catalogue identifiers; no arbitrary-topic promise. */
+    public void dispatchPersonal(String topic) throws Exception {
+        if(!("auroras".equals(topic)||"dna".equals(topic)||"volcanoes".equals(topic)))
+            throw new IOException("Tema aún no disponible para vídeo: "+topic);
+        JSONObject inputs=new JSONObject().put("topic",topic);
+        api("/actions/workflows/personal-topic.yml/dispatches","POST",
+            new JSONObject().put("ref","main").put("inputs",inputs));
+    }
     /** Launches the read-only research trial. This does not produce an MP4. */
     public void dispatchResearch(String topic) throws Exception {
         if (topic == null || topic.trim().length() < 3 || topic.trim().length() > 160
