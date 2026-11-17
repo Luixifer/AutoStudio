@@ -26,6 +26,13 @@ def words_from_phonemes(text,spoken):
         result.append({'word':word,'start':min(t.start for t in sounds),'end':max(t.end for t in sounds)})
     return result
 
+# Selected by the user after listening to three voices of KELT-9b.
+# A voice preference does not imply human-review approval of every rendition.
+DEFAULT_VOICE="em_alex"
+DEFAULT_SPEED=0.99
+DEFAULT_SENTENCE_PAUSE=0.22
+DEFAULT_CLAUSE_PAUSE=0.09
+
 class NeuralNarrator:
     def __init__(self,directory=None):
         import numpy as np
@@ -44,14 +51,17 @@ class NeuralNarrator:
         session=rt.InferenceSession(str(directory/'kokoro-v1.0.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
         self.engine=Kokoro.from_session(session,str(directory/'voices-v1.0.bin'),EspeakConfig(lib_path=espeakng_loader.get_library_path(),data_path=espeakng_loader.get_data_path()))
         if not self.engine.has_timings:raise RuntimeError('Model has no durations; no fallback to estimated subtitles.')
-        if 'ef_dora' not in self.engine.get_voices():raise RuntimeError('Requested Spanish voice absent.')
-    def synthesize(self,text,target):
+        if DEFAULT_VOICE not in self.engine.get_voices():raise RuntimeError('Requested Spanish voice absent: '+DEFAULT_VOICE)
+    def synthesize(self,text,target,*,voice=DEFAULT_VOICE,speed=DEFAULT_SPEED,sentence_pause=DEFAULT_SENTENCE_PAUSE,clause_pause=DEFAULT_CLAUSE_PAUSE):
         import numpy as np
-        audio,rate,spoken=self.engine.create_timed(text,voice='ef_dora',lang='es',speed=.88,trim=True,sentence_pause=.18,clause_pause=.07)
+        if not isinstance(text,str) or not text.strip():raise ValueError('Empty narration.')
+        if voice not in ('em_alex','ef_dora') or voice not in self.engine.get_voices():raise ValueError('Voice unavailable or not approved for testing.')
+        if not .85<=speed<=1.15 or not 0<=sentence_pause<=.5 or not 0<=clause_pause<=.3:raise ValueError('Unsafe pace parameters.')
+        audio,rate,spoken=self.engine.create_timed(text,voice=voice,lang='es',speed=speed,trim=True,sentence_pause=sentence_pause,clause_pause=clause_pause)
         words=words_from_phonemes(text,spoken)
         if not np.all(np.isfinite(audio)) or not len(audio):raise ValueError('Invalid neural audio.')
         if words[-1]['end']>len(audio)/rate+.01:raise ValueError('Timings extend beyond actual audio.')
         target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
         with wave.open(str(target),'wb') as f:
             f.setnchannels(1);f.setsampwidth(2);f.setframerate(rate);f.writeframes((np.clip(audio,-1,1)*32767).astype('<i2').tobytes())
-        return {'engine':'Kokoro ONNX 0.6.1, local CPU','model':'Kokoro 82M v1.0','voice':'ef_dora','locale_requested':'es-ES','phonemizer_language':'es (Castilian Spanish)','speed':.88,'sample_rate':rate,'timing_method':'model phoneme durations mapped at explicit word boundaries','words':words,'model_sha256':self.hashes,'accent_reviewed_by_human':False,'paid_inference_api':False}
+        return {'engine':'Kokoro ONNX 0.6.1, local CPU','model':'Kokoro 82M v1.0','voice':voice,'locale_requested':'es-ES','phonemizer_language':'es (Castilian Spanish)','speed':speed,'sample_rate':rate,'timing_method':'model phoneme durations mapped at explicit word boundaries','words':words,'model_sha256':self.hashes,'accent_reviewed_by_human':False,'paid_inference_api':False}
