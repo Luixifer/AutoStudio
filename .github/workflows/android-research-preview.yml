@@ -1,4 +1,4 @@
-name: AutoStudio 0.4 · APK de investigación para Samsung
+name: AutoStudio 0.5 · APK con biblioteca de vídeos
 run-name: APK investigar · ${{ github.sha }}
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
         run: python android/build.py
       - name: Verificar APK y certificado
         run: |
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/android/AutoStudio-Control-0.4.0-lab.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/android/AutoStudio-Control-0.5.0-lab.apk
           python - <<'PY'
           import hashlib,json
           from pathlib import Path
@@ -42,7 +42,7 @@ jobs:
           apk=Path('build/android')/info['apk']
           assert apk.exists()
           assert hashlib.sha256(apk.read_bytes()).hexdigest()==info['sha256']
-          assert info['application_id']=='com.luixifer.autostudio.lab04'
+          assert info['application_id']=='com.luixifer.autostudio.lab05'
           print('APK_BYTES',info['bytes'])
           print('APK_SHA256',info['sha256'])
           print('SOURCE_COMMIT',info['source_commit'])
@@ -50,9 +50,9 @@ jobs:
       - name: Subir APK de laboratorio como archivo de GitHub Actions
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: AutoStudio-0.4-Investigar-APK
+          name: AutoStudio-0.5-Mis-Videos-APK
           path: |
-            build/android/AutoStudio-Control-0.4.0-lab.apk
+            build/android/AutoStudio-Control-0.5.0-lab.apk
             build/android/SHA256SUMS
             build/android/apk-info.json
           retention-days: 7
