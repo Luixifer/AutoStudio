@@ -1,0 +1,53 @@
+name: AutoStudio PERSONAL · Short Aurora con Álex y QA
+on:
+  push:
+    branches: [feature/quality-gate-20]
+    paths:
+      - 'scripts/personal_demo.py'
+      - 'scripts/personal_studio.py'
+      - 'scripts/personal_editor.py'
+      - 'scripts/personal_quality.py'
+      - '.github/workflows/personal-demo-alex.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-voice-short:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar dependencias sin APIs de pago
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Montar Short auténtico con ocho imágenes y voz Alex
+        run: |
+          python -m scripts.personal_demo --out /tmp/autostudio-aurora
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path("/tmp/autostudio-aurora/render/quality-report.json")
+          report=json.loads(p.read_text(encoding="utf-8"))
+          assert report["technical_passed"] and not report["ready_to_publish"]
+          assert len(report["shots"])==8
+          assert report["subtitle_words"]>80
+          assert report["size"]==[720,1280]
+          print("PERSONAL_READY_FOR_REVIEW",report["sha256"],report["seconds"])
+          PY
+      - name: Guardar MP4, subtítulos y control de calidad
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Personal-Auroras-8-Escenas-Alex-PREVIEW
+          path: |
+            /tmp/autostudio-aurora/render/autostudio-personal-REVIEW.mp4
+            /tmp/autostudio-aurora/render/captions.srt
+            /tmp/autostudio-aurora/render/quality-report.json
+            /tmp/autostudio-aurora/input/auroras-personal.json
+          if-no-files-found: error
+          retention-days: 7
