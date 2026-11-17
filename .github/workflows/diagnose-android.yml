@@ -1,0 +1,22 @@
+name: AutoStudio · Diagnóstico Android
+on:
+  workflow_dispatch:
+  push:
+    tags: ['diagnose-android-*']
+permissions:
+  contents: read
+jobs:
+  logs:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Recuperar registros exactos y redactar credenciales
+        env:
+          GH_DIAGNOSTIC_TOKEN: ${{ github.token }}
+          DIAGNOSTIC_RUN_IDS: '44085521884,44086726077'
+        run: python3 scripts/diagnose_android_ci.py
