@@ -1,0 +1,47 @@
+name: AutoStudio PERSONAL · KELT-9b voz Alex completa
+on:
+  push:
+    branches: [feature/topic-intake-v04]
+    paths:
+      - scripts/kelt9b_alex_full.py
+      - .github/workflows/kelt9b-alex-full.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audio:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Instalar Kokoro local y verificar modelo
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Generar voz por escena y duración real
+        run: |
+          python -m scripts.kelt9b_alex_full --out /tmp/kelt9b-alex-10
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          folder=Path('/tmp/kelt9b-alex-10')
+          m=json.loads((folder/'alex-scene-manifest.json').read_text(encoding='utf8'))
+          assert m['voice']=='em_alex' and m['scene_count']==10
+          assert not m['youtube_enabled'] and not m['scientifically_approved']
+          for item in m['scenes']:
+              path=folder/item['file']
+              assert path.exists() and hashlib.sha256(path.read_bytes()).hexdigest()==item['sha256']
+              assert item['words'] and 1.5<item['seconds']<20
+          PY
+      - name: Adjuntar las diez frases narradas
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-KELT9b-Alex-10-escenas-WAV
+          path: |
+            /tmp/kelt9b-alex-10/*.wav
+            /tmp/kelt9b-alex-10/alex-scene-manifest.json
+          if-no-files-found: error
+          retention-days: 7
