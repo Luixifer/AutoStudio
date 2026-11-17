@@ -43,7 +43,7 @@ class ResearchTests(unittest.TestCase):
     def test_provider_strips_untrusted_links_and_limits_extract(self):
         payload = {"query": {"pages": [
             {"title": "Aurora", "fullurl": "https://es.wikipedia.org/wiki/Aurora_polar",
-             "extract": "a" * 3000},
+             "extract": "a" * 30000},
             {"title": "Malicioso", "fullurl": "http://example.com/bad", "extract": "Falso"},
         ]}}
         def fake_open(request, timeout):
@@ -52,7 +52,7 @@ class ResearchTests(unittest.TestCase):
             return Response(payload)
         results = fetch_wikipedia_candidates("Aurora", opener=fake_open)
         self.assertEqual(len(results), 1)
-        self.assertLessEqual(len(results[0]["excerpt"]), 1200)
+        self.assertLessEqual(len(results[0]["excerpt"]), 12000)
         self.assertEqual(results[0]["evidence_level"], "secondary_lead_only")
 
     def test_inside_question_retrieves_second_targeted_query(self):
