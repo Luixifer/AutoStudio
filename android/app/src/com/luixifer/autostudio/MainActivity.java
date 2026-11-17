@@ -16,7 +16,8 @@ public final class MainActivity extends Activity implements JobController.Listen
         try{java.util.List<TopicCatalog.Topic> choices=TopicCatalog.load(this);ArrayAdapter<TopicCatalog.Topic> adapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,choices);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);topic.setAdapter(adapter);}catch(Exception e){Ui.error(this,"No se pudo cargar el catálogo publicado. No se enviará ningún trabajo.");}
         form.addView(topic,new LinearLayout.LayoutParams(-1,Ui.dp(this,60)));
         generate=Ui.button(form,"Generar Short",Ui.GENERATE,true);generate.setOnClickListener(v->{try{if(topic.getSelectedItem()==null)throw new Exception("No hay un tema disponible.");jobs.start(((TopicCatalog.Topic)topic.getSelectedItem()).name);}catch(Exception e){Ui.error(this,e.getMessage());}});
-        Ui.para(form,"El tema, guion, vídeo y registros se guardan en el repositorio público Luixifer/AutoStudio. No introduzcas información privada. YouTube permanece desactivado.");
+        Ui.button(form,"Investigar tema libre (prueba)",1030,false).setOnClickListener(v->startActivity(new Intent(this,ResearchActivity.class)));
+        Ui.para(form,"Investigar no produce MP4. El tema, guion, vídeo y registros se guardan en el repositorio público Luixifer/AutoStudio. No introduzcas información privada. YouTube permanece desactivado.");
         LinearLayout progress=Ui.card(body);progress.addView(Ui.text(this,"Tu producción",20,true));status=Ui.para(progress,"Todavía no hay una producción.");status.setId(Ui.STATUS);
         Ui.button(progress,"Consultar estado",1010,false).setOnClickListener(v->jobs.refresh());
         play=Ui.button(progress,"Reproducir MP4",Ui.PLAY,true);play.setOnClickListener(v->{JSONObject s=jobs.snapshot();startActivity(new Intent(this,PlayerActivity.class).putExtra("request_id",s.optString("request_id")));});
