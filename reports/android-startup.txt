@@ -1,0 +1,23 @@
+Android Debug Bridge version 1.0.41
+Version 37.0.1-15733141
+Installed as /usr/local/lib/android/sdk/platform-tools/adb
+Running on Linux 7.0.0-1017-azure (x86_64)
+Loading local repository...                                                     
+[=========                              ] 25% Loading local repository...       
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+Auto-selecting single ABI x86_64
+SDK paths verified. AVDs: AutoStudio
+* daemon not running; starting now at tcp:5037
+* daemon started successfully
+Serving...
+All files should be loaded. Notifying the device.
+Performing Incremental Install
+Success
+Install command complete in 3801 ms
+Serving...
+All files should be loaded. Notifying the device.
+Performing Incremental Install
+Success
+Install command complete in 2338 ms
+Actual Android 15 booted and both APKs installed.

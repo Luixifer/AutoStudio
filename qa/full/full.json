@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "mode": "full",
+  "scope": "Android emulator UI and native decoder, not a physical Samsung test",
+  "physical_samsung_tested": false,
+  "native_network_probes": 1,
+  "native_github_api_verified": true,
+  "runtime_credential_format_accepted": true,
+  "credential_encrypted": true,
+  "selected_topic_id": "auroras",
+  "bundled_published_topics": 4,
+  "activity_recreation_preserved_request": true,
+  "request_id": "0bbc2f863ab14a00a647afe6d32d82d9",
+  "run_id": "44108051606",
+  "run_url": "https:\/\/github.com\/Luixifer\/AutoStudio\/actions\/runs\/44108051606",
+  "video_sha256": "5d80b06e5c7d68e60e51a92fd0eb81a1d5f12bb6e4acc787ae15d0aa7d00b797",
+  "video_bytes": 2809858,
+  "native_video_frame_rendered": true,
+  "playback_position_ms": 836,
+  "passed": true
+}

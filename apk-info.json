@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "application_id": "com.luixifer.autostudio.lab04",
+  "version_name": "0.4.0-lab",
+  "signing": "debug-only; no release credentials",
+  "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+  "apk": "AutoStudio-Control-0.4.0-lab.apk",
+  "bytes": 70179,
+  "sha256": "edd4303afa773bee1fd0e67e95ba16c89117798a0208c473edc70c5ef74f5f9f",
+  "source_commit": "256089d751385e57a338dc80dfe9a1b919470a27",
+  "github_run_id": "44107541708",
+  "worktree_dirty": false,
+  "physical_samsung_tested": false,
+  "published_topic_ids": [
+    "ocean-life",
+    "auroras",
+    "dna",
+    "volcanoes"
+  ],
+  "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+}
