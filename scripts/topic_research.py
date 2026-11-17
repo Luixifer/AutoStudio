@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 from scripts.topic_intake import prepare_topic
 from scripts.source_quality import valid_science_lead
+from scripts.external_sources import external_leads
 
 WIKIPEDIA_API = "https://es.wikipedia.org/w/api.php"
 USER_AGENT = "AutoStudio-Research/0.4 (educational; GitHub Luixifer/AutoStudio)"
@@ -91,7 +92,7 @@ def fetch_wikipedia_candidates(topic, opener=urlopen):
     return found[:8]
 
 
-def research_topic(topic, collector=fetch_wikipedia_candidates):
+def research_topic(topic, collector=fetch_wikipedia_candidates, external_collector=None):
     dossier = prepare_topic(topic)
     if dossier["can_render"]:
         dossier["research"] = {
@@ -99,28 +100,58 @@ def research_topic(topic, collector=fetch_wikipedia_candidates):
             "note": "El tema pertenece al catálogo existente; esta ejecución no revisa sus fuentes.",
         }
         return dossier
+    wiki_error = None
     try:
-        sources = collector(dossier["topic"])
-        if not isinstance(sources, list):
+        wiki_sources = collector(dossier["topic"])
+        if not isinstance(wiki_sources, list):
             raise ValueError("Fuentes inválidas.")
     except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as exc:
-        dossier["research"] = {
-            "status": "unavailable",
-            "error_type": type(exc).__name__,
-            "note": "Fallo de consulta; sin afirmaciones científicas generadas.",
-        }
-        return dossier
-    dossier["sources"] = sources
+        wiki_sources = []
+        wiki_error = type(exc).__name__
+
+    # Existing injected collector tests remain network-free. In production we
+    # request institutional / bibliographic leads even when Wikipedia fails.
+    external_error = None
+    if external_collector is None and collector is fetch_wikipedia_candidates:
+        external_collector = external_leads
+    additional = []
+    if external_collector is not None:
+        try:
+            additional, external_error = external_collector(dossier["topic"])
+            if not isinstance(additional, list):
+                raise ValueError("Fuentes académicas inválidas.")
+        except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as exc:
+            additional = []
+            external_error = type(exc).__name__
+
+    seen = set()
+    merged = []
+    for item in [*additional, *wiki_sources]:
+        if not isinstance(item, dict):
+            continue
+        url = item.get("url")
+        if not isinstance(url, str) or not url.startswith("https://") or url in seen:
+            continue
+        seen.add(url)
+        merged.append(item)
+    dossier["sources"] = merged
+    status = ("leads_found_not_verified" if merged else
+              "unavailable" if wiki_error or external_error else "no_leads")
     dossier["research"] = {
-        "status": "leads_found_not_verified" if sources else "no_leads",
+        "status": status,
         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
         "note": (
-            "Los extractos solo son pistas de investigación. Faltan fuentes científicas "
-            "independientes, evaluación editorial, guion, visuales y revisión de licencias."
+            "NASA: enlaces institucionales seleccionados, no artículos leídos. "
+            "Crossref: metadatos de publicaciones, no afirmaciones comprobadas. "
+            "Wikipedia: extractos secundarios sin revisión. Falta contrastar hechos."
         ),
         "verified_scientific_sources": 0,
+        "wikipedia_error_type": wiki_error,
+        "external_error_type": external_error,
+        "institutional_leads": sum(s.get("provider") == "NASA Science" for s in merged),
+        "academic_metadata_leads": sum(s.get("provider", "").startswith("Crossref") for s in merged),
+        "secondary_leads": sum(s.get("provider") == "Wikipedia en español" for s in merged),
     }
-    # No source collection can silently turn an unknown topic into a renderable video.
     dossier["can_render"] = False
     return dossier
 
