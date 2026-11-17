@@ -6,6 +6,7 @@ from scripts.providers import LocalScriptProvider,LocalImageProvider
 from scripts.production import build_plan
 from scripts.cinematic import verify_assets,CinematicArtwork,caption_layout
 from scripts.render import load_story
+from scripts.artwork import font,wrap_pixels
 from scripts.subtitles import group_words
 ROOT=Path(__file__).resolve().parents[1];NEW=['auroras','dna','volcanoes'];ID='aa'*16
 
@@ -63,6 +64,13 @@ class ScienceTopicTests(unittest.TestCase):
             for scene in story['scenes']:
                 words=[{'word':w,'start':i*.5,'end':i*.5+.4} for i,w in enumerate(scene['voice'].split())]
                 for group in group_words(words):self.assertLessEqual(len(caption_layout(group['words'])),2)
+    def test_every_authored_headline_renders_in_three_safe_lines(self):
+        for t in NEW:
+            story=LocalScriptProvider().create(catalog()[t]['name']);assets=verify_assets(story['asset_manifest'])
+            for i,scene in enumerate(story['scenes'],1):
+                if scene.get('headline'):
+                    self.assertLessEqual(len(wrap_pixels(scene['headline'],font(54,True),620)),3)
+                    self.assertEqual(CinematicArtwork(scene,i,8,assets).frame(.2,5,None).size,(720,1280))
     def test_each_new_topic_has_authored_projected_motion(self):
         for t in NEW:
             s=LocalScriptProvider().create(catalog()[t]['name']);assets=verify_assets(s['asset_manifest']);self.assertTrue(any(a.get('motion_paths') for a in assets.values()))
