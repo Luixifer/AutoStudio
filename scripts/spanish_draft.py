@@ -6,6 +6,7 @@ No scientific fact is ever marked verified without editorial checking.
 """
 import re
 from scripts.source_quality import black_hole_question
+from scripts.external_sources import NASA_BLACK_HOLE_PAGES
 
 # A sentence is emitted only if all evidence groups match one same NASA excerpt.
 # Order is intended narrative flow, not chronology of physical events.
@@ -14,7 +15,7 @@ RULES = (
      "Los agujeros negros tienen una frontera decisiva: el horizonte de sucesos. ¿Qué podemos afirmar sobre lo que hay más allá?"),
     ("Frontera", (("event horizon",), ("boundary", "point of no return")),
      "El horizonte de sucesos delimita una región de la que no podemos recibir señales como desde el espacio exterior."),
-    ("Luz", (("black hole",), ("light",), ("escape", "cannot", "can't", "can't get out")),
+    ("Luz", (("black hole",), ("light",), ("cannot escape", "can't escape", "no light escapes")),
      "La luz también está sometida a esta frontera gravitatoria: desde el interior no puede escapar hacia fuera."),
     ("Alrededores", (("accretion disk",), ("gas", "matter", "light")),
      "Alrededor de algunos agujeros negros, el material forma un disco de acreción. Esto ocurre fuera de la frontera, no en su interior."),
@@ -39,6 +40,7 @@ def draft_spanish_narration(topic, evidence):
             "note":"Redactor experimental limitado a preguntas sobre agujeros negros.",
         }
     passages=evidence.get("passages",[]) if isinstance(evidence,dict) else []
+    trusted_urls=frozenset(url for _,url in NASA_BLACK_HOLE_PAGES)
     if not isinstance(passages,list):
         raise ValueError("Pasajes inválidos.")
     scenes=[]
@@ -49,7 +51,7 @@ def draft_spanish_narration(topic, evidence):
                 continue
             excerpt=source.get("excerpt_original_en","")
             link=source.get("source_url","")
-            if not isinstance(excerpt,str) or not isinstance(link,str) or not link.startswith("https://science.nasa.gov/"):
+            if not isinstance(excerpt,str) or link not in trusted_urls:
                 continue
             if _has_evidence(excerpt,cue_groups):
                 matched=source
