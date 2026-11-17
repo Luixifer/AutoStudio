@@ -26,8 +26,8 @@ def main():
                 p=Text();p.feed(body.decode('utf-8',errors='replace'));text=' '.join(p.parts);item['title']=' '.join(p.title);terms={'auroras':['aurora','oxygen','nitrogen','solar wind'],'dna':['DNA','bases','protein','expression'],'volcanoes':['magma','lava','mantle','gas','pressure']}[topic]
                 snippets=[]
                 for term in terms:
-                    m=re.search(r'\b'+re.escape(term)+r'\b',text,re.I)
-                    if m:snippets.append({'term':term,'excerpt':text[max(0,m.start()-120):m.start()+900]})
+                    matches=list(re.finditer(r'\b'+re.escape(term)+r'\b',text,re.I))
+                    for m in matches[-4:]:snippets.append({'term':term,'excerpt':text[max(0,m.start()-180):m.start()+1000]})
                 item['excerpts']=snippets;item['retrieved']=item['status']==200 and len(text)>1000 and bool(snippets)
             except Exception as e:item.update(retrieved=False,error=type(e).__name__+': '+str(e))
             pages.append(item)

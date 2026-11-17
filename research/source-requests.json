@@ -26,12 +26,24 @@
   "volcanoes": {
     "sources": [
       {
-        "name": "US Geological Survey",
+        "name": "USGS: magma and lava",
         "url": "https://www.usgs.gov/faqs/what-difference-between-magma-and-lava"
       },
       {
-        "name": "British Geological Survey",
-        "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/how-volcanoes-form/"
+        "name": "USGS: eruption mechanisms",
+        "url": "https://www.usgs.gov/faqs/how-do-volcanoes-erupt"
+      },
+      {
+        "name": "USGS: inside the Earth",
+        "url": "https://pubs.usgs.gov/gip/dynamic/inside.html"
+      },
+      {
+        "name": "USGS: eruptions",
+        "url": "https://pubs.usgs.gov/gip/volc/eruptions.html"
+      },
+      {
+        "name": "BGS volcanoes overview",
+        "url": "https://www.bgs.ac.uk/discovering-geology/volcanoes/"
       }
     ]
   }
