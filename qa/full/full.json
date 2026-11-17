@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "mode": "full",
+  "scope": "Android emulator UI and native decoder, not a physical Samsung test",
+  "physical_samsung_tested": false,
+  "passed": false,
+  "failure": "Exception: Real GitHub connection could not be saved"
+}
