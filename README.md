@@ -1,69 +1,72 @@
-# AutoStudio — MVP 0.2
+# AutoStudio 0.2 — escenas y voz neuronal
 
-Fábrica experimental de vídeos científicos **sin APIs de pago ni publicación en YouTube**. Es una prueba real de montaje, no una IA autónoma de investigación ni un generador cinematográfico terminado.
+Fábrica experimental de vídeos científicos con programas libres y **sin APIs de pago ni publicación en YouTube**. Montaje reproducible en GitHub Actions, administrable desde el móvil. No es un generador cinematográfico autónomo terminado.
 
-## Usarlo desde tu Samsung, sin ordenador
+## Generar y descargar desde tu Samsung
 
-El código ya está subido y la primera ejecución real de GitHub Actions ha terminado correctamente.
+1. Abre [Actions](https://github.com/Luixifer/AutoStudio/actions/workflows/create-short.yml) → **Run workflow**.
+2. Selecciona **cinematic** para la nueva revisión; **classic** conserva el render anterior de tres diagramas y voz eSpeak.
+3. Espera al resultado. La [rama de resultados](https://github.com/Luixifer/AutoStudio/tree/video-preview) contiene `attempt.json`, vídeo, subtítulos, tiempos y pruebas.
+4. **[Descargar el último MP4](https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4)**.
 
-[Descargar el MP4 verificado de 41,08 segundos](https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4) · [Ver ejecución real y sus pruebas](https://github.com/Luixifer/AutoStudio/actions/runs/44068185619)
+Si no ves Run workflow, activa «Sitio de escritorio» en tu navegador móvil. No requiere un ordenador. Si el intento falla, se registra; un MP4 anterior no se presenta como una salida nueva. El enlace estable contiene el último vídeo; el historial Git conserva los resultados anteriores.
 
-Para generar otro vídeo desde el móvil:
+## Qué cambia
 
-1. Abre [Luixifer/AutoStudio](https://github.com/Luixifer/AutoStudio) en el navegador del móvil.
-2. En **Actions**, selecciona **Crear vídeo científico de prueba (sin YouTube)** → **Run workflow**.
-3. Espera a que termine. En la rama [`video-preview`](https://github.com/Luixifer/AutoStudio/tree/video-preview) aparecerá el resultado y su enlace de descarga.
-4. [Descargar el último MP4](https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4). Este enlace solo funciona tras una ejecución que haya generado el vídeo.
-5. Revisa `attempt.json`, `validation.json` y `SHA256SUMS`. Si el último intento falló, el README lo indicará; un MP4 anterior no se presenta como un resultado nuevo.
+- Ocho planos montados a partir de cinco ilustraciones 3D originales, con cámara animada, partículas sutiles y transiciones. Se retira la caja de párrafos. Los renders se producen en Blender; el montaje de cada vídeo reutiliza esas imágenes.
+- Voz neuronal **Kokoro ONNX**, ejecutada localmente en CPU; voz española `ef_dora`, fonemizador castellano `es`. No se utiliza una API de voz. La naturalidad y el acento necesitan evaluación humana: seleccionar español no garantiza una locución profesional de España.
+- Subtítulos de **hasta tres palabras**, con palabra activa resaltada. Los tiempos proceden de las duraciones de fonemas de la misma inferencia que genera el audio. Se rechazan desajustes de palabras; no se inventan tiempos por longitud. No es una alineación independiente con reconocimiento de voz ni una aprobación humana.
+- Apertura directa «Aquí no llega el Sol»; conclusión sobre otra manera de obtener energía. Se conserva el matiz del oxígeno de superficie para evitar sugerir independencia absoluta de la fotosíntesis.
+- Ambiente sonoro sintético original y discreto, normalización de voz y limitador; sin música descargada ni grabaciones ajenas.
 
-Si la interfaz móvil oculta **Run workflow**, abre GitHub en Chrome/Samsung Internet con la vista de escritorio. Eso no requiere disponer de un ordenador.
+**Las imágenes se identifican como ILUSTRACIÓN 3D**: no son filmaciones submarinas, imágenes fotográficas ni simulación completa de fluidos. Cámara y partículas se animan sobre renders fijos. El guion sigue necesitando revisión científica humana.
 
-No se usa almacenamiento de Artifacts: el MP4 pequeño y los informes se guardan por Git en una rama separada. El código permanece en `main`. Las etiquetas `render-*` también permiten iniciar una prueba explícita por Git cuando la API no está disponible. Un push normal a `main` no lanza renders automáticamente.
+## Conservar la versión funcional
+
+- Etiqueta [`baseline-mvp-41s`](https://github.com/Luixifer/AutoStudio/tree/baseline-mvp-41s): código anterior.
+- [MP4 anterior de 41,08 s, enlace fijo](https://raw.githubusercontent.com/Luixifer/AutoStudio/81eb7dfb0874b4483c86b45b1894f1a7bf1ff95b/short_ciencia_demo.mp4).
+- [Primera ejecución real](https://github.com/Luixifer/AutoStudio/actions/runs/44068185619).
+- Los módulos `artwork.py`, `narration.py` y `ocean.json` conservan el modo clásico; no se han sustituido por el nuevo diseño.
 
 ## Coste y límites
 
-- Programas libres: Python, Pillow, eSpeak NG, FFmpeg y tipografías DejaVu.
-- El render no solicita imágenes, audio ni texto a APIs externas. No necesita claves de pago.
-- GitHub Actions solo permite el trabajo en **repositorio público y runner estándar `ubuntu-24.04`**. No usa GPU, runners grandes, suscripciones adicionales ni programaciones periódicas.
-- No se necesitan credenciales de YouTube; no hay código de subida a YouTube.
-- Límite por prueba: 150 segundos de vídeo y 20 MiB por MP4. Una única ejecución concurrente, con timeout de 15 minutos.
-- El token automático de GitHub es una credencial técnica para escribir la rama de resultados; no es un servicio de IA facturado por tokens.
-- El runner Linux estándar de repositorios públicos es la opción gratuita de GitHub. Su disponibilidad, límites y políticas no los controla AutoStudio. No actives opciones facturadas ni un presupuesto de pago para solucionar un bloqueo. No se promete una infraestructura gratuita ilimitada.
+- Python, Pillow, FFmpeg, Blender, eSpeak NG y Kokoro/ONNX locales; consulta [procedencia y licencias](THIRD_PARTY.md).
+- Modelos gratuitos descargados de una publicación oficial de GitHub, con SHA-256 fijados. No se incluyen sus 354 MB en Git ni se consulta un servicio de inferencia.
+- Solo **repositorio público y runner estándar `ubuntu-24.04`**, sin GPU, cron, Artifacts, cache de pago, runners grandes ni claves de servicios externos.
+- Una ejecución concurrente, timeout de 15 minutos, MP4 máximo 20 MiB y 150 segundos. No hay render automático por cada cambio: manual o etiqueta `render-*`.
+- El token automático de GitHub solo escribe resultados en `video-preview`; no es un token de IA facturado. La disponibilidad y políticas del servicio gratuito las determina GitHub; no se promete capacidad gratuita ilimitada ni se cambia la facturación.
+- YouTube está desactivado: no hay integración de publicación.
 
-## Qué produce realmente
+## Reproducción en infraestructura cloud
 
-Tres escenas con diagramas originales animados, narración española local y subtítulos aproximados. Exporta H.264 720×1280, 25 fps, AAC estéreo 48 kHz y MP4 fast-start compatible con reproductores móviles habituales. La voz original se sintetiza a la frecuencia de eSpeak; convertirla a 48 kHz no la convierte en una voz de estudio.
-
-La validación decodifica todo el MP4, comprueba audio/vídeo, duración, presencia de señal sonora, clipping, tamaño, fast-start y SHA-256. Esto no sustituye escuchar la voz ni comprobar los hechos científicos.
-
-Los diagramas **no son filmaciones submarinas**, ni imágenes fotorrealistas generadas por IA. Los subtítulos usan estimación temporal, no alineación palabra por palabra. El guion está escrito y requiere revisión editorial humana. Las referencias del ejemplo no equivalen a una investigación autónoma.
-
-## Ejecución reproducible en la nube
-
-GitHub Actions instala los programas libres y ejecuta:
+El workflow instala `ffmpeg`, `espeak-ng`, fuentes DejaVu y Python 3.12, y ejecuta:
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements-neural.txt
+.venv/bin/python scripts/fetch_voice.py
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python scripts/render.py --out output
+.venv/bin/python scripts/render.py --profile cinematic --out output
 ```
 
-Cuando no hay ejecutable `espeak-ng`, el entorno de desarrollo puede instalar `requirements-local.txt`: incluye una biblioteca local de eSpeak NG. No utiliza un servicio remoto.
+El perfil clásico también funciona con `requirements.txt` y `espeak-ng`, sin descargar modelos:
 
-Cada ejecución crea una carpeta nueva en `output/`; no sobrescribe vídeos anteriores. `output/latest.json` apunta al último resultado verificado. El publicador solo acepta una salida de **esa ejecución real de GitHub Actions**, con commit y hash coincidentes. Rechaza presentar un render local como un run de GitHub.
+```sh
+.venv/bin/python scripts/render.py --profile classic --out output
+```
 
-## Estructura
+Para regenerar el arte en una máquina cloud con Blender 4.3.2, Python y FFmpeg gratuitos:
 
-- `.github/workflows/create-short.yml`: ejecución manual o por etiqueta, solo en público.
-- `scripts/render.py`: montaje y exportación.
-- `scripts/narration.py`: voz local, sin sustitución silenciosa por silencio.
-- `scripts/artwork.py`: esquemas originales y tipografía segura.
-- `scripts/validate_video.py`: verificación del MP4 real.
-- `scripts/publish_result.py`: resultado descargable mediante Git; nunca cambia `main` ni fuerza pushes.
-- `scripts/ocean.json`: guion y referencias del ejemplo.
-- `tests/`: pruebas de datos, seguridad, diseño y detección de silencio.
-- `source_upload/`: ZIP original aportado, conservado para auditoría.
-- `docs/REVIEW.md`: revisión de defectos y estado real de la entrega.
+```sh
+blender -b -t 4 --python scripts/create_cinematic_assets.py -- "$PWD"
+```
 
-El repositorio público deja visibles el código y los guiones. No subas credenciales ni datos personales. No se ha impuesto una nueva licencia al código aportado; la gratuidad de las herramientas no modifica por sí sola la titularidad del proyecto.
+El generador conserva renders sin filtro en `output/original-blender-stills/`, filtra ruido espacial y actualiza el manifiesto; no amplía imágenes para inventar detalle. El archivo editable está en `sources/ocean_environment_v02.blend`. El workflow de montaje habitual **no ejecuta Blender**, usa las ilustraciones versionadas. No se necesita un ordenador personal para usarlo; futuras revisiones de arte requieren un entorno cloud con Blender, no una API facturada.
+
+## Controles verificables
+
+Las 16 pruebas anteriores se conservan, con pruebas adicionales de subtítulos, límites, movimiento, integridad de recursos, voz ausente o alterada y ambiente reproducible. El render real añade `quality.json`: cobertura completa de palabras, tiempos dentro del audio, subtítulos de dos líneas como máximo y cambios medidos entre encuadres.
+
+`validation.json` comprueba decodificación completa, H.264 720×1280/25 fps, AAC estéreo, duración, señal de audio, clipping, fast-start y SHA-256. Esto **no mide belleza, comprensión, pronunciación o rigor científico**. Consulta [la revisión](docs/REVIEW_02.md) para resultados y limitaciones.
+
+El publicador solo acepta una salida de esa ejecución de GitHub Actions, verificando commit, run ID y hash. No puede etiquetar un render de desarrollo como una prueba de Actions.

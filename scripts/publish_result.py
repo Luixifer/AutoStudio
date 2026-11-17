@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 ROOT=Path(__file__).resolve().parents[1]
 BRANCH='video-preview'
-FILES=['short_ciencia_demo.mp4','metadata.json','validation.json','captions.srt','SHA256SUMS']
+FILES=['short_ciencia_demo.mp4','metadata.json','validation.json','captions.srt','SHA256SUMS','quality.json','word-timings.json']
 
 def git(*args,capture=False,check=True):
     p=subprocess.run(['git',*args],cwd=ROOT,text=True,capture_output=capture,check=check)
@@ -58,7 +58,7 @@ def main():
         for path in (stage/'logs').glob('*'):shutil.copy2(path,ROOT/'logs'/path.name)
         download=f'https://github.com/{repo}/raw/refs/heads/{BRANCH}/short_ciencia_demo.mp4'
         note='Vídeo nuevo generado y validado en esta ejecución.' if bundle else 'Este intento falló. Si existe un MP4 anterior, no corresponde a este intento.'
-        readme=f'# AutoStudio — resultado de prueba\n\n{note}\n\n[Ejecución real de GitHub Actions]({run_url})\n\n[Descargar MP4 para móvil]({download})\n\nConsulta `attempt.json`, `metadata.json`, `validation.json` y `SHA256SUMS`. Los esquemas son ilustraciones originales, la voz es sintética y la publicación en YouTube está desactivada. Esta rama contiene resultados; el código está en `main`.\n'
+        readme=f'# AutoStudio — resultado de prueba\n\n{note}\n\n[Ejecución real de GitHub Actions]({run_url})\n\n[Descargar MP4 para móvil]({download})\n\nConsulta `attempt.json`, `metadata.json`, `validation.json` y `SHA256SUMS`. Las imágenes son ilustraciones originales, la voz es sintética y la publicación en YouTube está desactivada. Esta rama contiene resultados; el código está en `main`.\n'
         (ROOT/'README.md').write_text(readme)
         git('config','user.name','AutoStudio Actions');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
         paths=['attempt.json','README.md']+[name for name in FILES if (stage/name).is_file()]+[str(Path('logs')/p.name) for p in (stage/'logs').glob('*')]

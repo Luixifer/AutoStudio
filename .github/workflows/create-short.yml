@@ -2,6 +2,12 @@ name: Crear vídeo científico de prueba (sin YouTube)
 run-name: AutoStudio · prueba narrada · ${{ github.ref_name }}
 on:
   workflow_dispatch:
+    inputs:
+      profile:
+        description: 'cinematic: voz neuronal y escenas 3D; classic: prueba anterior'
+        type: choice
+        options: [cinematic, classic]
+        default: cinematic
   push:
     tags:
       - 'render-*'
@@ -30,12 +36,17 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
           python -m venv .venv
-          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements-neural.txt
           mkdir -p reports
+      - name: Descargar y verificar voz libre (solo modo neuronal)
+        if: ${{ inputs.profile != 'classic' }}
+        run: .venv/bin/python scripts/fetch_voice.py
       - name: Ejecutar pruebas
         run: .venv/bin/python -m unittest discover -s tests -v > reports/unit-tests.txt 2>&1
       - name: Generar y verificar vídeo con narración real
-        run: .venv/bin/python scripts/render.py --out output > reports/render.log 2>&1
+        env:
+          RENDER_PROFILE: ${{ inputs.profile || 'cinematic' }}
+        run: .venv/bin/python scripts/render.py --profile "$RENDER_PROFILE" --out output > reports/render.log 2>&1
       - name: Guardar resultado y descarga móvil por Git
         if: ${{ always() }}
         env:

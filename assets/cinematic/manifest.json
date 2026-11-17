@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "generator": "scripts/create_cinematic_assets.py",
+  "source": "sources/ocean_environment_v02.blend",
+  "assets": [
+    {
+      "id": "seabed_wide",
+      "file": "assets/cinematic/seabed_wide.jpg",
+      "sha256": "921f39672ff60ee835b49d8642db4f5686dadf634dc3832dc579c8aae113ca8e",
+      "width": 864,
+      "height": 1536,
+      "origin": "Original Blender CPU render from scripts/create_cinematic_assets.py",
+      "type": "3D illustration, not actual footage",
+      "lighting": "Virtual exploration lighting, not sunlight at the seabed",
+      "license": "Project-original artwork; no third-party image assets",
+      "raw_sha256": "b7660093e70c14e4118f66b5507b361b12579cd0ef6e87486ce5f20a5f5e6184"
+    },
+    {
+      "id": "vent_close",
+      "file": "assets/cinematic/vent_close.jpg",
+      "sha256": "630ee5c6282dcc150861e51759a16e111d20702a6318b9d6d3b7881c91709984",
+      "width": 864,
+      "height": 1536,
+      "origin": "Original Blender CPU render from scripts/create_cinematic_assets.py",
+      "type": "3D illustration, not actual footage",
+      "lighting": "Virtual exploration lighting, not sunlight at the seabed",
+      "license": "Project-original artwork; no third-party image assets",
+      "raw_sha256": "39107395edbc738ba0e623f1ab4af4f2af231d7d77c56af4838697b36bffa81e"
+    },
+    {
+      "id": "community",
+      "file": "assets/cinematic/community.jpg",
+      "sha256": "f76f1eb20236bbed10428d5b135b38c78f0566ef71ab7379487073e192debd33",
+      "width": 864,
+      "height": 1536,
+      "origin": "Original Blender CPU render from scripts/create_cinematic_assets.py",
+      "type": "3D illustration, not actual footage",
+      "lighting": "Virtual exploration lighting, not sunlight at the seabed",
+      "license": "Project-original artwork; no third-party image assets",
+      "raw_sha256": "8227f2c6b17b958be1e96d6a3bc51a8ac55061f2298eb012b63e7836429591b7"
+    },
+    {
+      "id": "closing",
+      "file": "assets/cinematic/closing.jpg",
+      "sha256": "b3d85229da4dfb7ff6fdd99ce469b8898170aae61e33d93c0dcc6f22b3ba3339",
+      "width": 864,
+      "height": 1536,
+      "origin": "Original Blender CPU render from scripts/create_cinematic_assets.py",
+      "type": "3D illustration, not actual footage",
+      "lighting": "Virtual exploration lighting, not sunlight at the seabed",
+      "license": "Project-original artwork; no third-party image assets",
+      "raw_sha256": "8676b0f59c6219e41a97c58076819aa8fe51d912e232a49025bcaa24171bb30a"
+    },
+    {
+      "id": "microbes",
+      "file": "assets/cinematic/microbes.jpg",
+      "sha256": "9200ed451af1dcbdb187a7fc0e00c6100288ae87b85a7e6c12abf5a080682560",
+      "width": 864,
+      "height": 1536,
+      "origin": "Original Blender CPU render from scripts/create_cinematic_assets.py",
+      "type": "3D illustration, not actual footage",
+      "lighting": "Virtual exploration lighting, not sunlight at the seabed",
+      "license": "Project-original artwork; no third-party image assets",
+      "raw_sha256": "62631fe738c20a3dd4520aad3f1413f64b4d507f9c11c2ba85f5408b21fba4ea"
+    }
+  ],
+  "real_underwater_footage": false,
+  "postprocess": "FFmpeg nlmeans=s=8:p=7:r=21, JPEG q=2; spatial noise reduction, no enlargement or new image detail"
+}

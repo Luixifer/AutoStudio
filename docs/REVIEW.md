@@ -52,7 +52,7 @@ La API de GitHub continúa bloqueada en este entorno; no ha impedido la ejecuci�
 - Tamaño: 1.642.620 bytes.
 - SHA-256: `e26c5500aaf0649db7c01ec3859a7ad68725e52d4c72a379443bee6dd70fbf6c`.
 - Audio decodificado: RMS −20,83 dBFS; pico −3,81 dBFS; sin muestras a escala completa; no es una evaluación semántica ni de naturalidad.
-- Descarga: https://github.com/Luixifer/AutoStudio/raw/refs/heads/video-preview/short_ciencia_demo.mp4
+- Descarga: https://raw.githubusercontent.com/Luixifer/AutoStudio/81eb7dfb0874b4483c86b45b1894f1a7bf1ff95b/short_ciencia_demo.mp4
 - Informes: https://github.com/Luixifer/AutoStudio/tree/video-preview
 
 La publicación en YouTube permanece desactivada. No se han utilizado servicios de IA facturados, GPU ni runners de pago. La prueba física y la valoración perceptiva en Samsung quedan a cargo del usuario.
