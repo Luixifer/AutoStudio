@@ -5,7 +5,7 @@ templates are only emitted when explicit English evidence cues are present.
 No scientific fact is ever marked verified without editorial checking.
 """
 import re
-from scripts.source_quality import black_hole_question
+from scripts.source_quality import black_hole_question, clean
 from scripts.external_sources import NASA_BLACK_HOLE_PAGES
 
 # A sentence is emitted only if all evidence groups match one same NASA excerpt.
@@ -38,6 +38,16 @@ def draft_spanish_narration(topic, evidence):
             "status": "unsupported_subject", "scenes":[],
             "approved":False,"can_render":False,
             "note":"Redactor experimental limitado a preguntas sobre agujeros negros.",
+        }
+    # The current templates are specifically about the interior of a black
+    # hole. Do not present that script as an answer to a different question
+    # (e.g. formation, mass, lifetime, or an alternative science topic).
+    question_words=set(re.findall(r"[a-z]+",clean(topic)))
+    if not question_words.intersection({"dentro","interior","adentro"}):
+        return {
+            "status":"unsupported_question_angle", "scenes":[],
+            "approved":False, "can_render":False,
+            "note":"Plantillas limitadas al interior de los agujeros negros.",
         }
     passages=evidence.get("passages",[]) if isinstance(evidence,dict) else []
     trusted_urls=frozenset(url for _,url in NASA_BLACK_HOLE_PAGES)
