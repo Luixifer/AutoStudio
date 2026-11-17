@@ -13,6 +13,7 @@ from scripts.topic_research import research_topic
 from scripts.storyboard_draft import draft_storyboard
 from scripts.narration_candidates import narration_candidates
 from scripts.nasa_reading import fetch_nasa_evidence
+from scripts.spanish_draft import draft_spanish_narration
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = ROOT / "output" / "research"
@@ -26,6 +27,7 @@ def prepare_research_package(topic, researcher=research_topic, nasa_reader=None)
         nasa_reader = fetch_nasa_evidence
     nasa_evidence = (nasa_reader(dossier['topic']) if nasa_reader is not None and not dossier.get('can_render')
                      else {'status':'not_requested','passages':[],'errors':[]})
+    spanish_draft = draft_spanish_narration(dossier['topic'], nasa_evidence)
     if dossier.get("can_render"):
         state = "existing_catalog"
     elif dossier.get("research", {}).get("status") == "unavailable":
@@ -43,6 +45,7 @@ def prepare_research_package(topic, researcher=research_topic, nasa_reader=None)
         "storyboard": outline,
         "narration_candidates": excerpt_candidates,
         "nasa_evidence": nasa_evidence,
+        "spanish_draft": spanish_draft,
         "paid_api_allowed": False,
         "youtube_enabled": False,
         "disclaimer": (
