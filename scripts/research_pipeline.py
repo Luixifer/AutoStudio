@@ -11,6 +11,7 @@ from pathlib import Path
 
 from scripts.topic_research import research_topic
 from scripts.storyboard_draft import draft_storyboard
+from scripts.narration_candidates import narration_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = ROOT / "output" / "research"
@@ -19,6 +20,7 @@ OUTPUT_ROOT = ROOT / "output" / "research"
 def prepare_research_package(topic, researcher=research_topic):
     dossier = researcher(topic)
     outline = draft_storyboard(dossier)
+    excerpt_candidates = narration_candidates(dossier)
     if dossier.get("can_render"):
         state = "existing_catalog"
     elif dossier.get("research", {}).get("status") == "unavailable":
@@ -34,11 +36,13 @@ def prepare_research_package(topic, researcher=research_topic):
         "existing_topic_id": dossier.get("topic_id"),
         "dossier": dossier,
         "storyboard": outline,
+        "narration_candidates": excerpt_candidates,
         "paid_api_allowed": False,
         "youtube_enabled": False,
         "disclaimer": (
-            "Expediente de investigación, no vídeo. Los temas nuevos requieren "
-            "hechos contrastados, guion narrable, materiales visuales y validación."
+            "Expediente de investigación, no vídeo. Las frases preliminares son "
+            "extractos textuales atribuidos; no son guion original ni afirmaciones "
+            "científicamente comprobadas. Falta verificación, revisión y arte visual."
         ),
     }
 
