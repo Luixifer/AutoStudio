@@ -12,15 +12,20 @@ from pathlib import Path
 from scripts.topic_research import research_topic
 from scripts.storyboard_draft import draft_storyboard
 from scripts.narration_candidates import narration_candidates
+from scripts.nasa_reading import fetch_nasa_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = ROOT / "output" / "research"
 
 
-def prepare_research_package(topic, researcher=research_topic):
+def prepare_research_package(topic, researcher=research_topic, nasa_reader=None):
     dossier = researcher(topic)
     outline = draft_storyboard(dossier)
     excerpt_candidates = narration_candidates(dossier)
+    if nasa_reader is None and researcher is research_topic:
+        nasa_reader = fetch_nasa_evidence
+    nasa_evidence = (nasa_reader(dossier['topic']) if nasa_reader is not None and not dossier.get('can_render')
+                     else {'status':'not_requested','passages':[],'errors':[]})
     if dossier.get("can_render"):
         state = "existing_catalog"
     elif dossier.get("research", {}).get("status") == "unavailable":
@@ -37,6 +42,7 @@ def prepare_research_package(topic, researcher=research_topic):
         "dossier": dossier,
         "storyboard": outline,
         "narration_candidates": excerpt_candidates,
+        "nasa_evidence": nasa_evidence,
         "paid_api_allowed": False,
         "youtube_enabled": False,
         "disclaimer": (
