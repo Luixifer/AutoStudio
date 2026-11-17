@@ -1,0 +1,82 @@
+name: AutoStudio · APK Android y prueba integral
+run-name: AutoStudio · Android LAB · ${{ github.ref_name }}
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'android-*'
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-android-lab
+  cancel-in-progress: false
+jobs:
+  android:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      actions: write # Only the runtime test dispatch; never embedded into an APK.
+    env:
+      ANDROID_IMAGE: system-images;android-35;google_apis;x86_64
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar SDK oficial, JDK y pruebas
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          mkdir -p reports
+          (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools' emulator "$ANDROID_IMAGE"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements-neural.txt
+      - name: Ejecutar regresiones
+        run: .venv/bin/python -m unittest discover -s tests -v > reports/unit-tests.txt 2>&1
+      - name: Compilar APK real y verificar firma
+        run: python android/build.py > reports/android-build.txt 2>&1
+      - name: Iniciar Android 15 aislado
+        run: |
+          if [ ! -e /dev/kvm ]; then echo 'No hay KVM para validar Android. No se simulará una prueba física.'; exit 1; fi
+          sudo setfacl -m "u:$USER:rw" /dev/kvm
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name AutoStudio --package "$ANDROID_IMAGE" --device pixel_6
+          "$ANDROID_HOME/emulator/emulator" -avd AutoStudio -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none -camera-front none -memory 2048 -cores 2 -accel on > reports/emulator.log 2>&1 &
+          adb wait-for-device
+          timeout 240 bash -c 'until [ "$(adb shell getprop sys.boot_completed | tr -d "\r")" = "1" ]; do sleep 2; done'
+          adb shell wm size 450x800
+          adb shell wm density 160
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          adb shell input keyevent 82
+          adb install build/android/AutoStudio-Control-0.3.0-lab.apk
+          adb install build/android/autostudio-instrumentation.apk
+      - name: APK → GitHub Actions → MP4 → reproducción nativa real
+        env:
+          ANDROID_TEST_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          adb shell am instrument -w -r -e mode full -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.lab.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-instrumentation.txt
+          mkdir -p reports/android-qa/full
+          for name in full.json 01-control.png 02-ready.png 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab cat "files/qa/full/$name" > "reports/android-qa/full/$name"; done
+          python -c 'import json; r=json.load(open("reports/android-qa/full/full.json")); print(json.dumps(r,indent=2)); assert r["passed"] and r["native_video_frame_rendered"]'
+      - name: Reiniciar proceso y comprobar conservación sin otro render
+        run: |
+          adb shell am force-stop com.luixifer.autostudio.lab
+          adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.lab.test/com.luixifer.autostudio.test.SmokeInstrumentation > reports/android-recovery.txt
+          mkdir -p reports/android-qa/recovery
+          for name in recovery.json 03-playing.png; do adb exec-out run-as com.luixifer.autostudio.lab cat "files/qa/recovery/$name" > "reports/android-qa/recovery/$name"; done
+          python -c 'import json; r=json.load(open("reports/android-qa/recovery/recovery.json")); print(json.dumps(r,indent=2)); assert r["passed"] and r["process_restart_preserved_result"]'
+      - name: Publicar APK e informe de esta ejecución
+        if: ${{ always() }}
+        env:
+          AUTOSTUDIO_JOB_STATUS: ${{ job.status }}
+        run: python scripts/publish_android.py
+      - name: Detener emulador aislado
+        if: ${{ always() }}
+        run: adb emu kill || true

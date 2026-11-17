@@ -7,3 +7,9 @@ artifacts/
 *.egg-info/
 reports/
 .cache/
+
+# Android build output and private debug signing keys
+build/
+*.keystore
+*.jks
+local.properties

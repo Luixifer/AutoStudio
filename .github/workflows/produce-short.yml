@@ -1,0 +1,53 @@
+name: AutoStudio · Producir Short desde móvil
+run-name: AutoStudio · control · ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: Identificador único de 32 caracteres hexadecimales
+        required: true
+        type: string
+      topic:
+        description: Tema del proveedor gratuito local (océano, fuentes hidrotermales, quimiosíntesis)
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-render
+  cancel-in-progress: false
+jobs:
+  produce:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      AUTOSTUDIO_REQUEST_ID: ${{ inputs.request_id }}
+      AUTOSTUDIO_TOPIC: ${{ inputs.topic }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Instalar herramientas gratuitas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          mkdir -p reports
+      - name: Validar solicitud y organizar escenas
+        run: .venv/bin/python scripts/production.py --prepare-only
+      - name: Ejecutar regresiones
+        run: .venv/bin/python -m unittest discover -s tests -v > reports/unit-tests.txt 2>&1
+      - name: Preparar modelo gratuito local
+        run: .venv/bin/python scripts/fetch_voice.py
+      - name: Producir y validar MP4
+        run: .venv/bin/python scripts/production.py > reports/render.log 2>&1
+      - name: Publicar solo el resultado de esta solicitud
+        if: ${{ always() }}
+        env:
+          AUTOSTUDIO_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/publish_job.py

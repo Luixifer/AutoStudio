@@ -1,0 +1,11 @@
+{
+  "schema":1,
+  "provider":"curated-local-v1",
+  "scope":"Guiones científicos locales revisados como borradores. No generación abierta ni investigación autónoma.",
+  "topics":[
+    {"id":"ocean-life","name":"Vida sin Sol en el fondo del mar","examples":["Vida sin Sol en el fondo del mar","Fuentes hidrotermales","Quimiosíntesis"],"keywords":["oceano","fondo del mar","vida sin sol","hidroterm","quimiosint","mar profundo","abisal"],"story":"scripts/ocean_v02.json"}
+  ],
+  "formats":{"short":{"enabled":true,"max_seconds":150},"documentary":{"enabled":false,"reason":"Requiere más contenido, validación editorial y presupuesto de ejecución; no disponible en este incremento."}},
+  "youtube":{"enabled":false},
+  "future_providers":{"chatgpt":{"enabled":false,"network_calls_allowed":false,"reason":"Integración de contrato únicamente; no hay cliente ni clave API."}}
+}
