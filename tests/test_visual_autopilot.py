@@ -80,6 +80,18 @@ class AutopilotTests(unittest.TestCase):
             r=auto.evaluate_image(fake_jpeg(),"A gas world","View of gaseous planet","a"*32,"tok")
         self.assertEqual(r["decision"],"FAIL")
 
+    def test_nested_moondream_response_is_read(self):
+        self.assertEqual(auto._extract_text({"result":{"answer":"DECISION: PASS\\nEVIDENCE: Visible gas clouds."}}),
+                         "DECISION: PASS\\nEVIDENCE: Visible gas clouds.")
+        self.assertEqual(auto._extract_text({"output":{"answer":"A bright planet"}}),"A bright planet")
+        self.assertEqual(auto._extract_text({"choices":[{"message":{"content":"Visible star"}}]}),"Visible star")
+
+    def test_moondream_unknown_shape_rejected_with_keys(self):
+        with patch.object(auto,"_request",return_value={"unexpected_response":{"stuff":"not image evidence"}}):
+            result=auto.evaluate_image(fake_jpeg(),"Gas giant","Space planet","a"*32,"tok")
+        self.assertEqual(result["decision"],"UNSURE")
+        self.assertIn("unexpected_response",result["response_keys"])
+
     def test_planner_uses_narration_not_hardcoded_kelt(self):
         with patch.object(auto,"_request",return_value={"response":"An ultra-realistic science documentary still of water droplets in rain, high contrast natural lighting, crisp foreground."}):
             prompt=auto.plan_scene("Raindrops form from water vapor.","Weather","", "a"*32,"tok")
