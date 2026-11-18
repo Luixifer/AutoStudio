@@ -50,9 +50,7 @@ jobs:
         working-directory: engine
         run: |
           python -m scripts.personal_visual_briefs \
-            /tmp/autostudio-custom/storyboard/storyboard.json
-            /tmp/autostudio-custom/briefs/direccion-visual.json
-            /tmp/autostudio-custom/briefs/prompts-imagenes.md \
+            /tmp/autostudio-custom/storyboard/storyboard.json \
             --out /tmp/autostudio-custom/briefs
       - name: Narrar guion con Álex y montar MP4 con cámara automática
         working-directory: engine
