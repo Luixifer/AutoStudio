@@ -178,6 +178,11 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                 assessment=vision(image,narration,refined,account,token)
                 report["vision_requests"]+=1
                 candidate["vision"]=assessment
+                # Reveal model verdict without printing account tokens or base64 images.
+                print(json.dumps({"scene":idx,"variant":attempt,
+                    "vision_decision":assessment.get("decision","UNSURE"),
+                    "vision_evidence":assessment.get("evidence","")[:300],
+                    "vision_excerpt":assessment.get("raw_excerpt","")[:240]},ensure_ascii=False),flush=True)
                 if assessment.get("decision")=="PASS":
                     candidate["status"]="approved"
                     entry["approved"]=True
@@ -202,7 +207,11 @@ def main():
                       "vision_requests":result["vision_requests"],"all_approved":result["all_scenes_approved"],
                       "live":a.live}))
     if a.live and not result["all_scenes_approved"]:
-        raise SystemExit("One or more scenes require editorial review; no unapproved MP4 produced.")
+        rejected=[{"scene":s["scene"],"decision":s["candidates"][-1].get("vision",{}).get("decision","UNSURE"),
+                   "evidence":s["candidates"][-1].get("vision",{}).get("evidence","")[:300]}
+                  for s in result["scenes"] if not s["approved"] and s["candidates"]]
+        print("VISUAL_REVIEW_REQUIRED "+json.dumps(rejected,ensure_ascii=False),flush=True)
+        raise SystemExit("Some images need human review; no unapproved MP4 produced.")
 
 if __name__=="__main__":
     main()
