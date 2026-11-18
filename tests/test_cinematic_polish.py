@@ -50,6 +50,15 @@ class CinematicPolishTests(unittest.TestCase):
         self.assertIn("fps=60",fa)
         self.assertIn("cos(PI*",fa)
 
+    def test_focus_is_a_real_smooth_approach(self):
+        focus={"camera":{"movement":"focus","zoom":1.12,"target":[.7,.45]}}
+        still={"camera":{"movement":"static","zoom":1.12,"target":[.7,.45]}}
+        focused=zoom_filter(focus,300,[720,1280],fps=60)
+        stationary=zoom_filter(still,300,[720,1280],fps=60)
+        self.assertNotEqual(focused,stationary)
+        self.assertIn("1+(1.12-1)",focused)
+        self.assertIn("cos(PI*",focused)
+
     def test_output_still_keeps_requested_size(self):
         with tempfile.TemporaryDirectory() as temp:
             p=Path(temp)
