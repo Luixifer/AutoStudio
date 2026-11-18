@@ -1,6 +1,10 @@
 name: AutoStudio · Revisar imagen existente con IA (cero FLUX)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/recheck-gemma-2026-11-19.txt'
 permissions:
   contents: read
   actions: read
@@ -15,7 +19,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Pruebas offline de fallback y seguridad
-        run: python -m unittest tests.test_recheck_visual_artifact tests.test_visual_autopilot tests.test_visual_diagnostics -v
+        run: python -m unittest tests.test_recheck_visual_artifact tests.test_vision_gemma tests.test_visual_autopilot tests.test_visual_diagnostics -v
       - name: Descargar la IMAGEN YA GENERADA de Actions (no crear otra)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -35,7 +39,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          python -m scripts.recheck_visual_artifact --manifest original/visual-supervision-manifest.json --out replay/vision-recheck.json
+          python -m scripts.recheck_visual_artifact --manifest original/visual-supervision-manifest.json --out replay/vision-recheck.json --provider gemma
       - name: Archivar diagnóstico nuevo sin regenerar imagen
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
