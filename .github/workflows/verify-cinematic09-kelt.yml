@@ -1,0 +1,36 @@
+name: AutoStudio · verificar un Short KELT-9b con pulido 0.9
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-cinematic09-kelt.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  verify-one-personal-request:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Reutilizar una solicitud de imágenes ya subida sin volver a publicarlas
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REQUEST: 51cc3cfcdfef933be83eb3d4bb739472
+        run: |
+          python - <<'PY'
+          import json,os,urllib.request
+          url=f"https://api.github.com/repos/{os.environ['REPO']}/actions/workflows/personal-custom.yml/dispatches"
+          data=json.dumps({"ref":"main","inputs":{"request_id":os.environ["REQUEST"]}}).encode("utf-8")
+          req=urllib.request.Request(url,data=data,method="POST",headers={
+              "Authorization":"Bearer "+os.environ["GH_TOKEN"],
+              "Accept":"application/vnd.github+json",
+              "X-GitHub-Api-Version":"2022-11-28",
+              "Content-Type":"application/json",
+              "User-Agent":"AutoStudio-Cinematic-Verification",
+          })
+          with urllib.request.urlopen(req,timeout=25) as response:
+              if response.status!=204:
+                  raise RuntimeError(f"Unexpected GitHub dispatch response {response.status}")
+          print("CINEMATIC09_VALIDATION_DISPATCH_OK")
+          PY
