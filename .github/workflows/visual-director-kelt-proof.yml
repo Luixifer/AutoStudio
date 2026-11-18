@@ -1,0 +1,51 @@
+name: AutoStudio · Guía visual real de KELT-9b
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/visual-director-kelt-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-storyboard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Cargar motor de dirección visual fijado
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e722cf94007e326fd6a4537ad57ebbc60b43faa9
+          path: engine
+      - name: Cargar storyboard que ya envió el móvil
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Generar diez indicaciones de imagen coherentes con el guion real
+        working-directory: engine
+        run: |
+          python -m scripts.personal_visual_briefs \
+            ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/autostudio-kelt-visual-plan
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/autostudio-kelt-visual-plan/direccion-visual.json').read_text())
+          assert len(d['scenes'])==10
+          assert all(x['narration'] and x['narration'] in x['image_prompt'] for x in d['scenes'])
+          assert all(not x['image_generated'] for x in d['scenes'])
+          print('KELT_10_VISUAL_PLANS_VERIFIED',len(d['scenes']))
+          PY
+      - name: Entregar plan de imágenes original, editable y sin fotos privadas
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-KELT-9b-Guia-Visual-10-Planos
+          path: |
+            /tmp/autostudio-kelt-visual-plan/prompts-imagenes.md
+            /tmp/autostudio-kelt-visual-plan/direccion-visual.json
+          retention-days: 7
+          if-no-files-found: error
