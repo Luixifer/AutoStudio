@@ -123,7 +123,7 @@ def background_still(picture,out,width,height,heading,source_type):
     bg.save(out,quality=94,subsampling=0,optimize=True)
 
 
-def zoom_filter(scene,frames,size,fps=50):
+def zoom_filter(scene,frames,size,fps=60):
     camera=scene["camera"]
     movement=camera["movement"]
     zoom=float(camera.get("zoom",1.08))
