@@ -39,3 +39,5 @@ jobs:
             assert response.status==204, f"Unexpected response {response.status}"
           print("REQUEST_REDISPATCHED",os.environ["REQUEST_ID"])
           PY
+
+# Re-render with smooth 60 fps camera engine; reuses the two uploaded requests.
