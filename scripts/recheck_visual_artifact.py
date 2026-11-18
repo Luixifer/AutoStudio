@@ -7,7 +7,7 @@ from pathlib import Path
 from scripts.visual_autopilot import evaluate_image
 from scripts.image_generation import image_dimensions
 
-def replay(manifest_path,out):
+def replay(manifest_path,out,provider='gemma'):
     p=Path(manifest_path)
     report=json.loads(p.read_text(encoding="utf-8"))
     if report.get("schema")!=2 or report.get("mode")!="live" or len(report.get("scenes",[]))!=1:
@@ -33,7 +33,13 @@ def replay(manifest_path,out):
     token=os.getenv("CLOUDFLARE_API_TOKEN","")
     if not account or not token:
         raise ValueError("Cloudflare secrets required")
-    verdict=evaluate_image(image,scene["narration"],scene["image_prompt"],account,token)
+    if provider == "gemma":
+        from scripts.vision_gemma import evaluate_gemma
+        verdict=evaluate_gemma(image,scene["narration"],scene["image_prompt"],account,token)
+    elif provider == "auto":
+        verdict=evaluate_image(image,scene["narration"],scene["image_prompt"],account,token)
+    else:
+        raise ValueError("Unknown vision provider")
     result={"schema":1,"source_sha256":candidate["sha256"],"reused_original_image":True,
        "new_images_generated":0,"verdict":verdict,
        "scientific_fact_check":False,"human_approved":False,"youtube_enabled":False}
@@ -50,8 +56,9 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--manifest",required=True)
     p.add_argument("--out",required=True)
+    p.add_argument("--provider",choices=["gemma","auto"],default="gemma")
     a=p.parse_args()
-    replay(a.manifest,a.out)
+    replay(a.manifest,a.out,a.provider)
 
 if __name__=="__main__":
     main()

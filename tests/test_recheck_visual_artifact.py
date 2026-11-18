@@ -26,8 +26,11 @@ class ReplayTests(unittest.TestCase):
 
     def test_empty_caption_fails_closed(self):
         with patch.object(auto,"_request",side_effect=[{"answer":""},{"caption":None}]):
-            verdict=auto.evaluate_image(fake_jpeg(),"Gas","A gas planet","a"*32,"token")
+            with patch("scripts.vision_gemma.evaluate_gemma",
+                return_value={"decision":"UNSURE","evidence":"No readable result"}) as fallback:
+                verdict=auto.evaluate_image(fake_jpeg(),"Gas","A gas planet","a"*32,"token")
         self.assertEqual(verdict["decision"],"UNSURE")
+        fallback.assert_called_once()
 
     def test_replay_reuses_hashed_image(self):
         with tempfile.TemporaryDirectory() as d:
@@ -39,7 +42,7 @@ class ReplayTests(unittest.TestCase):
                 "sha256":hashlib.sha256(blob).hexdigest()}]}]}
             m=p/"visual-supervision-manifest.json";m.write_text(json.dumps(doc))
             with patch.dict("os.environ",{"CLOUDFLARE_ACCOUNT_ID":"a"*32,"CLOUDFLARE_API_TOKEN":"tok"}):
-                with patch("scripts.recheck_visual_artifact.evaluate_image",return_value={"decision":"FAIL","evidence":"Ground is visible"}) as check:
+                with patch("scripts.vision_gemma.evaluate_gemma",return_value={"decision":"FAIL","evidence":"Ground is visible"}) as check:
                     result=replay(m,p/"out.json")
             self.assertEqual(check.call_count,1)
             self.assertEqual(result["new_images_generated"],0)

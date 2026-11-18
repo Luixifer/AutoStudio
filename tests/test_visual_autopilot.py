@@ -86,11 +86,15 @@ class AutopilotTests(unittest.TestCase):
         self.assertEqual(auto._extract_text({"output":{"answer":"A bright planet"}}),"A bright planet")
         self.assertEqual(auto._extract_text({"choices":[{"message":{"content":"Visible star"}}]}),"Visible star")
 
-    def test_moondream_unknown_shape_rejected_with_keys(self):
+    def test_moondream_unknown_shape_rejected_with_gemma_fallback(self):
         with patch.object(auto,"_request",return_value={"unexpected_response":{"stuff":"not image evidence"}}):
-            result=auto.evaluate_image(fake_jpeg(),"Gas giant","Space planet","a"*32,"tok")
+            with patch("scripts.vision_gemma.evaluate_gemma",
+                       return_value={"decision":"UNSURE","evidence":"Unknown visual evidence",
+                                     "response_keys":["usage"]}) as fallback:
+                result=auto.evaluate_image(fake_jpeg(),"Gas giant","Space planet","a"*32,"tok")
         self.assertEqual(result["decision"],"UNSURE")
-        self.assertIn("unexpected_response",result["response_keys"])
+        self.assertIn("usage",result["response_keys"])
+        fallback.assert_called_once()
 
     def test_planner_uses_narration_not_hardcoded_kelt(self):
         with patch.object(auto,"_request",return_value={"response":"An ultra-realistic science documentary still of water droplets in rain, high contrast natural lighting, crisp foreground."}):

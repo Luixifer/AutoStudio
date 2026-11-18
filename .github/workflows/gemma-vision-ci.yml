@@ -1,0 +1,23 @@
+name: AutoStudio · Gemma vision safety tests
+on:
+  pull_request:
+    paths:
+      - 'scripts/vision_gemma.py'
+      - 'scripts/visual_autopilot.py'
+      - 'scripts/recheck_visual_artifact.py'
+      - 'tests/test_vision_gemma.py'
+      - 'tests/test_recheck_visual_artifact.py'
+      - '.github/workflows/gemma-vision-ci.yml'
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m unittest tests.test_vision_gemma tests.test_recheck_visual_artifact tests.test_visual_autopilot tests.test_visual_diagnostics -v
+      - run: python -m py_compile scripts/vision_gemma.py scripts/visual_autopilot.py scripts/recheck_visual_artifact.py
