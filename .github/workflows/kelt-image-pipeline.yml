@@ -1,0 +1,121 @@
+name: AutoStudio · KELT-9b imagenes a documental (experimental)
+on:
+  workflow_dispatch:
+    inputs:
+      live:
+        description: 'Generar imagenes reales usando cuota Cloudflare (requiere secretos)'
+        required: true
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - 'scripts/image_generation.py'
+      - 'scripts/image_staging.py'
+      - 'tests/test_image_generation.py'
+      - 'tests/test_image_staging.py'
+      - '.github/workflows/kelt-image-pipeline.yml'
+permissions:
+  contents: read
+jobs:
+  kelt-image-pipeline:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout del codigo experimental en revisión
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: development
+      - name: Checkout del director y montador funcional, congelado
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e722cf94007e326fd6a4537ad57ebbc60b43faa9
+          path: engine
+      - name: Checkout del guion KELT-9b aportado anteriormente
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Verificar pruebas sin acceso a Cloudflare
+        working-directory: development
+        run: |
+          python -m unittest tests.test_image_generation tests.test_image_staging -v
+          python -m py_compile scripts/image_generation.py scripts/image_staging.py
+      - name: Convertir guion real en 10 instrucciones visuales
+        working-directory: engine
+        run: |
+          python -m scripts.personal_visual_briefs \
+            ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out ../visual-input
+          python - <<'PY'
+          import json
+          d=json.load(open('../visual-input/direccion-visual.json'))
+          assert len(d['scenes']) == 10
+          assert all(s['image_prompt'] and s['narration'] in s['image_prompt'] for s in d['scenes'])
+          print('10_SCENE_BRIEFS_OK')
+          PY
+      - name: Generar imagenes o manifiesto de simulación
+        working-directory: development
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AUTOSTUDIO_LIVE: ${{ github.event_name == 'workflow_dispatch' && inputs.live && 'true' || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ "$AUTOSTUDIO_LIVE" = true ]; then
+            python -m scripts.image_generation --story ../visual-input/direccion-visual.json \
+              --out ../generated-images --live --variants 1 --max-requests 10
+          else
+            python -m scripts.image_generation --story ../visual-input/direccion-visual.json \
+              --out ../generated-images --variants 1 --max-requests 10
+          fi
+      - name: Preparar storyboard real con imágenes nuevas verificadas
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: development
+        run: |
+          python -m scripts.image_staging \
+            --storyboard ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --manifest ../generated-images/image-generation-manifest.json \
+            --out ../new-storyboard
+      - name: Instalar programa de montaje y voz Álex
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Renderizar MP4 nuevo y verificar QA técnico
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: engine
+        run: |
+          python -m scripts.personal_prepare ../new-storyboard/storyboard.json --out ../ready
+          python -m scripts.personal_editor ../ready/input/studio-ready.json --out ../final-render
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('../final-render/quality-report.json').read_text())
+          assert q['technical_passed'] and not q['ready_to_publish']
+          assert not q['youtube_enabled']
+          print('RENDERED_MP4_QA_OK', q['sha256'])
+          PY
+      - name: Entregar trazabilidad y resultados
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ always() }}
+        with:
+          name: AutoStudio-KELT-9b-Imagenes-Experimentales
+          path: |
+            visual-input/direccion-visual.json
+            visual-input/prompts-imagenes.md
+            generated-images/image-generation-manifest.json
+            generated-images/*.png
+            new-storyboard/storyboard.json
+            new-storyboard/image-staging-report.json
+            final-render/autostudio-personal-REVIEW.mp4
+            final-render/quality-report.json
+            final-render/contacto-planos.jpg
+          retention-days: 3
+          if-no-files-found: warn
