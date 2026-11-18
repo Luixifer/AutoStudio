@@ -86,5 +86,7 @@ jobs:
             /tmp/autostudio-custom/render/contacto-planos.jpg
             /tmp/autostudio-custom/render/captions.srt
             /tmp/autostudio-custom/storyboard/storyboard.json
+            /tmp/autostudio-custom/briefs/direccion-visual.json
+            /tmp/autostudio-custom/briefs/prompts-imagenes.md
           if-no-files-found: error
           retention-days: 7
