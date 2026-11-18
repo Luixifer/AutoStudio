@@ -48,6 +48,18 @@ class AutopilotTests(unittest.TestCase):
         self.assertTrue(r["all_scenes_approved"])
         self.assertTrue(all(s["candidates"][0]["status"]=="approved" for s in r["scenes"]))
 
+    def test_default_vision_uses_gemma_once_per_scene(self):
+        with patch.dict("os.environ",{"CLOUDFLARE_API_TOKEN":"test","CLOUDFLARE_ACCOUNT_ID":"a"*32}):
+            with patch("scripts.vision_gemma.evaluate_gemma",return_value={
+                "decision":"PASS","evidence":"Visible gas, consistent with narration"}) as checker:
+                r=auto.run(self.story,self.root/"gemma",live=True,max_attempts=1,request_budget=2,
+                    director=lambda *a:"Photorealistic gas world and stellar irradiation, dramatic lighting.",
+                    generator=lambda *a:fake_jpeg())
+        self.assertTrue(r["all_scenes_approved"])
+        self.assertEqual(r["vision_requests"],2)
+        self.assertEqual(checker.call_count,2)
+        self.assertEqual(r["vision_model"],"@cf/google/gemma-4-26b-a4b-it")
+
     def test_ambiguous_vision_must_reject(self):
         with patch.dict("os.environ",{"CLOUDFLARE_API_TOKEN":"test","CLOUDFLARE_ACCOUNT_ID":"a"*32}):
             r=auto.run(self.story,self.root/"out",live=True,max_attempts=1,request_budget=2,

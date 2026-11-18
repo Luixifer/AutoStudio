@@ -6,7 +6,7 @@ Diseñado para trabajar con **cualquier narración de 1-24 escenas**, no contien
 
 - **Director**: Llama a `@cf/meta/llama-3.1-8b-instruct-fp8` para interpretar el texto de cada escena y crear una descripción visual inédita. No necesita que escribas diez prompts manuales.
 - **Generador**: Crea imágenes con FLUX.1 Schnell.
-- **Supervisor**: Envía la imagen *real* a `@cf/moondream/moondream3.1-9B-A2B` para contrastar lo que es visible con la narración y la dirección. Exige `DECISION: PASS`, con observación visible; de otro modo la marca `needs_human_review`.
+- **Supervisor**: Envía la imagen *real* a `@cf/google/gemma-4-26b-a4b-it` para contrastar lo que es visible con la narración y la dirección. Exige `DECISION: PASS`, con observación visible; de otro modo la marca `needs_human_review`.
 - **Reintento**: Opcionalmente repite la escena, como máximo una vez, incorporando a las instrucciones el motivo del rechazo visual.
 - **Validación de integridad**: SHA256 y dimensiones, rechazo de recursos ausentes o duplicados, y adaptador que solo puede seleccionar escenas aprobadas.
 - **Salida**: Si se aprueban todas, crea un nuevo storyboard, narración Álex y MP4 a 60 fps. Si alguna no pasa, conserva los ficheros y su informe para revisión; **no crea un vídeo marcado como aprobado**.
@@ -31,4 +31,4 @@ Para un video diferente solo debe cambiar el storyboard. El workflow actual est�
 - No es un motor de búsqueda científica ni una comprobación de verdades externas.
 - La identidad visual se intenta preservar con el contexto textual anterior; no hay condicionamiento visual entre imágenes ni referencia img2img.
 - Un `PASS` del modelo de visión significa **aprobación tentativa automática**, no calidad perfecta ni autorización editorial.
-- La compatibilidad real de los dos nuevos modelos de IA todavía debe verificarse con una ejecución live, sus cuotas y políticas.
+- Se verificó la inspección real de una imagen de KELT-9b con Gemma 4 (resultado PASS), pero todavía no se ha validado una producción completa con la nueva supervisión. El modelo puede fallar y la revisión editorial sigue siendo obligatoria.
