@@ -1,13 +1,18 @@
 """Offline regression tests: no external API calls or secrets required."""
-import base64
 import json
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from scripts.image_generation import build, png_dimensions, scene_prompts, generate_cloudflare
+from scripts.image_generation import build, image_dimensions, scene_prompts, generate_cloudflare, MAX_PROMPT
 
-PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAADy5G5u")  # header only for dimension checks
+
+def jpeg(w=512, h=512):
+    # Minimal marker stream for header parser only; not a decodable photograph.
+    return (b"\xff\xd8\xff\xc0\x00\x11\x08"
+            + h.to_bytes(2, "big") + w.to_bytes(2, "big")
+            + b"\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00"
+            + b"\xff\xd9")
 
 class ImageGenerationTests(unittest.TestCase):
     def test_prompts_are_cinematic_and_scene_specific(self):
@@ -21,10 +26,14 @@ class ImageGenerationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"explicit visual"):
             scene_prompts({"scenes":[{"voice":"a planet"}]})
 
-    def test_png_validation(self):
-        self.assertEqual(png_dimensions(PNG),(512,512))
+    def test_jpeg_validation(self):
+        self.assertEqual(image_dimensions(jpeg()), (512, 512, '.jpg'))
         with self.assertRaises(ValueError):
-            png_dimensions(b"not an image")
+            image_dimensions(b'not an image')
+
+    def test_prompts_fit_api_limit(self):
+        doc={'scenes':[{'image_prompt':'cosmic star '*400}]}
+        self.assertLessEqual(len(scene_prompts(doc)[0]['prompt']),MAX_PROMPT)
 
     def test_dry_run_creates_only_manifest(self):
         with tempfile.TemporaryDirectory() as temp:
