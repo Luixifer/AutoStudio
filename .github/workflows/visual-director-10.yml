@@ -1,0 +1,42 @@
+name: AutoStudio · Visual Director 1.0
+on:
+  push:
+    branches: [feature/visual-director-10]
+    paths:
+      - 'scripts/personal_visual_briefs.py'
+      - 'tests/test_personal_visual_briefs.py'
+      - '.github/workflows/visual-director-10.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generate-art-direction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Pruebas de briefs visuales originales, sin servicios externos
+        run: python -m unittest discover -s tests -p 'test_personal_visual_briefs.py' -v
+      - name: Crear guía visual sobre un storyboard de prueba
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          project={"title":"KELT-9b: planeta infernal","scenes":[
+            {"narration":"Existe un planeta mucho más caliente que nuestro mundo."},
+            {"narration":"El hidrógeno se separa en la atmósfera."},
+            {"narration":"La estrella está extraordinariamente cerca."}]}
+          Path("/tmp/storyboard.json").write_text(json.dumps(project,ensure_ascii=False))
+          PY
+          python -m scripts.personal_visual_briefs /tmp/storyboard.json --out /tmp/briefs
+          test -s /tmp/briefs/prompts-imagenes.md
+          test -s /tmp/briefs/direccion-visual.json
+      - name: Guardar ejemplo editable de dirección visual
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Visual-Director-Preview
+          path: /tmp/briefs/
+          retention-days: 7
