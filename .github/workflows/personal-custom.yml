@@ -21,7 +21,7 @@ jobs:
       - name: Cargar motor fijado a una revisión concreta
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 1c40bc57d2c4ead2b13c1981db9c6986f97e2add
+          ref: 877a65add653d176d63af041418441f221837844
           path: engine
       - name: Cargar únicamente datos subidos al repositorio público
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
