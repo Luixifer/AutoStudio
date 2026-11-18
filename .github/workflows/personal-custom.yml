@@ -21,7 +21,7 @@ jobs:
       - name: Cargar motor fijado a una revisión concreta
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: db678600a479b7e6eced4999b2d8e30601b5a732
+          ref: 8e039b77d52500d8883b91858122429618e2603f
           path: engine
       - name: Cargar únicamente datos subidos al repositorio público
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -46,6 +46,14 @@ jobs:
           python -m scripts.personal_custom_request "$AUTOSTUDIO_REQUEST" \
             --source-root "$GITHUB_WORKSPACE/uploads" \
             --out "/tmp/autostudio-custom/storyboard"
+      - name: Planificar dirección visual de cada imagen a partir del guion
+        working-directory: engine
+        run: |
+          python -m scripts.personal_visual_briefs \
+            /tmp/autostudio-custom/storyboard/storyboard.json
+            /tmp/autostudio-custom/briefs/direccion-visual.json
+            /tmp/autostudio-custom/briefs/prompts-imagenes.md \
+            --out /tmp/autostudio-custom/briefs
       - name: Narrar guion con Álex y montar MP4 con cámara automática
         working-directory: engine
         run: |
