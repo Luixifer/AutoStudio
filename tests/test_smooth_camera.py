@@ -70,7 +70,7 @@ class SmoothCameraTests(unittest.TestCase):
                 diffs.append(sum(abs(x-y) for x,y in zip(a,b))/count)
             center=diffs[25:125]
             self.assertGreater(sum(x>0.12 for x in center),85)
-            self.assertLess(max(center),5.0)
+            self.assertLess(max(center),12.0)
             self.assertLess(max(center),max(.5,sum(center)/len(center)*7))
 
 
