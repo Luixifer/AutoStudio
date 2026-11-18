@@ -111,6 +111,7 @@ jobs:
             visual-input/direccion-visual.json
             visual-input/prompts-imagenes.md
             generated-images/image-generation-manifest.json
+            generated-images/*.jpg
             generated-images/*.png
             new-storyboard/storyboard.json
             new-storyboard/image-staging-report.json

@@ -2,13 +2,16 @@
 import hashlib
 import json
 from pathlib import Path
-import struct
 import tempfile
 import unittest
 from scripts.image_staging import stage_generated_images
 
-def png(w=512,h=512):
-    return b"\x89PNG\r\n\x1a\n"+b"\x00\x00\x00\rIHDR"+struct.pack(">II",w,h)+b"\x08\x02\x00\x00\x00"+b"\x00"*4
+def jpeg(w=512, h=512):
+    # Minimal marker stream for header parser only; not a decodable photograph.
+    return (b"\xff\xd8\xff\xc0\x00\x11\x08"
+            + h.to_bytes(2, "big") + w.to_bytes(2, "big")
+            + b"\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00"
+            + b"\xff\xd9" + b"\x00"*8)
 
 class ImageStagingTests(unittest.TestCase):
     def setUp(self):
@@ -23,8 +26,8 @@ class ImageStagingTests(unittest.TestCase):
         self.manifest=self.root/"manifest.json"
         entries=[]
         for i in (1,2):
-            raw=png(512+i,512)
-            path=self.root/f"scene_{i:02}_v1.png"
+            raw=jpeg(512+i,512)
+            path=self.root/f"scene_{i:02}_v1.jpg"
             path.write_bytes(raw)
             entries.append({"scene":i,"candidates":[{"variant":1,"status":"generated","file":path.name,
                                                     "sha256":hashlib.sha256(raw).hexdigest(),"dimensions":[512+i,512]}]})
@@ -37,15 +40,15 @@ class ImageStagingTests(unittest.TestCase):
         doc=json.loads((self.root/"out"/"storyboard.json").read_text())
         self.assertFalse(doc["editorial_approved"])
         self.assertEqual(doc["scenes"][0]["rights"]["license"],"own_creation")
-        self.assertTrue((self.root/"out"/"auto-scene-01.png").exists())
+        self.assertTrue((self.root/"out"/"auto-scene-01.jpg").exists())
 
     def test_missing_image_rejected(self):
-        (self.root/"scene_02_v1.png").unlink()
+        (self.root/"scene_02_v1.jpg").unlink()
         with self.assertRaises(ValueError):
             stage_generated_images(self.story,self.manifest,self.root/"out")
 
     def test_changed_bytes_rejected(self):
-        (self.root/"scene_01_v1.png").write_bytes(png(768,512))
+        (self.root/"scene_01_v1.jpg").write_bytes(jpeg(768,512))
         with self.assertRaisesRegex(ValueError,"integrity"):
             stage_generated_images(self.story,self.manifest,self.root/"out")
 
