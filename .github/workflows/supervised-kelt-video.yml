@@ -1,0 +1,115 @@
+name: AutoStudio · Director IA y supervisor visual (experimental)
+on:
+  workflow_dispatch:
+    inputs:
+      live:
+        description: 'Generate and inspect new images with Workers AI free allocation'
+        required: true
+        type: boolean
+        default: false
+      max_attempts:
+        description: 'Maximum images per scene (1-2); costs inference quota'
+        required: true
+        type: choice
+        options: ['1', '2']
+        default: '1'
+  pull_request:
+    paths:
+      - 'scripts/visual_autopilot.py'
+      - 'scripts/stage_supervised.py'
+      - 'tests/test_visual_autopilot.py'
+      - '.github/workflows/supervised-kelt-video.yml'
+permissions:
+  contents: read
+jobs:
+  supervised-video:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Checkout director visual experimental
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: development
+      - name: Cargar motor de video fijado y validado
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e722cf94007e326fd6a4537ad57ebbc60b43faa9
+          path: engine
+      - name: Cargar storyboard real de KELT-9b
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Comprobar tests del director y supervisor sin consumir cuota
+        working-directory: development
+        run: |
+          python -m unittest tests.test_image_generation tests.test_image_staging tests.test_visual_autopilot -v
+          python -m py_compile scripts/visual_autopilot.py scripts/stage_supervised.py
+      - name: Planificacion automática del guion, creación y análisis visual
+        working-directory: development
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          LIVE: ${{ github.event_name == 'workflow_dispatch' && inputs.live && 'true' || 'false' }}
+          ATTEMPTS: ${{ inputs.max_attempts || '1' }}
+        run: |
+          set -euo pipefail
+          if [ "$LIVE" = true ]; then
+            python -m scripts.visual_autopilot \
+              --story ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+              --out ../supervised-art --live --max-attempts "$ATTEMPTS" --request-budget 20
+          else
+            python -m scripts.visual_autopilot \
+              --story ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+              --out ../supervised-art --max-attempts 1 --request-budget 10
+          fi
+      - name: Crear storyboard solo con imagenes aprobadas por el supervisor
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: development
+        run: |
+          python -m scripts.stage_supervised \
+            --storyboard ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --manifest ../supervised-art/visual-supervision-manifest.json \
+            --out ../reviewed-storyboard
+      - name: Instalar voz neuronal y montaje libre
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Render cinematográfico Álex 60 fps
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        working-directory: engine
+        run: |
+          python -m scripts.personal_prepare ../reviewed-storyboard/storyboard.json --out ../prepared
+          python -m scripts.personal_editor ../prepared/input/studio-ready.json --out ../final-render
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          qa=json.loads(Path("../final-render/quality-report.json").read_text())
+          assert qa["technical_passed"] and qa["youtube_enabled"] is False
+          assert not qa["ready_to_publish"]
+          print("SUPERVISED_MP4_TECHNICAL_QA_PASS",qa["sha256"])
+          PY
+      - name: Guardar pruebas, imagenes y MP4 de revisión sin publicar en YouTube
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Supervisor-Visual-REVISION
+          path: |
+            supervised-art/visual-supervision-manifest.json
+            supervised-art/*.jpg
+            supervised-art/*.png
+            reviewed-storyboard/storyboard.json
+            reviewed-storyboard/image-staging-report.json
+            final-render/autostudio-personal-REVIEW.mp4
+            final-render/quality-report.json
+            final-render/contacto-planos.jpg
+          retention-days: 3
+          if-no-files-found: warn
