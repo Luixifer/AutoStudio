@@ -1,6 +1,10 @@
 name: AutoStudio · Revisar imagen existente con IA (cero FLUX)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/recheck-gemma-reasoning-2026-11-19.txt'
 permissions:
   contents: read
   actions: read
