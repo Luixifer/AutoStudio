@@ -56,7 +56,8 @@ def make_visual_briefs(storyboard):
         subject=visual_subject(narration)
         composition=("sujeto principal bien separado del fondo, zona superior "
                      "e inferior despejada para títulos y subtítulos independientes")
-        prompt=f"{STYLE}. {lens.capitalize()}: {subject}; {hint}; {composition}. "
+        prompt=(f"{STYLE}. {lens.capitalize()}: {subject}; {hint}; {composition}. "
+                f"Interpretar visualmente esta idea sin escribir sus palabras ni inventar hechos: {narration}")
         results.append({
             "scene":i+1,
             "narration":narration,
