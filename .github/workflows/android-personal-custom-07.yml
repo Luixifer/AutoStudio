@@ -1,0 +1,55 @@
+name: AutoStudio Personal 0.7 · guion e imágenes propios
+run-name: APK Custom 0.7 · ${{ github.sha }}
+on:
+  push:
+    branches: [feature/android-personal-custom-07]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-personal07-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-personal-07:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: SDK Android y Java 17
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Compilar Android + pruebas JVM
+        run: python android/build.py
+      - name: Verificar SHA y firma debug
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/android/AutoStudio-Control-0.7.0-lab.apk
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          info=json.loads(Path("build/android/apk-info.json").read_text())
+          apk=Path("build/android")/info["apk"]
+          assert info["application_id"]=="com.luixifer.autostudio.lab07"
+          assert apk.is_file() and apk.stat().st_size>80000
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()==info["sha256"]
+          print("AUTOSTUDIO_CUSTOM07_BYTES",info["bytes"])
+          print("AUTOSTUDIO_CUSTOM07_SHA256",info["sha256"])
+          print("AUTOSTUDIO_CUSTOM07_SOURCE",info["source_commit"])
+          PY
+      - name: Descargar APK verificable para Samsung
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Custom-0.7-APK-Samsung
+          path: |
+            build/android/AutoStudio-Control-0.7.0-lab.apk
+            build/android/SHA256SUMS
+            build/android/apk-info.json
+          retention-days: 7
+          if-no-files-found: error

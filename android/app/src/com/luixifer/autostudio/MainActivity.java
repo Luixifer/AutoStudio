@@ -9,7 +9,7 @@ import org.json.*;
 public final class MainActivity extends Activity implements JobController.Listener {
     private Spinner topic;private TextView status,connection;private Button generate,play,scenes,logs;private JobController jobs;
     @Override public void onCreate(Bundle saved){super.onCreate(saved);jobs=((AutoStudioApp)getApplication()).jobs();LinearLayout body=Ui.scroll(this,Ui.root(this,"AutoStudio"));
-        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.6\nVídeos en la nube, sin ordenador ni APIs de pago.");
+        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.7\nVídeos en la nube, sin ordenador ni APIs de pago.");
         LinearLayout c=Ui.card(body);connection=Ui.para(c,"");connection.setId(Ui.CONNECTION);Ui.button(c,"Conectar / ajustes de GitHub",Ui.SETTINGS,false).setOnClickListener(v->startActivity(new Intent(this,SettingsActivity.class)));
         LinearLayout form=Ui.card(body);form.addView(Ui.text(this,"¿Qué vamos a contar?",20,true));Ui.para(form,"Elige un tema publicado. Cada uno tiene su propio guion e ilustraciones. La generación sobre temas arbitrarios, los documentales y la cola aún no están habilitados.");
         topic=new Spinner(this);topic.setId(Ui.TOPIC);
@@ -24,7 +24,8 @@ public final class MainActivity extends Activity implements JobController.Listen
         scenes=Ui.button(progress,"Ver escenas de este vídeo",Ui.SCENES,false);scenes.setOnClickListener(v->startActivity(new Intent(this,ScenesActivity.class).putExtra("request_id",jobs.snapshot().optString("request_id"))));
         logs=Ui.button(progress,"Ver ejecución en GitHub",1011,false);logs.setOnClickListener(v->Ui.browser(this,jobs.snapshot().optString("run_url","https://github.com/"+GitHubClient.REPO+"/actions")));
         Ui.para(progress,"Puedes cerrar la aplicación: la generación continúa en GitHub. Al volver, se consulta la misma solicitud. El móvil no renderiza el vídeo.");
-        Ui.button(body,"Crear vídeo personal · auroras, ADN o volcanes",2210,true).setOnClickListener(v->startActivity(new Intent(this,PersonalVideosActivity.class)));
+        Ui.button(body,"Crear Short con mi guion y mis imágenes",4430,true).setOnClickListener(v->startActivity(new Intent(this,CustomVideoActivity.class)));
+        Ui.button(body,"Crear vídeo personal · auroras, ADN o volcanes",2210,false).setOnClickListener(v->startActivity(new Intent(this,PersonalVideosActivity.class)));
         Ui.button(body,"Investigaciones anteriores y sus borradores",1210,false).setOnClickListener(v->startActivity(new Intent(this,ResearchVideosActivity.class)));
         Ui.button(body,"Biblioteca de Shorts anteriores",1012,false).setOnClickListener(v->startActivity(new Intent(this,LibraryActivity.class)));
         Ui.para(body,"Sin publicación en YouTube. Documentales, producción por lotes y edición de escenas están pendientes de validar tras este primer recorrido.");
