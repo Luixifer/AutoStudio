@@ -24,10 +24,13 @@ jobs:
           python-version: '3.12'
       - name: Dependencies without paid APIs
         run: |
-          command -v ffmpeg
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            timeout 120s sudo apt-get update -qq
+            timeout 180s sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          fi
           ffmpeg -version | head -1
           if ! python -c 'from PIL import Image; print(Image.__version__)'; then
-            python -m pip install --disable-pip-version-check --retries 1 --timeout 15 Pillow==11.3.0
+            python -m pip install --disable-pip-version-check --retries 1 --timeout 20 Pillow==11.3.0
           fi
       - name: Cinematic composition and colour tests
         run: python -m unittest discover -s tests -p 'test_cinematic_polish.py' -v
