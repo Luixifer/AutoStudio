@@ -30,7 +30,7 @@ def inspect_production(path,project,shots,srt):
     if actual!=want:errors.append("Resolución distinta del perfil.")
     if v.get("codec_name")!="h264" or v.get("pix_fmt")!="yuv420p":
         errors.append("Vídeo sin H264/yuv420p.")
-    if Fraction(v["avg_frame_rate"])!=25:errors.append("FPS incorrectos.")
+    if Fraction(v["avg_frame_rate"])!=project["profile"]["fps"]:errors.append("FPS incorrectos.")
     if a.get("codec_name")!="aac" or int(a.get("sample_rate",0))!=48000:
         errors.append("Audio sin AAC/48 kHz.")
     seconds=float(info["format"]["duration"])
