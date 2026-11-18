@@ -9,11 +9,11 @@ import re
 from pathlib import Path
 
 PROFILES={
-    "short":{"size":[720,1280],"fps":50,"hard_seconds":[10,180],
+    "short":{"size":[720,1280],"fps":60,"hard_seconds":[10,180],
              "recommended_seconds":[35,55],"min_scenes":2,"max_scenes":45},
-    "documentary":{"size":[1280,720],"fps":50,"hard_seconds":[180,1800],
+    "documentary":{"size":[1280,720],"fps":60,"hard_seconds":[180,1800],
                    "recommended_seconds":[480,720],"min_scenes":8,"max_scenes":180},
-    "lab":{"size":[720,1280],"fps":50,"hard_seconds":[3,180],
+    "lab":{"size":[720,1280],"fps":60,"hard_seconds":[3,180],
            "recommended_seconds":[35,55],"min_scenes":2,"max_scenes":45},
 }
 MOVEMENTS={"zoom_in","zoom_out","pan_left","pan_right","focus","static"}
