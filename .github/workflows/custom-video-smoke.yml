@@ -1,0 +1,45 @@
+name: AutoStudio Custom Video LAB · real mobile-request smoke
+on:
+  push:
+    branches: [feature/personal-custom-storyboard-07]
+    paths:
+      - 'scripts/personal_custom_*.py'
+      - 'tests/test_personal_custom_request.py'
+      - '.github/workflows/custom-video-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: custom-video-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate-uploads-fast:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Pillow for JPEG validation
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Reject forged or corrupt mobile requests
+        run: python -m unittest discover -s tests -p 'test_personal_custom_request.py' -v
+  validate-and-render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar modelos gratuitos y FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Probar solicitudes y recursos corruptos
+        run: python -m unittest discover -s tests -p 'test_personal_custom_request.py' -v
+      - name: Probar solicitud de 3 imágenes -> Álex -> vídeo real
+        run: python -m scripts.personal_custom_smoke
