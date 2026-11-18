@@ -143,14 +143,14 @@ def evaluate_image(image_bytes, narration, prompt, account, token):
             "A caption can omit objects, so do not assume unmentioned objects are absent. "
             "Reject only clear visual contradictions. If ambiguous, reply UNSURE. "
             "Reply in EXACTLY two lines: DECISION: PASS or FAIL or UNSURE; "
-            "EVIDENCE: one factual reason. Do not infer scientific truth merely from a caption.\\n"
+            "EVIDENCE: one factual reason. Do not infer scientific truth merely from a caption.\n"
             "Expected narration: "+narration[:500]+"\\nExpected composition: "+prompt[:750]+
             "\\nWhat is actually visible (caption): "+caption[:950])
         judgement=_extract_text(_request(DIRECTOR_MODEL,{"messages":[
             {"role":"user","content":judge_input}],"max_tokens":180,"temperature":0.0},
             account,token))
-        jmatch=re.search(r"(?im)^DECISION:\\s*(PASS|FAIL|UNSURE)\\s*$",judgement)
-        jreason=re.search(r"(?im)^EVIDENCE:\\s*(.{8,500})$",judgement)
+        jmatch=re.search(r"(?im)^DECISION:\s*(PASS|FAIL|UNSURE)\s*$",judgement)
+        jreason=re.search(r"(?im)^EVIDENCE:\s*(.{8,500})$",judgement)
         if not jmatch or not jreason:
             return {"decision":"UNSURE","evidence":"Caption obtained but judge response unclear.",
                     "caption_excerpt":caption[:400],"judge_excerpt":judgement[:260]}
