@@ -1,1 +1,3 @@
 Run one replay: reuse prior image, call only Cloudflare text/vision models, and publish minimal result to GitHub issue #20; no FLUX image generation.
+
+Retry after correcting escaped regular expressions. No FLUX calls. Automatic report to issue #20.
