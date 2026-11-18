@@ -86,29 +86,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     Path(path).write_text(result,encoding="utf-8")
 
 
-def background_still(picture,out,width,height,heading,source_type):
-    from PIL import Image,ImageFilter,ImageEnhance,ImageOps,ImageDraw
+def background_still(picture,out,width,height,heading,source_type,focal=(.5,.5)):
+    from PIL import Image,ImageDraw
+    from scripts.personal_cinematic import fit_for_camera
     with Image.open(picture) as original:
-        original=original.convert("RGB")
-        ratio=original.width/original.height
-        output_ratio=width/height
-        if abs(ratio-output_ratio)<.16:
-            # Preserve the entire 9:16 original as closely as possible: do not
-            # bury a cinematic vertical image inside a narrow rectangle.
-            bg=ImageOps.fit(original,(width,height),Image.Resampling.LANCZOS,centering=(.5,.5))
-        else:
-            bg=original.resize((width,height),Image.Resampling.LANCZOS)
-            bg=bg.filter(ImageFilter.GaussianBlur(max(12,width//24)))
-            bg=ImageEnhance.Brightness(bg).enhance(.32)
-            limitw=width
-            limith=int(height*(.70 if height>width else .82))
-            scale=min(limitw/original.width,limith/original.height)
-            fg=original.resize((round(original.width*scale),round(original.height*scale)),Image.Resampling.LANCZOS)
-            x=(width-fg.width)//2
-            y=(height-fg.height)//2
-            bg.paste(fg,(x,y))
-    # Faint gradients behind title/subtitles to ensure legibility without
-    # painting permanently moving text into the image.
+        bg,full_bleed=fit_for_camera(original,width,height,focal)
+    # Low-opacity safety gradients preserve captions and titles while the
+    # complete raster moves behind a separate, stationary ASS text layer.
     overlay=Image.new("RGBA",(width,height),(0,0,0,0))
     draw=ImageDraw.Draw(overlay)
     for y in range(height):
@@ -121,6 +105,7 @@ def background_still(picture,out,width,height,heading,source_type):
         if alpha:draw.line((0,y,width,y),fill=(1,5,12,min(alpha,95)))
     bg=Image.alpha_composite(bg.convert("RGBA"),overlay).convert("RGB")
     bg.save(out,quality=94,subsampling=0,optimize=True)
+    return {"full_bleed":full_bleed,"focal":list(focal)}
 
 
 def zoom_filter(scene,frames,size,fps=60):
@@ -131,16 +116,18 @@ def zoom_filter(scene,frames,size,fps=60):
     # Smooth velocity at the beginning and end of each camera move.
     # Supersampling avoids discrete 1px jumps in slow panning shots.
     phase=f"(0.5-0.5*cos(PI*min(on/{max(1,frames-1)},1)))"
-    if movement=="zoom_in":
+    if movement in ("zoom_in","focus"):
+        # Previously focus was static despite being advertised as a camera
+        # movement. Make it a true gradual approach to the chosen focal point.
         z=f"1+({zoom}-1)*{phase}"
     elif movement=="zoom_out":
         z=f"{zoom}-({zoom}-1)*{phase}"
     else:
         z=f"{zoom}"
     if movement=="pan_left":
-        x=f"(iw-iw/zoom)*(0.85-0.70*{phase})"
+        x=f"(iw-iw/zoom)*clip(({tx})+0.32-0.64*{phase},0,1)"
     elif movement=="pan_right":
-        x=f"(iw-iw/zoom)*(0.15+0.70*{phase})"
+        x=f"(iw-iw/zoom)*clip(({tx})-0.32+0.64*{phase},0,1)"
     else:
         x=f"(iw-iw/zoom)*{tx}"
     y=f"(ih-ih/zoom)*{ty}"
@@ -157,14 +144,20 @@ def produce(manifest,out,allow_lab=False):
     fps=project["profile"]["fps"]
     raw_manifest=json.loads(Path(manifest).read_text(encoding="utf-8"))
     parts=[];all_cues=[];offset=0.0;shot_info=[]
+    from scripts.personal_cinematic import source_image_report
+    source_checks=[]
     for i,(entry,raw) in enumerate(zip(project["scenes"],raw_manifest["scenes"]),1):
         seconds=entry["voice_seconds"]+.25
         frames=math.ceil(seconds*fps)
         still=work/f"visual_{i:03}.jpg"
         subtitle=work/f"subtitle_{i:03}.ass"
         segment=work/f"part_{i:03}.mp4"
-        background_still(entry["image_path"],still,width*CAMERA_SUPERSAMPLE,height*CAMERA_SUPERSAMPLE,
-                         raw.get("heading",project["title"]),raw.get("source_type","illustration"))
+        source_check=source_image_report(entry["image_path"])
+        camera_composition=background_still(entry["image_path"],still,
+                         width*CAMERA_SUPERSAMPLE,height*CAMERA_SUPERSAMPLE,
+                         raw.get("heading",project["title"]),raw.get("source_type","illustration"),
+                         focal=entry["camera"].get("target",[.5,.5]))
+        source_checks.append({"scene":i,**source_check,**camera_composition})
         cues=caption_groups(entry["timed_words"])
         write_ass(subtitle,cues,size,raw.get("heading",project["title"]),seconds,raw.get("source_type","illustration"))
         # Escaping is required because FFmpeg treats ':' and '\\' as filter delimiters.
@@ -195,6 +188,10 @@ def produce(manifest,out,allow_lab=False):
         for i,c in enumerate(all_cues,1)),encoding="utf-8")
     from scripts.personal_quality import inspect_production
     report=inspect_production(final,project,shot_info,srt)
+    report["image_preflight"]=source_checks
+    for check in source_checks:
+        report["warnings"].extend(f"Imagen {check['scene']}: {warning}" for warning in check["warnings"])
+    report["cinematic_preset"]="conservative-graded-focal-v1"
     from scripts.personal_visual_audit import inspect_visuals
     visual=inspect_visuals(final,shot_info,work,format_name=project["format"])
     report["visual_audit"]=visual
