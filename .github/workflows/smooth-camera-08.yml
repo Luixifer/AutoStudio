@@ -28,7 +28,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
           python -m pip install --disable-pip-version-check Pillow==11.3.0
-      - name: Comprobar 50 fps y desplazamiento subpíxel en vídeo real
+      - name: Comprobar 60 fps y desplazamiento subpíxel en vídeo real
         run: python -m unittest discover -s tests -p 'test_smooth_camera.py' -v
       - name: Comprobar contratos, derechos y subtítulos
         run: python -m unittest discover -s tests -p 'test_personal_studio.py' -v
