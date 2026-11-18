@@ -176,7 +176,7 @@ def _scenes(story):
     return scenes,title
 
 def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
-        director=plan_scene, generator=generate_cloudflare, vision=evaluate_image):
+        director=plan_scene, generator=generate_cloudflare, vision=None):
     """Run a bounded visual loop; always write manifest, even after partial failure."""
     if not 1<=max_attempts<=MAX_RETRIES+1 or not 1<=request_budget<=48:
         raise ValueError("Invalid generation budget")
@@ -188,10 +188,18 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
     token=os.getenv("CLOUDFLARE_API_TOKEN","") if live else ""
     if live and (not account or not token):
         raise ValueError("Missing Cloudflare secrets")
+    if vision is None:
+        # Prefer the actual vision model proven on a real FLUX image. This avoids
+        # two nonproductive Moondream calls per scene on the Free allocation.
+        from scripts.vision_gemma import evaluate_gemma
+        vision=evaluate_gemma
+        vision_model="@cf/google/gemma-4-26b-a4b-it"
+    else:
+        vision_model="injected_vision_evaluator"
     out=Path(out_path)
     out.mkdir(parents=True,exist_ok=True)
     report={"schema":2,"mode":"live" if live else "dry-run",
-            "director_model":DIRECTOR_MODEL,"vision_model":VISION_MODEL,
+            "director_model":DIRECTOR_MODEL,"vision_model":vision_model,
             "generator_model":"@cf/black-forest-labs/flux-1-schnell",
             "planned_max_image_requests":len(scenes)*max_attempts,
             "completed_requests":0,"vision_requests":0,
