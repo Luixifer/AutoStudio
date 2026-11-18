@@ -44,17 +44,33 @@ def _request(model, payload, account, token, timeout=95):
     return reply.get("result")
 
 def _extract_text(result):
-    if isinstance(result,str):
+    """Extract a text reply from known Cloudflare and nested model envelopes.
+
+    Do not coerce arbitrary objects to text: that could accidentally approve
+    an image on an unrelated metadata field.
+    """
+    if isinstance(result, str):
         return result.strip()
-    if isinstance(result,dict):
-        for key in ("response","answer","text","output"):
-            if isinstance(result.get(key),str):
-                return result[key].strip()
-        choices=result.get("choices")
-        if isinstance(choices,list) and choices:
-            msg=choices[0].get("message") if isinstance(choices[0],dict) else None
-            if isinstance(msg,dict) and isinstance(msg.get("content"),str):
-                return msg["content"].strip()
+    if not isinstance(result, dict):
+        return ""
+    for key in ("answer", "response", "caption", "text", "content", "output"):
+        item = result.get(key)
+        if isinstance(item, str) and item.strip():
+            return item.strip()
+        if isinstance(item, dict):
+            nested = _extract_text(item)
+            if nested:
+                return nested
+    choices = result.get("choices")
+    if isinstance(choices, list) and choices:
+        msg = choices[0].get("message") if isinstance(choices[0], dict) else None
+        if isinstance(msg, dict):
+            nested = _extract_text(msg)
+            if nested:
+                return nested
+    # Some SDK and compatibility layers add another result envelope.
+    if isinstance(result.get("result"), dict):
+        return _extract_text(result["result"])
     return ""
 
 def plan_scene(narration, title, previous_style, account, token):
@@ -106,11 +122,13 @@ def evaluate_image(image_bytes, narration, prompt, account, token):
     result=_request(VISION_MODEL,{"task":"query","image":data_uri,"question":question,
         "reasoning":False,"max_tokens":220,"temperature":0.1},account,token)
     answer=_extract_text(result)
+    # On parse failure expose only model response shape (not image bytes or tokens).
+    response_keys = sorted(str(k)[:60] for k in result.keys()) if isinstance(result, dict) else []
     match=re.search(r"(?im)^DECISION:\s*(PASS|FAIL|UNSURE)\s*$",answer)
     evidence=re.search(r"(?im)^EVIDENCE:\s*(.{8,500})$",answer)
     if not match or not evidence:
         return {"decision":"UNSURE","evidence":"Unparseable vision response; requires review.",
-                "raw_excerpt":answer[:300]}
+                "raw_excerpt":answer[:300], "response_keys":response_keys}
     return {"decision":match.group(1).upper(),"evidence":evidence.group(1).strip()}
 
 def _scenes(story):
@@ -182,7 +200,8 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                 print(json.dumps({"scene":idx,"variant":attempt,
                     "vision_decision":assessment.get("decision","UNSURE"),
                     "vision_evidence":assessment.get("evidence","")[:300],
-                    "vision_excerpt":assessment.get("raw_excerpt","")[:240]},ensure_ascii=False),flush=True)
+                    "vision_excerpt":assessment.get("raw_excerpt","")[:240],
+                    "vision_response_keys":assessment.get("response_keys",[])},ensure_ascii=False),flush=True)
                 if assessment.get("decision")=="PASS":
                     candidate["status"]="approved"
                     entry["approved"]=True
