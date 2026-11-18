@@ -1,0 +1,45 @@
+name: AutoStudio · Prueba real supervisión visual (una escena)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/supervisor-real-smoke-2026-11-18.txt'
+permissions:
+  contents: read
+jobs:
+  one-scene:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Preparar UNA escena del guion real (sin prompts manuales)
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          full=json.loads(Path('requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json').read_text())
+          full['scenes']=full['scenes'][:1]
+          Path('one-scene.json').write_text(json.dumps(full,ensure_ascii=False))
+          PY
+      - name: Un prompt IA, UNA imagen FLUX, UNA inspección visual
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.visual_autopilot --story one-scene.json \
+            --out output/supervision --live --max-attempts 1 --request-budget 1
+      - name: Entregar resultado real y evidencia técnica aunque haya rechazo
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Supervisor-Prueba-Una-Escena
+          path: |
+            output/supervision/visual-supervision-manifest.json
+            output/supervision/*.jpg
+            output/supervision/*.png
+          retention-days: 3
+          if-no-files-found: warn
