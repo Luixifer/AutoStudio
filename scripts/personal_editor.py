@@ -18,6 +18,9 @@ from scripts.personal_studio import load_project, summarize_project, sha256_file
 FONT="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 BOLD="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
+# zoompan rounds crop offsets to source pixels; 4x input allows 0.25px steps.
+CAMERA_SUPERSAMPLE=4
+
 
 def ffmpeg(*arguments,timeout=180):
     subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y",*map(str,arguments)],
@@ -117,17 +120,17 @@ def background_still(picture,out,width,height,heading,source_type):
             alpha=0
         if alpha:draw.line((0,y,width,y),fill=(1,5,12,min(alpha,95)))
     bg=Image.alpha_composite(bg.convert("RGBA"),overlay).convert("RGB")
-    bg.save(out,optimize=True)
+    bg.save(out,quality=94,subsampling=0,optimize=True)
 
 
-def zoom_filter(scene,frames,size):
+def zoom_filter(scene,frames,size,fps=50):
     camera=scene["camera"]
     movement=camera["movement"]
     zoom=float(camera.get("zoom",1.08))
     tx,ty=camera.get("target",[.5,.5])
-    # Evaluated per output frame with zoompan's built-in "on" counter.
-    # All parameters are clamped by the manifest validator.
-    phase=f"min(on/{max(1,frames-1)},1)"
+    # Smooth velocity at the beginning and end of each camera move.
+    # Supersampling avoids discrete 1px jumps in slow panning shots.
+    phase=f"(0.5-0.5*cos(PI*min(on/{max(1,frames-1)},1)))"
     if movement=="zoom_in":
         z=f"1+({zoom}-1)*{phase}"
     elif movement=="zoom_out":
@@ -142,36 +145,38 @@ def zoom_filter(scene,frames,size):
         x=f"(iw-iw/zoom)*{tx}"
     y=f"(ih-ih/zoom)*{ty}"
     width,height=size
-    return (f"zoompan=z='{z}':x='{x}':y='{y}':"
-            f"d=1:s={width}x{height}:fps=25,format=yuv420p")
+    return (f"format=yuv444p,"
+            f"zoompan=z='{z}':x='{x}':y='{y}':"
+            f"d=1:s={width}x{height}:fps={fps},format=yuv420p")
 
 
 def produce(manifest,out,allow_lab=False):
     project=load_project(manifest,allow_lab=allow_lab)
     work=Path(out);work.mkdir(parents=True,exist_ok=True)
     size=project["profile"]["size"];width,height=size
+    fps=project["profile"]["fps"]
     raw_manifest=json.loads(Path(manifest).read_text(encoding="utf-8"))
     parts=[];all_cues=[];offset=0.0;shot_info=[]
     for i,(entry,raw) in enumerate(zip(project["scenes"],raw_manifest["scenes"]),1):
         seconds=entry["voice_seconds"]+.25
-        frames=math.ceil(seconds*25)
-        still=work/f"visual_{i:03}.png"
+        frames=math.ceil(seconds*fps)
+        still=work/f"visual_{i:03}.jpg"
         subtitle=work/f"subtitle_{i:03}.ass"
         segment=work/f"part_{i:03}.mp4"
-        background_still(entry["image_path"],still,width,height,
+        background_still(entry["image_path"],still,width*CAMERA_SUPERSAMPLE,height*CAMERA_SUPERSAMPLE,
                          raw.get("heading",project["title"]),raw.get("source_type","illustration"))
         cues=caption_groups(entry["timed_words"])
         write_ass(subtitle,cues,size,raw.get("heading",project["title"]),seconds,raw.get("source_type","illustration"))
         # Escaping is required because FFmpeg treats ':' and '\\' as filter delimiters.
         safe_path=subtitle.resolve().as_posix().replace("\\","\\\\").replace(":","\\:")
-        vf=zoom_filter(entry,frames,size)+f",ass=filename='{safe_path}'"
-        ffmpeg("-loop","1","-framerate","25","-i",still,
+        vf=zoom_filter(entry,frames,size,fps=fps)+f",ass=filename='{safe_path}'"
+        ffmpeg("-loop","1","-framerate",str(fps),"-i",still,
                "-i",entry["audio_path"],"-vf",vf,
                "-frames:v",str(frames),"-af","apad",
                "-c:v","libx264","-preset","veryfast","-crf","22",
                "-pix_fmt","yuv420p","-c:a","aac","-b:a","128k",
                "-ar","48000","-ac","2",
-               "-t",f"{seconds:.4f}","-movflags","+faststart",segment,timeout=180)
+               "-t",f"{seconds:.4f}","-movflags","+faststart",segment,timeout=300)
         parts.append(segment)
         all_cues.extend([{"start":c["start"]+offset,"end":c["end"]+offset,"text":c["text"]} for c in cues])
         shot_info.append({"scene":i,"heading":raw.get("heading",project["title"]),"image_sha256":entry["image_sha256"],
