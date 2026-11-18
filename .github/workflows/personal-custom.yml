@@ -1,0 +1,84 @@
+name: AutoStudio PERSONAL · Guion e imágenes propios
+run-name: Vídeo personalizado · ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: "Identificador de solicitud subida por la APK (32 hexadecimales)"
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-custom-${{ github.event.sender.login }}
+  cancel-in-progress: false
+jobs:
+  render-personal:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Cargar motor fijado a una revisión concreta
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 3a89763f24b3bd3177aea36e2fd3a1fc9c7629f4
+          path: engine
+      - name: Cargar únicamente datos subidos al repositorio público
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas locales y modelo neuronal con hash verificado
+        working-directory: engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Validar identificador e imágenes subidas sin ejecutar datos
+        working-directory: engine
+        env:
+          AUTOSTUDIO_REQUEST: ${{ inputs.request_id }}
+        run: |
+          python -m scripts.personal_custom_request "$AUTOSTUDIO_REQUEST" \
+            --source-root "$GITHUB_WORKSPACE/uploads" \
+            --out "/tmp/autostudio-custom/storyboard"
+      - name: Narrar guion con Álex y montar MP4 con cámara automática
+        working-directory: engine
+        run: |
+          python -m scripts.personal_prepare /tmp/autostudio-custom/storyboard/storyboard.json \
+            --out /tmp/autostudio-custom/prepared
+          python -m scripts.personal_editor /tmp/autostudio-custom/prepared/studio-ready.json \
+            --out /tmp/autostudio-custom/render
+      - name: Exigir QA técnico antes de entregar
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/autostudio-custom/render/quality-report.json")
+          q=json.loads(p.read_text(encoding="utf-8"))
+          assert q["technical_passed"] and not q["ready_to_publish"]
+          assert not q["youtube_enabled"]
+          assert len(q["shots"])>=2
+          assert q["visual_audit"]["shots_checked"]==len(q["shots"])
+          assert not q["visual_audit"]["technical_errors"]
+          assert len(q["sha256"])==64
+          print("CUSTOM_MP4_SHA256",q["sha256"])
+          print("CUSTOM_MP4_SECONDS",q["seconds"])
+          PY
+      - name: Entregar MP4 y pruebas para la APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Custom-${{ inputs.request_id }}-Alex-REVIEW
+          path: |
+            /tmp/autostudio-custom/render/autostudio-personal-REVIEW.mp4
+            /tmp/autostudio-custom/render/quality-report.json
+            /tmp/autostudio-custom/render/visual-audit.json
+            /tmp/autostudio-custom/render/contacto-planos.jpg
+            /tmp/autostudio-custom/render/captions.srt
+            /tmp/autostudio-custom/storyboard/storyboard.json
+          if-no-files-found: error
+          retention-days: 7
