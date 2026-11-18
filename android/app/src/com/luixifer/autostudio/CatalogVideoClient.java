@@ -28,6 +28,7 @@ public final class CatalogVideoClient {
         if(artifact==null)return null;
         for(String key:new String[]{"auroras","dna","volcanoes"})
             if(artifact.equals("AutoStudio-Personal-"+key+"-Alex-REVIEW"))return key;
+        if(artifact.matches("AutoStudio-Custom-[a-f0-9]{32}-Alex-REVIEW"))return "personalizado";
         return null;
     }
     static File local(File filesDir,String run) throws IOException {
@@ -66,6 +67,10 @@ public final class CatalogVideoClient {
     }
     public JSONArray runs() throws Exception {
         return get("/actions/workflows/"+WORKFLOW+"/runs?event=workflow_dispatch&per_page=30")
+            .getJSONArray("workflow_runs");
+    }
+    public JSONArray customRuns() throws Exception {
+        return get("/actions/workflows/personal-custom.yml/runs?event=workflow_dispatch&per_page=30")
             .getJSONArray("workflow_runs");
     }
     public Map<String,JSONObject> videos() throws Exception {
