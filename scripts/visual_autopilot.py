@@ -134,10 +134,14 @@ def evaluate_image(image_bytes, narration, prompt, account, token):
             "caption_length":"long","max_tokens":320},account,token)
         caption=_extract_text(caption_result)
         if not caption:
-            return {"decision":"UNSURE","evidence":"Vision query and caption returned no usable text.",
-                    "raw_excerpt":answer[:300],"response_keys":response_keys,
-                    "caption_response_keys":sorted(str(k)[:60] for k in caption_result.keys())
-                         if isinstance(caption_result,dict) else []}
+            # Moondream returned no content twice in the first real AutoStudio
+            # experiment. A different multimodal model now inspects the original
+            # image, with no additional FLUX generation.
+            from scripts.vision_gemma import evaluate_gemma
+            alternative = evaluate_gemma(image_bytes, narration, prompt, account, token)
+            alternative["moondream_query_empty"] = not bool(answer)
+            alternative["moondream_caption_empty"] = True
+            return alternative
         judge_input=(
             "Inspect ONLY this caption produced by an image-viewing model. "
             "A caption can omit objects, so do not assume unmentioned objects are absent. "
