@@ -127,9 +127,37 @@ def evaluate_image(image_bytes, narration, prompt, account, token):
     match=re.search(r"(?im)^DECISION:\s*(PASS|FAIL|UNSURE)\s*$",answer)
     evidence=re.search(r"(?im)^EVIDENCE:\s*(.{8,500})$",answer)
     if not match or not evidence:
-        return {"decision":"UNSURE","evidence":"Unparseable vision response; requires review.",
-                "raw_excerpt":answer[:300], "response_keys":response_keys}
-    return {"decision":match.group(1).upper(),"evidence":evidence.group(1).strip()}
+        # Moondream query occasionally returns an empty answer. Use its simpler
+        # caption task and ask a text model to compare the OBSERVED caption with
+        # the scene. Never approve a blank caption or malformed classifier.
+        caption_result=_request(VISION_MODEL,{"task":"caption","image":data_uri,
+            "caption_length":"long","max_tokens":320},account,token)
+        caption=_extract_text(caption_result)
+        if not caption:
+            return {"decision":"UNSURE","evidence":"Vision query and caption returned no usable text.",
+                    "raw_excerpt":answer[:300],"response_keys":response_keys,
+                    "caption_response_keys":sorted(str(k)[:60] for k in caption_result.keys())
+                         if isinstance(caption_result,dict) else []}
+        judge_input=(
+            "Inspect ONLY this caption produced by an image-viewing model. "
+            "A caption can omit objects, so do not assume unmentioned objects are absent. "
+            "Reject only clear visual contradictions. If ambiguous, reply UNSURE. "
+            "Reply in EXACTLY two lines: DECISION: PASS or FAIL or UNSURE; "
+            "EVIDENCE: one factual reason. Do not infer scientific truth merely from a caption.\\n"
+            "Expected narration: "+narration[:500]+"\\nExpected composition: "+prompt[:750]+
+            "\\nWhat is actually visible (caption): "+caption[:950])
+        judgement=_extract_text(_request(DIRECTOR_MODEL,{"messages":[
+            {"role":"user","content":judge_input}],"max_tokens":180,"temperature":0.0},
+            account,token))
+        jmatch=re.search(r"(?im)^DECISION:\\s*(PASS|FAIL|UNSURE)\\s*$",judgement)
+        jreason=re.search(r"(?im)^EVIDENCE:\\s*(.{8,500})$",judgement)
+        if not jmatch or not jreason:
+            return {"decision":"UNSURE","evidence":"Caption obtained but judge response unclear.",
+                    "caption_excerpt":caption[:400],"judge_excerpt":judgement[:260]}
+        return {"decision":jmatch.group(1).upper(),"evidence":jreason.group(1).strip(),
+                "method":"caption_plus_text_comparison","caption_excerpt":caption[:400]}
+    return {"decision":match.group(1).upper(),"evidence":evidence.group(1).strip(),
+            "method":"direct_vision_query"}
 
 def _scenes(story):
     scenes=story.get("scenes")
@@ -201,7 +229,8 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                     "vision_decision":assessment.get("decision","UNSURE"),
                     "vision_evidence":assessment.get("evidence","")[:300],
                     "vision_excerpt":assessment.get("raw_excerpt","")[:240],
-                    "vision_response_keys":assessment.get("response_keys",[])},ensure_ascii=False),flush=True)
+                    "vision_response_keys":assessment.get("response_keys",[]),
+                    "vision_method":assessment.get("method","undetermined")},ensure_ascii=False),flush=True)
                 if assessment.get("decision")=="PASS":
                     candidate["status"]="approved"
                     entry["approved"]=True
