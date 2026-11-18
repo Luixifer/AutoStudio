@@ -1,0 +1,1 @@
+One-time real Gemma 4 (reasoning disabled) evaluation of original cached JPG with issue #20 diagnostics. Zero FLUX generations, Free tier, no publication.
