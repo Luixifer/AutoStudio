@@ -12,7 +12,7 @@ def jpeg(w=512, h=512):
     return (b"\xff\xd8\xff\xc0\x00\x11\x08"
             + h.to_bytes(2, "big") + w.to_bytes(2, "big")
             + b"\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00"
-            + b"\xff\xd9")
+            + b"\xff\xd9" + b"\x00"*8)
 
 class ImageGenerationTests(unittest.TestCase):
     def test_prompts_are_cinematic_and_scene_specific(self):
