@@ -1,0 +1,36 @@
+name: AutoStudio · Smooth Camera 0.8 QA
+on:
+  push:
+    branches: [fix/smooth-camera-v08]
+    paths:
+      - 'scripts/personal_editor.py'
+      - 'scripts/personal_studio.py'
+      - 'scripts/personal_quality.py'
+      - 'tests/test_smooth_camera.py'
+      - '.github/workflows/smooth-camera-08.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: smooth-camera08-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  subpixel-and-real-mp4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Instalar FFmpeg y Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Comprobar 50 fps y desplazamiento subpíxel en vídeo real
+        run: python -m unittest discover -s tests -p 'test_smooth_camera.py' -v
+      - name: Comprobar contratos, derechos y subtítulos
+        run: python -m unittest discover -s tests -p 'test_personal_studio.py' -v
+      - name: Comprobar codificación H264 y duración con audio real de prueba
+        run: python -m unittest discover -s tests -p 'test_personal_video_real.py' -v
