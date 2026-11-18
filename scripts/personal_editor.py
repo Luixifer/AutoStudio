@@ -116,7 +116,9 @@ def zoom_filter(scene,frames,size,fps=60):
     # Smooth velocity at the beginning and end of each camera move.
     # Supersampling avoids discrete 1px jumps in slow panning shots.
     phase=f"(0.5-0.5*cos(PI*min(on/{max(1,frames-1)},1)))"
-    if movement=="zoom_in":
+    if movement in ("zoom_in","focus"):
+        # Previously focus was static despite being advertised as a camera
+        # movement. Make it a true gradual approach to the chosen focal point.
         z=f"1+({zoom}-1)*{phase}"
     elif movement=="zoom_out":
         z=f"{zoom}-({zoom}-1)*{phase}"
