@@ -1,15 +1,14 @@
-"""Prepare a complete replacement storyboard from generated PNGs without touching originals.
+"""Prepare a complete replacement storyboard from generated images without touching originals.
 
-Requires one verified PNG per scene; rejects partial jobs and inconsistent manifests.
+Requires one verified image per scene; rejects partial jobs and inconsistent manifests.
 The resulting storyboard can be consumed by personal_prepare from the pinned engine.
 """
 import argparse
 import hashlib
 import json
 from pathlib import Path
-import shutil
 
-from scripts.image_generation import png_dimensions
+from scripts.image_generation import image_dimensions
 
 def stage_generated_images(storyboard_path, manifest_path, output):
     storyboard_path=Path(storyboard_path)
@@ -32,18 +31,21 @@ def stage_generated_images(storyboard_path, manifest_path, output):
             raise ValueError(f"Missing generated image for scene {i}")
         candidate=candidates[0]
         name=candidate.get("file","")
-        if not isinstance(name,str) or name!=f"scene_{i:02d}_v{candidate.get('variant')}.png":
+        if not isinstance(name,str) or name not in (f"scene_{i:02d}_v{candidate.get('variant')}.png", f"scene_{i:02d}_v{candidate.get('variant')}.jpg"):
             raise ValueError("Invalid candidate path")
         path=manifest_path.parent/name
         if not path.is_file() or path.is_symlink() or path.stat().st_size>12_000_000:
             raise ValueError("Missing or oversized image")
         data=path.read_bytes()
-        dimensions=list(png_dimensions(data))
+        width,height,ext=image_dimensions(data)
+        dimensions=[width,height]
+        if not name.endswith(ext):
+            raise ValueError("Image extension and format mismatch")
         digest=hashlib.sha256(data).hexdigest()
         if digest!=candidate.get("sha256") or dimensions!=candidate.get("dimensions"):
             raise ValueError("Generated image integrity mismatch")
-        selected.append((data,digest,dimensions))
-    if len(set(digest for _,digest,_ in selected))!=len(selected):
+        selected.append((data,digest,dimensions,ext))
+    if len(set(digest for _,digest,_,_ in selected))!=len(selected):
         raise ValueError("Duplicate generated images")
     out=Path(output)
     if out.exists() and any(out.iterdir()):
@@ -52,8 +54,8 @@ def stage_generated_images(storyboard_path, manifest_path, output):
     copy=json.loads(json.dumps(source))
     copy["editorial_approved"]=False
     copy["youtube"]={"enabled":False}
-    for i,(scene,(data,digest,dimensions)) in enumerate(zip(copy["scenes"],selected),1):
-        name=f"auto-scene-{i:02d}.png"
+    for i,(scene,(data,digest,dimensions,ext)) in enumerate(zip(copy["scenes"],selected),1):
+        name=f"auto-scene-{i:02d}{ext}"
         (out/name).write_bytes(data)
         scene.update({"image":name, "image_sha256":digest,
                       "rights":{"license":"own_creation"},
@@ -62,7 +64,7 @@ def stage_generated_images(storyboard_path, manifest_path, output):
     (out/"storyboard.json").write_text(json.dumps(copy,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     report={"schema":1,"scenes":len(scenes),"chosen_variant":"first valid candidate, NOT visual ranking",
             "scientific_reviewed":False,"human_visual_approved":False,"youtube_enabled":False,
-            "images":[{"scene":i,"sha256":d,"size":sz} for i,(_,d,sz) in enumerate(selected,1)]}
+            "images":[{"scene":i,"sha256":d,"size":sz} for i,(_,d,sz,ext) in enumerate(selected,1)]}
     (out/"image-staging-report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     return report
 
