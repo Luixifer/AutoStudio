@@ -1,0 +1,208 @@
+"""AutoStudio experimental visual autopilot: script -> AI art brief -> image -> vision QC.
+
+All AI calls are opt-in. Fail closed: an image is not approved unless vision
+explicitly returns PASS with visible evidence. This is NOT scientific fact-checking.
+Do not use the generated art as factual evidence.
+"""
+from __future__ import annotations
+import argparse
+import base64
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import urllib.error
+import urllib.request
+
+from scripts.image_generation import MAX_BYTES, MAX_PROMPT, generate_cloudflare, image_dimensions
+
+DIRECTOR_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8"
+VISION_MODEL = "@cf/moondream/moondream3.1-9B-A2B"
+ROOT_API = "https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/"
+MAX_RETRIES = 1
+MAX_SCENES = 24
+
+def _request(model, payload, account, token, timeout=95):
+    if not re.fullmatch(r"[0-9a-fA-F]{32}", account or "") or not token:
+        raise ValueError("Missing Cloudflare credentials")
+    req=urllib.request.Request(
+        ROOT_API.format(account=account) + model,
+        data=json.dumps(payload,ensure_ascii=False).encode("utf-8"),
+        method="POST",headers={"Authorization":"Bearer "+token,
+                                "Content-Type":"application/json"})
+    try:
+        with urllib.request.urlopen(req,timeout=timeout) as resp:
+            data=resp.read(1_000_001)
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError("Workers AI request rejected: HTTP "+str(exc.code)) from None
+    if len(data)>1_000_000:
+        raise ValueError("Workers AI response too large")
+    reply=json.loads(data)
+    if not isinstance(reply,dict) or not reply.get("success"):
+        raise RuntimeError("Workers AI unsuccessful response")
+    return reply.get("result")
+
+def _extract_text(result):
+    if isinstance(result,str):
+        return result.strip()
+    if isinstance(result,dict):
+        for key in ("response","answer","text","output"):
+            if isinstance(result.get(key),str):
+                return result[key].strip()
+        choices=result.get("choices")
+        if isinstance(choices,list) and choices:
+            msg=choices[0].get("message") if isinstance(choices[0],dict) else None
+            if isinstance(msg,dict) and isinstance(msg.get("content"),str):
+                return msg["content"].strip()
+    return ""
+
+def plan_scene(narration, title, previous_style, account, token):
+    """The model makes scene-specific instructions; no hardcoded subject templates."""
+    if not isinstance(narration,str) or not 12<=len(narration)<=600:
+        raise ValueError("Narration required for automatic art direction")
+    user=(
+        "You direct scientific documentary visuals. Generate ONE single-frame "
+        "image-generation prompt in English, at most 1000 characters. "
+        "Use ONLY the factual information in the supplied narration and title. "
+        "If a scientific property is not supported, avoid depicting it. "
+        "Never invent land, structures, organisms, exact colors, dimensions, or materials. "
+        "If the subject is a gas planet, depict gas only, not rocky land. "
+        "Show the actual subject, clear shot composition, lighting and visual hierarchy. "
+        "Photorealistic premium cinematic scientific reconstruction, no text/labels/watermark. "
+        "Avoid making a different object from the last scenes. "
+        "Return ONLY the image prompt as plain text, no explanation.\n"
+        + "Video title: "+title[:180]+"\nNarration: "+narration+"\n"
+        + "Visual identity from preceding scene: "+previous_style[:250]
+    )
+    response=_request(DIRECTOR_MODEL,{"messages":[{"role":"user","content":user}],
+        "max_tokens":320,"temperature":0.2},account,token)
+    prompt=_extract_text(response)
+    if not 40<=len(prompt)<=1800 or "http://" in prompt or "https://" in prompt:
+        raise ValueError("Automatic visual director produced invalid or incomplete prompt")
+    return prompt[:MAX_PROMPT]
+
+def evaluate_image(image_bytes, narration, prompt, account, token):
+    """Ask a vision model about visible evidence, not merely a textual plan.
+
+    Strict output grammar makes ambiguous responses UNSURE rather than silently
+    approving. Vision models can still make mistakes; human editorial review remains.
+    """
+    _,_,ext=image_dimensions(image_bytes)
+    mime="image/png" if ext==".png" else "image/jpeg"
+    data_uri="data:"+mime+";base64,"+base64.b64encode(image_bytes).decode("ascii")
+    question=(
+        "Act as a cautious image quality inspector. Describe ONLY what is VISIBLE "
+        "in the attached image. Compare it with this intended scientific documentary "
+        "shot. Reject if a clearly depicted object or setting contradicts the narration "
+        "or scene description, if the main subject is missing, if the image is a sketch, "
+        "or if it contains text/watermarks. Do not assume objects absent from the image "
+        "are present. If you cannot tell, say UNSURE. "
+        "Reply on exactly TWO lines:\n"
+        "DECISION: PASS or FAIL or UNSURE\n"
+        "EVIDENCE: brief visible evidence; if FAIL, say what must change.\n"
+        "Narration: "+narration[:550]+"\nPlanned visual: "+prompt[:850]
+    )
+    result=_request(VISION_MODEL,{"task":"query","image":data_uri,"question":question,
+        "reasoning":False,"max_tokens":220,"temperature":0.1},account,token)
+    answer=_extract_text(result)
+    match=re.search(r"(?im)^DECISION:\s*(PASS|FAIL|UNSURE)\s*$",answer)
+    evidence=re.search(r"(?im)^EVIDENCE:\s*(.{8,500})$",answer)
+    if not match or not evidence:
+        return {"decision":"UNSURE","evidence":"Unparseable vision response; requires review.",
+                "raw_excerpt":answer[:300]}
+    return {"decision":match.group(1).upper(),"evidence":evidence.group(1).strip()}
+
+def _scenes(story):
+    scenes=story.get("scenes")
+    if not isinstance(scenes,list) or not 1<=len(scenes)<=MAX_SCENES:
+        raise ValueError("Storyboard must contain 1-24 scenes")
+    title=story.get("title","Scientific documentary")
+    if not isinstance(title,str):
+        raise ValueError("Invalid title")
+    for item in scenes:
+        if not isinstance(item,dict) or not isinstance(item.get("narration"),str):
+            raise ValueError("Each scene must contain narration")
+    return scenes,title
+
+def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
+        director=plan_scene, generator=generate_cloudflare, vision=evaluate_image):
+    """Run a bounded visual loop; always write manifest, even after partial failure."""
+    if not 1<=max_attempts<=MAX_RETRIES+1 or not 1<=request_budget<=48:
+        raise ValueError("Invalid generation budget")
+    story=json.loads(Path(story_path).read_text(encoding="utf-8"))
+    scenes,title=_scenes(story)
+    if len(scenes)*max_attempts>request_budget:
+        raise ValueError("Budget too low for worst-case attempts; no requests made")
+    account=os.getenv("CLOUDFLARE_ACCOUNT_ID","") if live else ""
+    token=os.getenv("CLOUDFLARE_API_TOKEN","") if live else ""
+    if live and (not account or not token):
+        raise ValueError("Missing Cloudflare secrets")
+    out=Path(out_path)
+    out.mkdir(parents=True,exist_ok=True)
+    report={"schema":2,"mode":"live" if live else "dry-run",
+            "director_model":DIRECTOR_MODEL,"vision_model":VISION_MODEL,
+            "generator_model":"@cf/black-forest-labs/flux-1-schnell",
+            "planned_max_image_requests":len(scenes)*max_attempts,
+            "completed_requests":0,"vision_requests":0,
+            "human_visual_approved":False,"scientific_facts_verified":False,
+            "youtube_enabled":False,"all_scenes_approved":False,"scenes":[]}
+    identity=""
+    try:
+        for idx,scene in enumerate(scenes,1):
+            narration=scene["narration"]
+            entry={"scene":idx,"narration":narration,"candidates":[],"approved":False}
+            report["scenes"].append(entry)
+            if not live:
+                entry["status"]="planned"
+                continue
+            prompt=director(narration,title,identity,account,token)
+            entry["image_prompt"]=prompt
+            identity=prompt[:240]
+            for attempt in range(1,max_attempts+1):
+                refined=prompt
+                if attempt>1:
+                    last=entry["candidates"][-1]["vision"]
+                    refined=(prompt[:1350]+" Correction after seeing previous image: "
+                             +last["evidence"][:350]
+                             +". Do not repeat the previous visual mistake.")[:MAX_PROMPT]
+                image=generator(refined,account,token)
+                width,height,ext=image_dimensions(image)
+                path=out/f"scene_{idx:02d}_v{attempt}{ext}"
+                path.write_bytes(image)
+                report["completed_requests"]+=1
+                candidate={"variant":attempt,"status":"generated","file":path.name,
+                           "sha256":hashlib.sha256(image).hexdigest(),
+                           "dimensions":[width,height],"format":ext[1:]}
+                entry["candidates"].append(candidate)
+                assessment=vision(image,narration,refined,account,token)
+                report["vision_requests"]+=1
+                candidate["vision"]=assessment
+                if assessment.get("decision")=="PASS":
+                    candidate["status"]="approved"
+                    entry["approved"]=True
+                    break
+            entry["status"]="approved" if entry["approved"] else "needs_human_review"
+    finally:
+        report["all_scenes_approved"]=bool(report["scenes"]) and len(report["scenes"])==len(scenes) and all(s["approved"] for s in report["scenes"])
+        (out/"visual-supervision-manifest.json").write_text(
+            json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+    return report
+
+def main():
+    p=argparse.ArgumentParser(description="Autonomous image prompting and image vision QC; dry-run by default")
+    p.add_argument("--story",required=True)
+    p.add_argument("--out",required=True)
+    p.add_argument("--live",action="store_true")
+    p.add_argument("--max-attempts",type=int,default=1)
+    p.add_argument("--request-budget",type=int,default=10)
+    a=p.parse_args()
+    result=run(a.story,a.out,live=a.live,max_attempts=a.max_attempts,request_budget=a.request_budget)
+    print(json.dumps({"scenes":len(result["scenes"]),"images":result["completed_requests"],
+                      "vision_requests":result["vision_requests"],"all_approved":result["all_scenes_approved"],
+                      "live":a.live}))
+    if a.live and not result["all_scenes_approved"]:
+        raise SystemExit("One or more scenes require editorial review; no unapproved MP4 produced.")
+
+if __name__=="__main__":
+    main()
