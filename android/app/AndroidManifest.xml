@@ -8,6 +8,7 @@
     <activity android:name="com.luixifer.autostudio.ResearchActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.ResearchVideosActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.PersonalVideosActivity" android:exported="false"/>
+    <activity android:name="com.luixifer.autostudio.CustomVideoActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.PlayerActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.LibraryActivity" android:exported="false"/>
     <activity android:name="com.luixifer.autostudio.ScenesActivity" android:exported="false"/>
