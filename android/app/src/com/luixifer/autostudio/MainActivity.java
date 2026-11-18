@@ -9,7 +9,7 @@ import org.json.*;
 public final class MainActivity extends Activity implements JobController.Listener {
     private Spinner topic;private TextView status,connection;private Button generate,play,scenes,logs;private JobController jobs;
     @Override public void onCreate(Bundle saved){super.onCreate(saved);jobs=((AutoStudioApp)getApplication()).jobs();LinearLayout body=Ui.scroll(this,Ui.root(this,"AutoStudio"));
-        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.6\nVídeos en la nube, sin ordenador ni APIs de pago.");
+        Ui.para(body,"CONTROL DE PRODUCCIÓN · LAB 0.7\nVídeos en la nube, sin ordenador ni APIs de pago.");
         LinearLayout c=Ui.card(body);connection=Ui.para(c,"");connection.setId(Ui.CONNECTION);Ui.button(c,"Conectar / ajustes de GitHub",Ui.SETTINGS,false).setOnClickListener(v->startActivity(new Intent(this,SettingsActivity.class)));
         LinearLayout form=Ui.card(body);form.addView(Ui.text(this,"¿Qué vamos a contar?",20,true));Ui.para(form,"Elige un tema publicado. Cada uno tiene su propio guion e ilustraciones. La generación sobre temas arbitrarios, los documentales y la cola aún no están habilitados.");
         topic=new Spinner(this);topic.setId(Ui.TOPIC);
