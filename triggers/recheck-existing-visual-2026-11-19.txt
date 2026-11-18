@@ -1,0 +1,1 @@
+Run one replay: reuse prior image, call only Cloudflare text/vision models, and publish minimal result to GitHub issue #20; no FLUX image generation.
