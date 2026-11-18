@@ -1,9 +1,6 @@
 name: AutoStudio · Revisar imagen existente con IA (cero FLUX)
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'triggers/recheck-existing-visual-2026-11-18.txt'
+  workflow_dispatch:
 permissions:
   contents: read
   actions: read
