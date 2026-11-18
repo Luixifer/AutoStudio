@@ -25,9 +25,14 @@ jobs:
           python-version: '3.12'
       - name: Instalar FFmpeg y Pillow
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
-          python -m pip install --disable-pip-version-check Pillow==11.3.0
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+          if ! python -c "from PIL import Image" 2>/dev/null; then
+            python -m pip install --disable-pip-version-check Pillow==11.3.0
+          fi
+          ffmpeg -version | head -1
       - name: Comprobar 60 fps y desplazamiento subpíxel en vídeo real
         run: python -m unittest discover -s tests -p 'test_smooth_camera.py' -v
       - name: Comprobar contratos, derechos y subtítulos
