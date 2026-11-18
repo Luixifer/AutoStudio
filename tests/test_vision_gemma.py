@@ -23,6 +23,21 @@ class GemmaVisionTests(unittest.TestCase):
         self.assertTrue(parts[1]["image_url"]["url"].startswith("data:image/jpeg;base64,"))
         self.assertEqual(base64.b64decode(parts[1]["image_url"]["url"].split(",",1)[1]),jpeg())
 
+    def test_openai_choices_with_multimodal_text_parts(self):
+        result={"choices":[{"message":{"content":[{"type":"text","text":"DECISION: PASS\\nEVIDENCE: Visible clouds of gas."}],
+            "reasoning_content":"never log thought"},"finish_reason":"stop"}]}
+        self.assertEqual(vision_gemma._final_answer(result),
+                         "DECISION: PASS\\nEVIDENCE: Visible clouds of gas.")
+        safe=vision_gemma._safe_shape(result)
+        self.assertIn("reasoning_content_length",safe)
+        self.assertNotIn("never log thought",str(safe))
+
+    def test_thinking_only_result_is_not_approved(self):
+        result={"choices":[{"message":{"reasoning_content":"I think the image is correct","content":None},
+                            "finish_reason":"length"}]}
+        self.assertEqual(vision_gemma._final_answer(result),"")
+        self.assertEqual(vision_gemma._parse_verdict(vision_gemma._final_answer(result))["decision"],"UNSURE")
+
     def test_missing_decision_is_unapproved(self):
         for answer in ["", "Looks fantastic!", "DECISION: PASS", "DECISION: MAYBE\nEVIDENCE: Unknown"]:
             result=vision_gemma._parse_verdict(answer)

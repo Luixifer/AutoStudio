@@ -70,6 +70,7 @@ jobs:
               print("- Método de comprobación:",str(v.get("method","unknown"))[:60])
               print("- Motivo (resumen):",str(v.get("evidence","not available")).replace("\\n"," ")[:230])
               print("- Claves de respuesta:",", ".join(str(x)[:35] for x in v.get("response_keys",[])[:8]))
+              print("- Forma de respuesta:",str(v.get("response_shape",{}))[:480])
           else:
               print("- Resultado: no se generó el manifiesto de revisión; comprobar logs internos")
           PY
