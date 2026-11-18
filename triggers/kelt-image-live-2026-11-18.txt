@@ -1,0 +1,4 @@
+Autorizacion de prueba puntual de generacion real con la cuota gratuita de Cloudflare Workers AI.
+Guion: requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json
+Maximo: 10 peticiones a FLUX.1 Schnell, sin cambiar el plan Free, no publicar en YouTube.
+Esta marca se usa una vez y el disparador push se retirara despues de la ejecucion.
