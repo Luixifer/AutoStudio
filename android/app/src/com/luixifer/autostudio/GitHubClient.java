@@ -35,6 +35,13 @@ public final class GitHubClient {
         api("/actions/workflows/personal-topic.yml/dispatches","POST",
             new JSONObject().put("ref","main").put("inputs",inputs));
     }
+    /** Validated user-script request; actual data was uploaded via Contents API. */
+    public void dispatchCustom(String requestId)throws Exception {
+        if(!validId(requestId))throw new IOException("Solicitud personal inválida.");
+        api("/actions/workflows/personal-custom.yml/dispatches","POST",
+            new JSONObject().put("ref","main").put("inputs",
+                new JSONObject().put("request_id",requestId)));
+    }
     /** Launches the read-only research trial. This does not produce an MP4. */
     public void dispatchResearch(String topic) throws Exception {
         if (topic == null || topic.trim().length() < 3 || topic.trim().length() > 160
