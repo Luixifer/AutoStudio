@@ -56,7 +56,7 @@ def image_prompt(scene_number, narration, shot):
 
 
 def pilot(story, checkpoint_path, out_dir, account, token, live=False,
-          generator=generate_cloudflare, reviewer=None):
+          generator=generate_cloudflare, reviewer=None, scout_reviewer=None):
     """Always preserve a manifest; never interpret AI QA as publishing approval."""
     if live and (not account or not token):
         raise ValueError("Live pilot needs existing Cloudflare secrets")
@@ -80,9 +80,14 @@ def pilot(story, checkpoint_path, out_dir, account, token, live=False,
         "scientific_facts_verified": False,
         "ready_to_publish": False, "youtube_enabled": False
     }
+    # Two actual image inspectors by default in live mode; injection disables
+    # accidental network calls in offline tests.
     if reviewer is None and live:
         from scripts.vision_gemma import evaluate_gemma
+        from scripts.vision_scout import evaluate_scout
         reviewer = evaluate_gemma
+        if scout_reviewer is None:
+            scout_reviewer = evaluate_scout
     try:
         for number in PILOT_SCENES:
             narration = scenes[number - 1]["narration"]
@@ -106,19 +111,36 @@ def pilot(story, checkpoint_path, out_dir, account, token, live=False,
             entry.update({"image_generated": True, "file": name,
                           "sha256": hashlib.sha256(raw).hexdigest(),
                           "dimensions": [width, height]})
-            try:
-                if reviewer:
+            if reviewer:
+                try:
                     evaluation = reviewer(raw, narration, prompt, account, token)
                     if not isinstance(evaluation, dict) or evaluation.get("decision") not in (
                             "PASS", "FAIL", "UNSURE"):
                         raise ValueError("Vision response is unverified")
                     entry["vision"] = evaluation
-            except Exception as exc:
-                # A vision provider outage cannot turn a draft into an
-                # approved image and must not erase the generated candidate.
-                entry["vision"] = {"decision": "UNSURE",
-                                   "evidence": "Vision evaluation unavailable: " +
-                                   type(exc).__name__}
+                except Exception as exc:
+                    entry["vision"] = {"decision": "UNSURE",
+                                       "evidence": "Vision evaluation unavailable: " +
+                                       type(exc).__name__}
+            entry["scout"] = {"decision": "UNSURE",
+                              "evidence": "Independent model not evaluated"}
+            if scout_reviewer:
+                try:
+                    # H2 scientific reconstruction is inspected differently
+                    # from scenes that require a luminous star plus gas giant.
+                    kind = "hydrogen" if number == 6 else "orbit"
+                    verdict = scout_reviewer(raw, narration, prompt, account, token,
+                                             scene_kind=kind)
+                    if not isinstance(verdict, dict) or verdict.get("decision") not in (
+                            "PASS", "FAIL", "UNSURE"):
+                        raise ValueError("Scout verdict malformed")
+                    entry["scout"] = verdict
+                except Exception as exc:
+                    entry["scout"] = {"decision": "UNSURE",
+                                      "evidence": "Scout unavailable: " + type(exc).__name__}
+            from scripts.vision_scout import independent_gate
+            entry["independent_review"] = independent_gate(
+                entry["vision"], entry["scout"])
     finally:
         (out / "cinematic-pilot-manifest.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2) + "\n",
@@ -132,14 +154,26 @@ def main():
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--live", action="store_true")
+    parser.add_argument("--image-model",
+                        choices=("flux1-schnell", "flux2-klein-4b", "flux2-klein-9b"),
+                        default="flux1-schnell")
     parser.add_argument("--max-requests", type=int, default=3)
     args = parser.parse_args()
     if args.max_requests != MAX_PILOT_REQUESTS:
         raise ValueError("This pilot requires an explicit three-image ceiling")
     story = json.loads(Path(args.story).read_text(encoding="utf-8"))
+    if args.image_model == "flux1-schnell":
+        generator = generate_cloudflare
+    elif args.image_model == "flux2-klein-4b":
+        from scripts.flux2_klein import generate_klein
+        generator = generate_klein
+    else:
+        from scripts.flux2_klein_9b import generate_klein9b
+        generator = generate_klein9b
     output = pilot(story, args.checkpoint, args.out,
                    os.getenv("CLOUDFLARE_ACCOUNT_ID", ""),
-                   os.getenv("CLOUDFLARE_API_TOKEN", ""), live=args.live)
+                   os.getenv("CLOUDFLARE_API_TOKEN", ""), live=args.live,
+                   generator=generator)
     print(json.dumps({
         "mode": output["mode"],
         "completed_requests": output["completed_image_requests"],
