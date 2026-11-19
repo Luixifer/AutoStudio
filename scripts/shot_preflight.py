@@ -644,9 +644,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 validate_plan({"shots":candidate},prefix_story)
                 check_explicit_story_constraints(story,candidate)
                 review_story_consistency(chunk_story,local,request,account,token)
-                accepted = candidate
                 if on_accepted is not None:
-                    on_accepted(accepted, chunk_size)
+                    on_accepted(candidate, chunk_size)
+                accepted = candidate
                 break
             except ValueError as exc:
                 reason = exc
