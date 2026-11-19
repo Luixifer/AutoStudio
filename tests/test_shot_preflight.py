@@ -99,9 +99,10 @@ class ShotPlanTests(unittest.TestCase):
             return {"response":'{"shots":['}
         with self.assertRaisesRegex(ValueError,"Shot batch 1 failed twice"):
             planner.build_plan(story,fake,"account","token")
-        self.assertEqual(len(prompts),2)
+        self.assertEqual(len(prompts),4)
         self.assertIn("final bounded retry",prompts[1])
         self.assertIn("exactly 2 shots",prompts[1])
+        self.assertIn("EXACTLY 1 objects",prompts[2])
 
     def test_abstract_two_word_actions_rejected(self):
         bad=json.loads(json.dumps(VALID))
