@@ -1,0 +1,1 @@
+One-time retrospective analysis of original visual model reports for ten KELT-9b scenes. No Workers AI requests, no new images, report to issue #20.
