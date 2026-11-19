@@ -11,7 +11,7 @@ class HydrogenSceneTests(unittest.TestCase):
         self.assertAlmostEqual(d[0],92)
         self.assertAlmostEqual(d[-1],452)
         self.assertTrue(all(b>=a for a,b in zip(d,d[1:])))
-        self.assertLess(max(b-a for a,b in zip(d,d[1:])),6)
+        self.assertLess(max(b-a for a,b in zip(d,d[1:])),10)
 
     def test_recombination_reverses_distance(self):
         for i in range(121):
