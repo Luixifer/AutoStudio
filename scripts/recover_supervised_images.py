@@ -10,7 +10,6 @@ import copy
 import hashlib
 import json
 from pathlib import Path
-import shutil
 
 from scripts.image_generation import image_dimensions
 from scripts.vision_gemma import evaluate_gemma
@@ -117,8 +116,13 @@ def main():
     p.add_argument("--manifest",required=True)
     p.add_argument("--out",required=True)
     p.add_argument("--scenes",type=int,default=10)
+    p.add_argument("--retry-scenes",default="1,10",help="Comma-separated scene indices to recheck")
     args=p.parse_args()
+    retry=[int(x) for x in args.retry_scenes.split(",") if x.strip()]
+    if not retry or len(retry)>2 or len(retry)!=len(set(retry)):
+        raise ValueError("Only one or two unique retry scenes supported")
     result=recover(args.manifest,args.out,expected_scenes=args.scenes,
+                   allowed_retry_scenes=tuple(retry),
                    account=os.environ.get("CLOUDFLARE_ACCOUNT_ID",""),
                    token=os.environ.get("CLOUDFLARE_API_TOKEN",""))
     print(json.dumps({"approved":sum(s["approved"] for s in result["scenes"]),
