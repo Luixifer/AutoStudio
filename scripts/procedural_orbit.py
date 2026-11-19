@@ -12,6 +12,8 @@ import math
 import subprocess
 from pathlib import Path
 
+import imageio_ffmpeg
+
 try:
     from PIL import Image, ImageDraw, ImageFilter
 except ImportError as exc:
@@ -118,7 +120,7 @@ def render(out_dir: str|Path, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT,
     out.mkdir(parents=True,exist_ok=True)
     total=fps*seconds
     proc=subprocess.Popen([
-        "ffmpeg","-y","-hide_banner","-loglevel","error",
+        imageio_ffmpeg.get_ffmpeg_exe(),"-y","-hide_banner","-loglevel","error",
         "-f","rawvideo","-pixel_format","rgb24",
         "-video_size",f"{width}x{height}","-framerate",str(fps),
         "-i","pipe:0","-an","-c:v","libx264","-preset","veryfast",
