@@ -25,7 +25,7 @@ def stage_supervised(storyboard_path, supervised_manifest_path, out_dir):
     bridge=manifest_path.parent/"approved-images-for-staging.json"
     bridge.write_text(json.dumps(legacy,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     report=stage_generated_images(storyboard_path,bridge,out_dir)
-    report["supervision"]="Moondream image-to-text AI review; not a science fact-check"
+    report["supervision"]="Gemma 4 image-aware AI review; not scientific fact-checking"
     report["human_visual_approved"]=False
     Path(out_dir,"image-staging-report.json").write_text(
         json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
