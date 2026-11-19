@@ -448,6 +448,100 @@ class ShotPlanTests(unittest.TestCase):
             planner.build_plan(STORY,fake,"account","token")
         self.assertEqual(len(calls),1)
 
+    def test_checkpoint_resumes_after_timeout_without_repeating_verified_shots(self):
+        story={"title":"Ocean scenes","scenes":[
+            {"narration":"Tidal waves form along the deep ocean shore."},
+            {"narration":"Rain droplets fall into the deep ocean surface."},
+            {"narration":"Cloud vapors condense above the wide blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a long coastal shoreline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Tidal waves form along the deep ocean shore."),
+            shot(2,"close","frontal","detail","Ocean rainfall",
+                 "Rain droplets fall into the deep ocean surface.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Condensing clouds",
+                 "Cloud vapors condense above the wide blue sea."),
+            shot(2,"extreme_wide","overhead","contrast","Moving foam",
+                 "Sea foam spreads across a moving wavefront.")]}
+        last={"shots":[
+            shot(1,"extreme_close","low","consequence","Moonlit coast",
+                 "The moon illuminates a long coastal shoreline.")]}
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"resume.json"
+            answers=[first,{"decision":"PASS","issues":[]}]
+            def interrupted(_model,_payload,*_args):
+                if not answers:
+                    raise TimeoutError("transient upstream timeout")
+                answer=answers.pop(0)
+                return {"response":json.dumps(answer)}
+            with self.assertRaises(TimeoutError):
+                planner.build_plan(story,interrupted,"account","secret",
+                                   checkpoint_path=cp)
+            self.assertTrue(cp.is_file())
+            cache=json.loads(cp.read_text())
+            self.assertEqual(len(cache["accepted_shots"]),2)
+            self.assertFalse(cache["ready_to_publish"])
+            remaining=[second,{"decision":"PASS","issues":[]},
+                       last,{"decision":"PASS","issues":[]}]
+            calls=[]
+            def resumed(_model,payload,*_args):
+                calls.append(payload["messages"][0]["content"])
+                return {"response":json.dumps(remaining.pop(0))}
+            shots=planner.build_plan(story,resumed,"account","secret",
+                                     checkpoint_path=cp)
+            self.assertEqual([x["scene"] for x in shots],list(range(1,6)))
+            self.assertEqual(len(calls),4)
+            self.assertIn("Cloud vapors condense",calls[0])
+            self.assertNotIn("BATCH SCRIPT (local scene numbers):\n1. Tidal waves",calls[0])
+            self.assertEqual(len(json.loads(cp.read_text())["accepted_shots"]),5)
+            def no_requests(*args):
+                raise AssertionError("Already approved plan should not rerun AI")
+            self.assertEqual(planner.build_plan(story,no_requests,"account","secret",
+                                                checkpoint_path=cp),shots)
+
+    def test_checkpoint_rejects_modified_story_and_forged_shots(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Long ocean waves roll toward a sandy shoreline."},
+            {"narration":"Rain falls from clouds over a distant ocean."},
+            {"narration":"Sea mist rises from the surface of warm water."},
+            {"narration":"Clouds move across the open coastal night sky."},
+            {"narration":"The moon shines above a long coastal beach."}]}
+        accepted=[shot(1,"wide","side","establish","Ocean waves",
+                       "Long ocean waves roll toward a sandy shoreline."),
+                  shot(2,"close","frontal","detail","Ocean rainfall",
+                       "Rain falls from clouds over a distant ocean.")]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"saved.json"
+            planner._write_checkpoint(cp,story,accepted,2,"secret")
+            self.assertEqual(planner._read_checkpoint(cp,story,"secret")[0],accepted)
+            altered=json.loads(json.dumps(story))
+            altered["scenes"][0]["narration"]="A different ocean story begins here."
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner._read_checkpoint(cp,altered,"secret")
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner._read_checkpoint(cp,story,"wrong-token")
+            data=json.loads(cp.read_text())
+            data["accepted_shots"][0]["visible_action"]="A new galaxy appears."
+            cp.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner._read_checkpoint(cp,story,"secret")
+
+    def test_checkpoint_rejects_invalid_json_without_calling_ai(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Waves rise along the ocean coast in morning light."}
+            for _ in range(5)]}
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"saved.json"
+            cp.write_text('{"accepted_shots": [')
+            calls=[]
+            def fake(*args):
+                calls.append(1)
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner.build_plan(story,fake,"account","secret",checkpoint_path=cp)
+            self.assertEqual(calls,[])
+
     def test_malformed_second_batch_falls_back_to_one_scene_with_prefix(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Tidal waves form along the distant ocean shore."},
