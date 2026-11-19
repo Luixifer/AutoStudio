@@ -1,9 +1,5 @@
 name: AutoStudio · Validar variedad de planos antes de FLUX
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'triggers/semantic-shot-preflight-2026-11-19.txt'
   workflow_dispatch:
 permissions:
   contents: read
