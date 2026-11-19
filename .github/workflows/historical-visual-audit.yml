@@ -1,0 +1,82 @@
+name: AutoStudio · Auditoría retrospectiva de variedad visual
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/visual-diversity-audit-2026-11-19.txt'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/audit_visual_history.py'
+      - 'tests/test_audit_visual_history.py'
+      - '.github/workflows/historical-visual-audit.yml'
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  historical:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Comprobar auditoría sin usar Cloudflare
+        run: python -m unittest tests.test_audit_visual_history tests.test_visual_distinctness -v
+      - name: Recuperar evidencia de imágenes originales
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p historical
+          gh run download 44478832858 --repo "$GITHUB_REPOSITORY" \
+             --name "AutoStudio-Supervisor-Visual-REVISION" --dir historical
+          test "$(find historical -name visual-supervision-manifest.json | wc -l)" -eq 1
+          echo "VISUAL_MANIFEST=$(find historical -name visual-supervision-manifest.json)" >> "$GITHUB_ENV"
+      - name: Detectar planos repetidos en las diez observaciones anteriores
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          python -m scripts.audit_visual_history --manifest "$VISUAL_MANIFEST" \
+             --out historical/variety-audit.json
+      - name: Guardar prueba legible
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Auditoria-Variedad-10-Escenas
+          path: historical/variety-audit.json
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Publicar informe en GitHub sin pedir archivos
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/variety.md
+          import json,os
+          from pathlib import Path
+          print("### AutoStudio · Auditoría retroactiva de variedad visual (10 escenas)")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Trabajo:",os.environ["STATUS"])
+          print("- Generaciones FLUX nuevas: **0**")
+          print("- Consultas a modelos: **0**")
+          path=Path("historical/variety-audit.json")
+          if path.exists():
+              r=json.loads(path.read_text())
+              print("- Escenas originales:",r["scenes"])
+              print("- Aprobaciones individuales originales:",r["previously_individual_passed"])
+              print("- Composiciones repetidas detectadas:",len(r["visual_composition_duplicates"]))
+              for d in r["visual_composition_duplicates"][:10]:
+                  print("- Coincidencia:",d["scene"],"con",d["prior_scene"],
+                        "| similitud:",d["score"],
+                        "| elementos:",", ".join(d["common_terms"][:7]))
+              print("- Requiere revisión editorial adicional:",r["would_require_additional_review"])
+          else:
+              print("- Informe: no disponible")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/variety.md
