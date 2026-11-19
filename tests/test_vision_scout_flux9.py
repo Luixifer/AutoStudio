@@ -32,6 +32,21 @@ class ScoutTests(unittest.TestCase):
         self.assertFalse(gate["ready_to_publish"])
         self.assertFalse(gate["human_visual_approved"])
 
+    def test_hydrogen_scene_is_not_required_to_contain_a_star(self):
+        good=("HYDROGEN: YES\nNO_TERRAIN: YES\nDECISION: PASS\n"
+              "EVIDENCE: Two neutral spheres separate on a dark background.")
+        bad=("HYDROGEN: NO\nNO_TERRAIN: NO\nDECISION: PASS\n"
+             "EVIDENCE: Rocks and a glowing planet rather than hydrogen atoms.")
+        self.assertEqual(vision_scout.parse_scout(good, scene_kind="hydrogen")["decision"], "PASS")
+        self.assertEqual(vision_scout.parse_scout(bad, scene_kind="hydrogen")["decision"], "FAIL")
+        with patch.object(vision_scout, "_request", return_value={"response": good}) as mocked:
+            verdict=vision_scout.evaluate_scout(
+                jpeg(), "Hydrogen molecules separate into neutral atoms.",
+                "Two hydrogen atoms dissociate.", "a"*32, "token",
+                scene_kind="hydrogen")
+        self.assertEqual(verdict["decision"], "PASS")
+        self.assertIn("HYDROGEN:", mocked.call_args.args[1]["messages"][0]["content"][0]["text"])
+
     def test_one_failure_vetoes(self):
         result = vision_scout.independent_gate({"decision": "PASS"}, {"decision": "FAIL"})
         self.assertEqual(result["automated_result"], "FAIL")
