@@ -1,0 +1,1 @@
+One-time supervised KELT-9b 10-scene live test: 1 FLUX image maximum per scene (10 total), automatic Llama art direction, Gemma 4 image QA, gated cinematic render only if all scenes pass. Free tier only. Never auto-publish. Report direct to Issue #20.
