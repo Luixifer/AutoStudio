@@ -711,6 +711,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
             response = request(MODEL, {"messages":[{"role":"user",
                 "content":request_text}], "max_tokens":350 if repair_local else max(500,len(batch)*250),
                 "temperature":0.1}, account, token)
+            attempted_repair_local = repair_local
+            attempted_previous_batch = previous_batch
+            attempted_duplicate_reference = duplicate_reference
             try:
                 parsed = parse_reply(_extract_text(response))
                 if repair_local is not None:
@@ -723,14 +726,22 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                         if not isinstance(arr,list) or len(arr)!=1:
                             raise ValueError("Single-shot batch repair returned invalid fields")
                         parsed=arr[0]
+                    elif isinstance(parsed,dict) and set(parsed)=={"shot"}:
+                        parsed=parsed["shot"]
                     if not isinstance(parsed,dict):
                         raise ValueError("Single-shot batch repair returned invalid fields")
                     frozen={"scene","scale","angle","role"}
                     editable={"subject","visible_action"}
+                    # Accept an explicitly matching absolute scene index on
+                    # a resumed documentary, but never a moved or missing
+                    # scene or any changed camera metadata.
+                    scene_id = parsed.get("scene",original["scene"])
+                    if scene_id not in (original["scene"],start+original["scene"]):
+                        raise ValueError("Single-shot batch repair returned invalid fields")
                     if (not editable.issubset(parsed) or
                         set(parsed)-editable-frozen or
                         any(parsed.get(k)!=original[k]
-                            for k in frozen if k in parsed) or
+                            for k in frozen-{"scene"} if k in parsed) or
                         not all(isinstance(parsed[k],str) for k in editable)):
                         raise ValueError("Single-shot batch repair returned invalid fields")
                     repaired = {"shots":[dict(item) for item in previous_batch["shots"]]}
@@ -765,6 +776,17 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 break
             except ValueError as exc:
                 reason = exc
+                # A well-formed but wrongly shaped patch is not approval.
+                # Keep the same frozen source shot for ONE strict correction.
+                if (attempt == 2 and
+                    str(exc) == "Single-shot batch repair returned invalid fields" and
+                    attempted_repair_local is not None and
+                    attempted_previous_batch is not None):
+                    repair_local = attempted_repair_local
+                    previous_batch = attempted_previous_batch
+                    duplicate_reference = attempted_duplicate_reference
+                    attempts = 3
+                    continue
                 # Only a well-formed, correctly numbered batch can undergo
                 # a surgical content repair; malformed plans stay rejected.
                 repair_local = None
