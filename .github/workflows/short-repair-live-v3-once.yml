@@ -1,0 +1,76 @@
+name: AutoStudio - live bounded short action repair v3 once
+on:
+  push:
+    branches:
+      - test/live-short-repair-v3-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  text-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Regression tests, no Cloudflare
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore authentic signed five-shot checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44524918816 --repo "$REPO" --name AutoStudio-Strict-Grounding-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Cloudflare real text-only shot preflight
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/complete-shot-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Save safely reviewed scenes even on timeout or rejection
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Short-Repair-V3-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Store result in technical issue, never YouTube
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          import json,os
+          from pathlib import Path
+          print("### AutoStudio · prueba real de reparación adicional de acciones cortas")
+          print("- Ejecución:",os.environ["RUN"])
+          print("- Estado:",os.environ["STATUS"])
+          print("- FLUX: 0 imágenes; YouTube: publicación desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas firmadas y preservadas:",len(d["accepted_shots"]))
+          else:
+              print("- No hay escenas preservadas")
+          p=Path("/tmp/complete-shot-plan.json")
+          if p.exists():
+              d=json.loads(p.read_text())
+              print("- Plan textual completo validado:",len(d["shots"]))
+              for shot in d["shots"]:
+                  print("- Escena",shot["scene"],shot["scale"],shot["angle"],shot["role"],"|",shot["visible_action"])
+          else:
+              print("- Plan aún incompleto o rechazado, sin aprobación de imágenes")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
