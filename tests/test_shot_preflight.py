@@ -415,6 +415,39 @@ class ShotPlanTests(unittest.TestCase):
             planner.build_plan(story,fake,"account","token")
 
 
+    def test_timed_out_critic_retries_same_text_request_and_still_validates(self):
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            if len(calls)==1:
+                return {"response":json.dumps(VALID)}
+            if len(calls)==2:
+                raise TimeoutError("read timed out")
+            return {"response":json.dumps({"decision":"PASS","issues":[]})}
+        shots=planner.build_plan(STORY,fake,"account","token")
+        self.assertEqual(len(shots),3)
+        self.assertEqual(len(calls),3)
+        self.assertEqual(calls[1],calls[2])
+
+    def test_repeated_text_timeout_fails_closed_before_images(self):
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload)
+            raise TimeoutError("read timed out")
+        with self.assertRaises(TimeoutError):
+            planner.build_plan(STORY,fake,"account","token")
+        self.assertEqual(len(calls),2)
+
+    def test_non_timeout_url_error_is_not_retried(self):
+        import urllib.error
+        calls=[]
+        def fake(*_args):
+            calls.append(1)
+            raise urllib.error.URLError("DNS failure")
+        with self.assertRaises(urllib.error.URLError):
+            planner.build_plan(STORY,fake,"account","token")
+        self.assertEqual(len(calls),1)
+
     def test_malformed_second_batch_falls_back_to_one_scene_with_prefix(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Tidal waves form along the distant ocean shore."},
