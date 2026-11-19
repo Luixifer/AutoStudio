@@ -52,6 +52,35 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"invalid JSON"):
             planner.parse_reply("Certainly, here are ten shots.")
 
+    def test_abstract_two_word_actions_rejected(self):
+        bad=json.loads(json.dumps(VALID))
+        bad["shots"][0]["visible_action"]="Orbital period"
+        with self.assertRaisesRegex(ValueError,"concrete observable"):
+            planner.validate_plan(bad,STORY)
+        bad["shots"][0]["visible_action"]="A chart of the orbital period appears beside a planet."
+        with self.assertRaisesRegex(ValueError,"Abstract visual shorthand"):
+            planner.validate_plan(bad,STORY)
+
+    def test_bounded_plan_repair_before_any_image_generation(self):
+        calls=[]
+        answers=[{"response":"not JSON"},{"response":json.dumps(VALID)}]
+        def model(*args):
+            calls.append(args)
+            return answers.pop(0)
+        result=planner.build_plan(STORY,model,"a"*32,"test")
+        self.assertEqual(len(result),3)
+        self.assertEqual(len(calls),2)
+        self.assertIn("PREVIOUS PLAN REJECTED",calls[1][1]["messages"][0]["content"])
+
+    def test_invalid_twice_fails_closed(self):
+        calls=[]
+        def model(*args):
+            calls.append(1)
+            return {"response":"{}"}
+        with self.assertRaisesRegex(ValueError,"failed preflight twice"):
+            planner.build_plan(STORY,model,"a"*32,"test")
+        self.assertEqual(len(calls),2)
+
     def test_build_plan_is_one_text_call_and_has_no_topic_templates(self):
         calls=[]
         def fake_request(model,payload,account,token):
