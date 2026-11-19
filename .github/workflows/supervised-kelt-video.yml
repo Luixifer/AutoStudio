@@ -13,6 +13,10 @@ on:
         type: choice
         options: ['1', '2']
         default: '1'
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/kelt10-supervised-proof-2026-11-19.txt'
   pull_request:
     paths:
       - 'scripts/visual_autopilot.py'
@@ -26,6 +30,7 @@ on:
       - '.github/workflows/supervised-kelt-video.yml'
 permissions:
   contents: read
+  issues: write
 jobs:
   supervised-video:
     if: ${{ github.event.repository.private == false }}
@@ -59,7 +64,7 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          LIVE: ${{ github.event_name == 'workflow_dispatch' && inputs.live && 'true' || 'false' }}
+          LIVE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'true' || (github.event_name == 'workflow_dispatch' && inputs.live && 'true' || 'false') }}
           ATTEMPTS: ${{ inputs.max_attempts || '1' }}
         run: |
           set -euo pipefail
@@ -73,7 +78,7 @@ jobs:
               --out ../supervised-art --max-attempts 1 --request-budget 10
           fi
       - name: Crear storyboard solo con imagenes aprobadas por el supervisor
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.live) }}
         working-directory: development
         run: |
           python -m scripts.stage_supervised \
@@ -81,7 +86,7 @@ jobs:
             --manifest ../supervised-art/visual-supervision-manifest.json \
             --out ../reviewed-storyboard
       - name: Instalar voz neuronal y montaje libre
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.live) }}
         working-directory: engine
         run: |
           sudo apt-get update -qq
@@ -89,7 +94,7 @@ jobs:
           python -m pip install --disable-pip-version-check -r requirements-neural.txt
           python scripts/fetch_voice.py
       - name: Render cinematográfico Álex 60 fps
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.live }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.live) }}
         working-directory: engine
         run: |
           python -m scripts.personal_prepare ../reviewed-storyboard/storyboard.json --out ../prepared
@@ -118,3 +123,45 @@ jobs:
             final-render/contacto-planos.jpg
           retention-days: 3
           if-no-files-found: warn
+      - name: Publicar resumen de QA directamente en GitHub Issue 20
+        if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GH_JOB_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/autostudio-supervised-report.md
+          import os,json
+          from pathlib import Path
+          p=Path("supervised-art/visual-supervision-manifest.json")
+          print("### KELT-9b: prueba de diez escenas con director y supervisor IA")
+          print("- GitHub Actions:",os.environ["GH_RUN_URL"])
+          print("- Trabajo:",os.environ["GH_JOB_STATUS"])
+          print("- YouTube: desactivado")
+          if p.exists():
+              data=json.loads(p.read_text(encoding="utf-8"))
+              scenes=data.get("scenes",[])
+              print("- Escenas procesadas:",len(scenes),"/ 10")
+              print("- Imágenes nuevas generadas:",data.get("completed_requests",0))
+              print("- Inspecciones de visión:",data.get("vision_requests",0))
+              approved=sum(1 for s in scenes if s.get("approved"))
+              print("- Escenas aprobadas por IA:",approved,"/ 10")
+              print("- Todas las escenas aprobadas:",data.get("all_scenes_approved"))
+              failures=[s for s in scenes if not s.get("approved")]
+              for s in failures[:10]:
+                  candidates=s.get("candidates",[])
+                  v=candidates[-1].get("vision",{}) if candidates else {}
+                  print("- Escena",s.get("scene"),"pendiente:",str(v.get("decision","not generated"))[:15],
+                        "-",str(v.get("evidence","unknown")).replace("\\n"," ")[:170])
+          else:
+              print("- Informe de escenas: no disponible (fallo anterior a generación)")
+          v=Path("final-render/quality-report.json")
+          if v.exists():
+              qa=json.loads(v.read_text(encoding="utf-8"))
+              print("- Vídeo renderizado y QA técnico:",qa.get("technical_passed",False))
+              print("- Publicación automática autorizada:",False)
+          else:
+              print("- Vídeo nuevo: no verificado; consultar pasos si el trabajo falló")
+          PY
+          gh issue comment 20 --repo "$GH_REPO" --body-file /tmp/autostudio-supervised-report.md
