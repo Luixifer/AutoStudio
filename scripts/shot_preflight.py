@@ -692,13 +692,13 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     "only the narrated gas or molecules, not invented solid "
                     "surfaces, landscapes or background worlds. Do not add "
                     "locations, materials or terrain absent from the narration. "
-                    "Do not output a shot list.\\n"
-                    "ERROR: "+str(reason)[:350]+"\\n"
-                    "NARRATION: "+batch[repair_local-1]["narration"]+"\\n"
+                    "Do not output a shot list.\n"
+                    "ERROR: "+str(reason)[:350]+"\n"
+                    "NARRATION: "+batch[repair_local-1]["narration"]+"\n"
                     "PREVIOUS SHOT: "+
                     json.dumps(previous_batch["shots"][repair_local-1],
                                ensure_ascii=False)+
-                    ("\\nDUPLICATED EARLIER SHOT (do not repeat its concrete "
+                    ("\nDUPLICATED EARLIER SHOT (do not repeat its concrete "
                      "objects, composition or visible process): "+
                      json.dumps(duplicate_reference,ensure_ascii=False)
                      if duplicate_reference is not None else "")
