@@ -1,0 +1,1 @@
+One-time full KELT-9b narration-grounded cinematography planning with Llama text only: one bounded repair, zero FLUX, report in GitHub issue #20, no video publishing.
