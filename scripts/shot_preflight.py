@@ -266,46 +266,62 @@ def build_plan(story,request,account,token):
         "Title: "+str(story.get("title","Documentary"))[:180]+"\nNarration scenes:\n"+numbered
     )
     max_tokens=min(4600,max(900,len(scenes)*190))
-    # A bounded, targeted repair is allowed before any FLUX call.
-    # Preserve the COMPLETE valid plan for a semantic repair. In particular,
-    # truncating the plan at 3600 characters discarded later scenes and made
-    # the model reconstruct them from memory rather than fixing the error.
+    # One bounded semantic repair, without another full ten-scene JSON dump.
+    # After structural validation, repair an explicit offending scene alone;
+    # merge its new fields into the original plan and rerun ALL safeguards.
     from scripts.visual_autopilot import _extract_text
     last_error=None
     last_reply=""
     last_shots=None
     for attempt in range(2):
-        user_prompt=prompt
-        if attempt:
-            user_prompt += (
-                "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:950]+
-                "\\nThe preceding plan was NOT authorized. Fix the named defect "
-                "without introducing new unsupported objects or settings. "
-                "When the defect cites scene N, change ONLY that scene's subject "
-                "and visible_action unless structural uniqueness requires another "
-                "change. Keep all other scenes and their order unchanged. "
-                "Use only the actual narrated subjects; remove unsupported "
-                "galaxies, dust, terrain or any other invented material. "
-                "Do not bypass the validator. Return the COMPLETE JSON object "
-                "with exactly "+str(len(scenes))+" shots, not a patch.\\n"
+        repair_scene=None
+        if attempt and last_shots is not None and last_error is not None:
+            match=re.search(r"\b[Ss]cene (\d+) (?:introduces|implies)\b",str(last_error))
+            if match:
+                n=int(match.group(1))
+                if 1<=n<=len(last_shots):
+                    repair_scene=n
+        if repair_scene is not None:
+            original=last_shots[repair_scene-1]
+            user_prompt=(
+                "Repair ONE invalid documentary shot. Do not add facts absent "
+                "from the supplied narration. Return ONLY a JSON object with "
+                "two string keys: subject and visible_action. No scene list, "
+                "no markdown, no new named places, materials or terrain. "
+                "visible_action must contain 6-22 English words describing "
+                "a concrete visible relationship. Other shot fields and all "
+                "other scenes remain frozen.\\n"
+                "ERROR: "+str(last_error)[:700]+"\\n"
+                "SCENE NARRATION: "+scenes[repair_scene-1]["narration"]+"\\n"
+                "FULL NARRATIVE CONTEXT: "+numbered+"\\n"
+                "ORIGINAL SHOT: "+json.dumps(original,ensure_ascii=False)
             )
-            if last_shots is not None:
-                user_prompt += (
-                    "FULL PREVIOUS PLAN (preserve non-failing scenes):\\n"+
-                    json.dumps({"shots":last_shots},ensure_ascii=False)
-                )
-            else:
-                user_prompt += (
-                    "Previous output could not be structurally validated; "
-                    "reconstruct from the complete narration. "
-                    "Malformed output excerpt (not authoritative):\\n"+
+            repair_tokens=480
+        else:
+            user_prompt=prompt
+            if attempt:
+                user_prompt+=(
+                    "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:950]+
+                    "\\nReturn COMPLETE corrected JSON for exactly "+
+                    str(len(scenes))+" shots; no invented facts.\\n"+
                     last_reply[:1200]
                 )
+            repair_tokens=max_tokens
         response=request(MODEL,{"messages":[{"role":"user","content":user_prompt}],
-                                "max_tokens":max_tokens,"temperature":0.15},account,token)
+                                "max_tokens":repair_tokens,"temperature":0.15},account,token)
         last_reply=_extract_text(response)
         try:
-            shots=validate_plan(parse_reply(last_reply),story)
+            parsed=parse_reply(last_reply)
+            if repair_scene is not None:
+                if (not isinstance(parsed,dict) or
+                    set(parsed)!={"subject","visible_action"} or
+                    not all(isinstance(parsed[k],str) for k in parsed)):
+                    raise ValueError("Single-scene semantic repair returned invalid fields")
+                candidate=[dict(item) for item in last_shots]
+                candidate[repair_scene-1].update(parsed)
+                shots=validate_plan({"shots":candidate},story)
+            else:
+                shots=validate_plan(parsed,story)
             last_shots=shots
             check_explicit_story_constraints(story, shots)
             review_story_consistency(story, shots, request, account, token)
