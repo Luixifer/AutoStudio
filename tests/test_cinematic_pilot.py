@@ -65,8 +65,8 @@ class CinematicPilotTests(unittest.TestCase):
             return {"decision":"FAIL" if scene_kind=="hydrogen" else "PASS",
                     "evidence":"The claimed object cannot be established in the pixels."}
         with tempfile.TemporaryDirectory() as root:
-            with patch.object(cp, "_read_checkpoint", return_value=(planned, 2)), \\
-                 patch.object(cp, "validate_plan", return_value=planned), \\
+            with patch.object(cp, "_read_checkpoint", return_value=(planned, 2)), \
+                 patch.object(cp, "validate_plan", return_value=planned), \
                  patch.object(cp, "check_explicit_story_constraints", return_value=True):
                 result=cp.pilot(
                     original,Path(root)/"checkpoint",Path(root)/"out",
