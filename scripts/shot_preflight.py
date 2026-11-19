@@ -911,10 +911,11 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     # incorrect JSON or other failures.
                     if (attempt == 2 and
                         (re.match(r"^Scene \d+: Shot visible_action",str(exc)) or
-                         repeated is not None)):
-                        # One more localized rewrite for a repeated physical
-                        # composition, not only for too-short descriptions.
-                        # All checks, including cross-batch uniqueness, remain.
+                         repeated is not None or
+                         grounding is not None)):
+                        # One last schema-constrained repair is appropriate
+                        # for a strictly named factual critic rejection too.
+                        # Preserve camera grammar and re-run ALL checks.
                         attempts = 3
         else:
             # A malformed two-shot JSON response cannot be trusted or
