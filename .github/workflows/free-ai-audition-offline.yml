@@ -1,0 +1,37 @@
+name: Free AI audition offline QA
+on:
+  push:
+    branches: [feat/free-ai-model-auditions]
+    paths:
+      - "scripts/free_ai_audition.py"
+      - "tests/test_free_ai_audition.py"
+      - ".github/workflows/free-ai-audition-offline.yml"
+  pull_request:
+    paths:
+      - "scripts/free_ai_audition.py"
+      - "tests/test_free_ai_audition.py"
+      - ".github/workflows/free-ai-audition-offline.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run isolated unit tests (no API calls)
+        run: python -m unittest discover -s tests -p test_free_ai_audition.py -v
+      - name: Assert dry-run creates no publish approval
+        run: |
+          python -m scripts.free_ai_audition --prompt-file docs/quality/free_ai_example_prompt.txt --model gpt_oss_20b --model llama_4_scout --out /tmp/ai-audition.json
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/ai-audition.json"))
+          assert x["calls_attempted"] == 0
+          assert x["publish_allowed"] is False
+          assert len(x["candidates"]) == 2
+          PY
