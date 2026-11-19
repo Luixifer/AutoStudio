@@ -212,9 +212,11 @@ def review_story_consistency(story, shots, request, account, token):
     # a long rubric and returns an unusable verdict. A short, self-contained
     # prompt preserves the same independent factual check and fail-closed gate.
     critic=(
-        "Review proposed documentary shots against ONLY the narration below. "
+        "You are a STORY-ONLY CONTRADICTION reviewer. Review proposed "
+        "documentary shots against ONLY the narration below. "
         "The narration may be Spanish; shots are in English. Recognize faithful "
-        "translations and physically plausible depictions of narrated processes. "
+        "translations and physically plausible depictions of narrated processes "
+        "are SUPPORTED. "
         "FAIL for an explicit contradiction or a prominent invented factual "
         "object, material, terrain, named place, organism, or spatial relation. "
         "Examples: a gaseous world described without ground must not gain rocky "
@@ -237,7 +239,8 @@ def review_story_consistency(story, shots, request, account, token):
     issues = None
     for attempt in range(2):
         prompt = critic if not attempt else (
-            "Previous verdict was malformed. Answer the same question using "
+            "Your previous response could not be parsed. Previous verdict was malformed. "
+            "Answer the same question using 
             "only a COMPLETE JSON object: "
             '{"decision":"PASS","issues":[]} or '
             '{"decision":"FAIL","issues":[{"scene":1,"issue":"clear contradiction"}]}. '
