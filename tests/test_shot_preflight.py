@@ -483,6 +483,68 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("EXACTLY 1 objects",calls[4])
         self.assertIn("wide / side / establish",calls[4])
 
+    def test_cross_batch_duplicate_repairs_only_repeated_scene(self):
+        story={"title":"Ocean processes","scenes":[
+            {"narration":"Ocean waves move across a coastal sea surface."},
+            {"narration":"Rain droplets fall from thick clouds above the ocean."},
+            {"narration":"Ocean waves and moving water strike the coastline."},
+            {"narration":"The moon lights the water surface at night."},
+            {"narration":"Wind pushes high clouds above an open ocean."}]}
+        original_action="Ocean waves move across a coastal sea surface."
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",original_action),
+            shot(2,"close","frontal","detail","Rainfall",
+                 "Rain droplets fall from thick clouds above the ocean.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Ocean coastline",original_action),
+            shot(2,"extreme_wide","overhead","contrast","Moonlit sea",
+                 "The distant moon lights the sea surface at night.")]}
+        patch={"subject":"Coastline breaking waves",
+               "visible_action":"A curling wave breaks against the coastline with visible white foam."}
+        final={"shots":[shot(1,"extreme_close","low","consequence",
+                             "High clouds and wind",
+                             "Wind pushes a high cloud bank across the ocean sky.")]}
+        answers=[first,{"decision":"PASS","issues":[]},second,patch,
+                 {"decision":"PASS","issues":[]},final,
+                 {"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(answers.pop(0))}
+        output=planner.build_plan(story,fake,"account","token")
+        self.assertEqual([x["scene"] for x in output],[1,2,3,4,5])
+        self.assertEqual(output[0]["visible_action"],original_action)
+        self.assertEqual(output[2]["visible_action"],patch["visible_action"])
+        self.assertEqual(output[3]["visible_action"],second["shots"][1]["visible_action"])
+        self.assertIn("DUPLICATED EARLIER SHOT",prompts[3])
+        self.assertEqual(len(prompts),7)
+
+    def test_cross_batch_duplicate_repair_still_rejects_same_action(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move across a coastal sea surface."},
+            {"narration":"Rain droplets fall from thick clouds above the ocean."},
+            {"narration":"Ocean waves and moving water strike the coastline."},
+            {"narration":"The moon lights the water surface at night."},
+            {"narration":"Wind pushes high clouds above the sea."}]}
+        repeated="Ocean waves move across a coastal sea surface."
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",repeated),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Raindrops fall from dark clouds into the open ocean.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Ocean waves",repeated),
+            shot(2,"extreme_wide","overhead","contrast","Moonlight",
+                 "Moonlight illuminates the wide sea surface at night.")]}
+        answers=[first,{"decision":"PASS","issues":[]},second,
+                 {"subject":"Ocean waves","visible_action":repeated}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(1)
+            return {"response":json.dumps(answers.pop(0))}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),4)
+
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
             "Tidal waves form along the distant ocean shore.",
