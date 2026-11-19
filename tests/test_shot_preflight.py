@@ -170,7 +170,7 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"concrete observable"):
             planner.validate_plan(bad,STORY)
         bad["shots"][0]["visible_action"]="A chart of the orbital period appears beside a planet."
-        with self.assertRaisesRegex(ValueError,"Abstract visual shorthand"):
+        with self.assertRaisesRegex(ValueError,"Forbidden diagram or graphic"):
             planner.validate_plan(bad,STORY)
 
     def test_bounded_plan_repair_before_any_image_generation(self):
