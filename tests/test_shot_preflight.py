@@ -30,6 +30,66 @@ def jpeg():
          +b"\xff\xd9"+b"\x00"*8)
 
 class ShotPlanTests(unittest.TestCase):
+    def test_live_scientist_and_diagram_shots_are_not_editorially_valid(self):
+        story={"title":"Planet documentary","scenes":[
+            {"narration":"A faraway planet is hotter than many stars."},
+            {"narration":"The giant gaseous planet approaches its hot parent star."}]}
+        scientist={"shots":[
+            shot(1,"wide","side","establish","a scientist speaking",
+                 "A scientist explains a concept through broad hand gestures."),
+            shot(2,"close","frontal","detail","gas giant",
+                 "The distant gas planet glows under its parent star.")]}
+        with self.assertRaisesRegex(ValueError,"Unnarrated human"):
+            planner.validate_plan(scientist,story)
+        chart={"shots":[
+            shot(1,"wide","side","establish","Hot exoplanet",
+                 "A glowing gas world appears far from a bright star."),
+            shot(2,"close","frontal","detail","a diagram of the planet",
+                 "A narrator points toward the fiery gas giant image.")]}
+        with self.assertRaisesRegex(ValueError,"Forbidden diagram"):
+            planner.validate_plan(chart,story)
+
+    def test_human_subject_is_allowed_when_scene_explicitly_narrates_them(self):
+        story={"scenes":[{"narration":
+            "A scientist at the observatory talks about the newly found planet."}]}
+        plan={"shots":[shot(1,"medium","frontal","establish","A scientist speaking",
+                            "A scientist speaks while facing an open observatory window.")]}
+        self.assertEqual(len(planner.validate_plan(plan,story)),1)
+
+    def test_old_signed_completed_checkpoint_rewinds_from_unrelated_human(self):
+        story={"title":"Planet documentary","scenes":[
+            {"narration":"A faraway planet is hotter than many stars."},
+            {"narration":"The giant gaseous planet approaches its hot parent star."},
+            {"narration":"The atmosphere of the world grows extremely hot."},
+            {"narration":"Hydrogen molecules split apart under the extreme heat."},
+            {"narration":"The dark hemisphere allows molecules to join again."}]}
+        old=[
+            shot(1,"wide","side","establish","A scientist speaking",
+                 "A scientist explains a concept through broad hand gestures."),
+            shot(2,"medium","high","detail","Gas giant atmosphere",
+                 "A large gaseous planet glows below its parent star."),
+            shot(3,"close","frontal","process","Hot atmosphere",
+                 "The atmosphere rises along the planet's intensely hot gas layers."),
+            shot(4,"extreme_wide","overhead","contrast","Hydrogen particles",
+                 "Hot atmospheric gas separates the hydrogen into smaller atoms."),
+            shot(5,"extreme_close","low","consequence","Hydrogen recombination",
+                 "Hydrogen atoms form molecules along the darker side of the world.")]
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"checkpoint.json"
+            # The authenticated historical prefix may have been approved
+            # under a weaker visual validator. It is no longer trusted as
+            # acceptable content and must be discarded before image requests.
+            payload={"version":planner.CHECKPOINT_VERSION,
+                     "story_sha256":planner._story_digest(story),
+                     "batch_size":1,"accepted_shots":old,
+                     "ready_to_publish":False,"scientific_facts_verified":False}
+            payload["signature"]=planner._checkpoint_signature(payload,"token")
+            path.write_text(json.dumps(payload),encoding="utf-8")
+            approved,size=planner._read_checkpoint(path,story,"token")
+            self.assertEqual(approved,[])
+            self.assertEqual(size,1)
+            self.assertFalse(path.exists())
+
     def test_validates_unique_compositions_and_preserves_scene_order(self):
         result=planner.validate_plan(VALID,STORY)
         self.assertEqual(len(result),3)
