@@ -1,0 +1,103 @@
+name: AutoStudio - checkpoint artifact roundtrip one-shot
+on:
+  push:
+    branches:
+      - test/durable-checkpoint-artifact-20261119
+permissions:
+  contents: read
+  actions: read
+jobs:
+  seed:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Generate a genuine reviewed prefix then simulate failure
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts import shot_preflight as p
+          from tests.test_shot_preflight import shot
+          story={"title":"Ocean film","scenes":[{"narration":v} for v in [
+              "Ocean waves rise along a coastal shoreline.",
+              "Rain droplets fall into the deep ocean surface.",
+              "Cloud vapors condense above the open sea.",
+              "Sea foam spreads across a moving wavefront.",
+              "The moon illuminates a long coastal shoreline."]]}
+          Path("story.json").write_text(json.dumps(story))
+          first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+              "Ocean waves rise along a coastal shoreline."),
+            shot(2,"close","frontal","detail","Rain droplets",
+              "Rain droplets fall into the deep ocean surface.")]}
+          answers=[first,{"decision":"PASS","issues":[]}]
+          def fake(*args):
+              if answers:
+                  return {"response":json.dumps(answers.pop(0))}
+              raise TimeoutError("simulated interruption")
+          try:
+              p.build_plan(story,fake,"account","fake-secret",checkpoint_path=".autostudio/shot-checkpoint.json")
+              raise AssertionError("Expected interrupted preflight")
+          except TimeoutError:
+              pass
+          data=json.loads(Path(".autostudio/shot-checkpoint.json").read_text())
+          assert len(data["accepted_shots"])==2
+          assert data["ready_to_publish"] is False
+          print("Seed: signed prefix saved, 2 scenes")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Test-Prefix
+          path: .autostudio/shot-checkpoint.json
+  resume:
+    needs: seed
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Download checkpoint via GitHub Actions API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          mkdir -p .autostudio
+          gh run download "$RUN" --repo "$REPO" --name AutoStudio-Test-Prefix --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Resume without revisiting approved scenes
+        run: |
+          python - <<'PY'
+          import json
+          from scripts import shot_preflight as p
+          from tests.test_shot_preflight import shot
+          story={"title":"Ocean film","scenes":[{"narration":v} for v in [
+              "Ocean waves rise along a coastal shoreline.",
+              "Rain droplets fall into the deep ocean surface.",
+              "Cloud vapors condense above the open sea.",
+              "Sea foam spreads across a moving wavefront.",
+              "The moon illuminates a long coastal shoreline."]]}
+          next_batch={"shots":[
+            shot(1,"medium","high","process","Cloud vapor",
+              "Cloud vapors condense above the open sea."),
+            shot(2,"extreme_wide","overhead","contrast","Sea foam",
+              "Sea foam spreads across a moving wavefront.")]}
+          final_batch={"shots":[shot(1,"extreme_close","low","consequence",
+              "Moonlit coast","The moon illuminates a long coastal shoreline.")]}
+          answers=[next_batch,{"decision":"PASS","issues":[]},final_batch,
+                   {"decision":"PASS","issues":[]}]
+          prompts=[]
+          def fake(_model,payload,*args):
+              prompts.append(payload["messages"][0]["content"])
+              return {"response":json.dumps(answers.pop(0))}
+          shots=p.build_plan(story,fake,"account","fake-secret",
+                             checkpoint_path=".autostudio/shot-checkpoint.json")
+          assert len(shots)==5 and len(prompts)==4
+          assert 'Cloud vapors condense' in prompts[0]
+          assert 'BATCH SCRIPT (local scene numbers):\\n1. Ocean waves' not in prompts[0]
+          print("Resume successful:",len(shots),"approved scenes; first two not regenerated")
+          PY
