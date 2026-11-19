@@ -95,8 +95,8 @@ def review_story_consistency(story, shots, request, account, token):
         "Do not claim numerical values unless the narration states them, including "
         "values written as words in Spanish. "
         "If uncertain whether a depicted fact is supported, reject it rather than invent it. "
-        "Return ONLY JSON object {\\\"decision\\\":\\\"PASS\\\" or \\\"FAIL\\\","
-        "\\\"issues\\\":[{\\\"scene\\\":1,\\\"issue\\\":\\\"factual contradiction\\\"}]}."
+        'Return ONLY JSON object {"decision":"PASS" or "FAIL",'
+        '"issues":[{"scene":1,"issue":"unsupported claim"}]}. '
         " For PASS, issues MUST be empty. If FAIL, give concrete corrections for up to "
         "six scenes in issues. No Markdown.\\n"
         "Narration:\\n"+narrative+"\\nProposed shots:\\n"+
