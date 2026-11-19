@@ -663,6 +663,15 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 match = re.search(
                     r"^Scene (\d+): Shot visible_action",str(exc))
                 local_index = int(match.group(1)) if match else None
+                # A structured factual contradiction points to the LOCAL
+                # scene number in this reviewed batch. Repair only that
+                # shot's wording, then independently review the full batch
+                # again. Never reinterpret an invalid verdict as approval.
+                grounding = re.search(
+                    r"^Story-grounding review FAIL: scene (\d+):",
+                    str(exc))
+                if grounding and local_index is None:
+                    local_index = int(grounding.group(1))
                 repeated = re.search(
                     r"^Near-duplicate visible action in scenes (\d+) and (\d+);",
                     str(exc))
