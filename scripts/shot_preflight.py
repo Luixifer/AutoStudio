@@ -18,6 +18,27 @@ SCALES = ("extreme_wide","wide","medium","close","extreme_close")
 ANGLES = ("frontal","side","three_quarter","overhead","low","high")
 ROLES = ("establish","relationship","detail","process","contrast","consequence","transition")
 MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8"
+# Independent reviewer uses a different, stronger free-tier Workers AI model.
+# Unlike the planner, it supports schema-constrained JSON at the /ai/run API.
+CRITIC_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+CRITIC_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "decision": {"type": "string", "enum": ["PASS", "FAIL"]},
+        "issues": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "scene": {"type": "integer"},
+                    "issue": {"type": "string"}
+                },
+                "required": ["scene", "issue"]
+            }
+        }
+    },
+    "required": ["decision", "issues"]
+}
 MAX_SCENES = 24
 MAX_WORDS = 22
 ACTION_FILLER = frozenset("a an the and or of to from in on with without over under above below is are as at by into through seen visible camera view shows showing appears image picture scene shot close distant bright glowing illuminated light dramatic cinematic".split())
@@ -254,8 +275,14 @@ def review_story_consistency(story, shots, request, account, token):
             "No prose, no markdown, no missing fields. Do not ignore any "
             "material factual conflict.\\n" + critic
         )
-        response=request(MODEL,{"messages":[{"role":"user","content":prompt}],
-                       "max_tokens":450,"temperature":0.0},account,token)
+        response=request(CRITIC_MODEL,{
+            "messages":[{"role":"user","content":prompt}],
+            "max_completion_tokens":450,
+            "temperature":0.0,
+            "chat_template_kwargs":{"enable_thinking":False},
+            "response_format":{"type":"json_schema",
+                               "json_schema":CRITIC_SCHEMA}
+        },account,token)
         try:
             decision,issues=_critic_response_object(response)
             break
