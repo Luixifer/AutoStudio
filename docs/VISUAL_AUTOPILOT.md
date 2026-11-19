@@ -4,7 +4,7 @@ Diseñado para trabajar con **cualquier narración de 1-24 escenas**, no contien
 
 ## Qué hace
 
-- **Director**: Llama a `@cf/meta/llama-3.1-8b-instruct-fp8` para interpretar el texto de cada escena y crear una descripción visual inédita. No necesita que escribas diez prompts manuales.
+- **Preproducción global**: Antes de llamar a FLUX, Llama propone una secuencia entera de planos con escala, ángulo, propósito narrativo, sujeto y acción visible; el plan exige combinaciones cinematográficas diferentes. Si es inválido, se corrige como máximo una vez con texto y, si sigue fallando, no se crea ninguna imagen. Esto no valida científicamente cada plano.\n- **Director**: Llama a `@cf/meta/llama-3.1-8b-instruct-fp8` para interpretar el texto de cada escena y crear una descripción visual inédita. No necesita que escribas diez prompts manuales.
 - **Generador**: Crea imágenes con FLUX.1 Schnell.
 - **Supervisor**: Envía la imagen *real* a `@cf/google/gemma-4-26b-a4b-it` para contrastar lo que es visible con la narración y la dirección. Exige `DECISION: PASS`, con observación visible; de otro modo la marca `needs_human_review`.
 - **Reintento**: Opcionalmente repite la escena, como máximo una vez, incorporando a las instrucciones el motivo del rechazo visual.
@@ -37,3 +37,7 @@ Para un video diferente solo debe cambiar el storyboard. El workflow actual est�
 ## Resultados y limitaciones del primer ensayo de diez escenas
 
 El primer ensayo de KELT-9b generó diez imágenes, ocho aprobadas individualmente por Gemma y dos ambiguas. Reutilizando todas las imágenes, se alcanzaron nueve aprobaciones, pero Gemma rechazó la escena 1 por una posible marca de agua. GitHub completó una vista previa de diagnóstico, no publicable. La revisión visual humana detectó repetición excesiva de remolinos en las imágenes, demostrando que una evaluación individual PASS no es suficiente para construir un documental variado. La nueva comprobación de diversidad es conservadora, requiere pruebas con nuevas escenas y todavía no se ha validado con otro ciclo completo de generación.
+
+## Prueba de preproducción solo con texto (19/11/2026)
+
+La primera prueba real produjo diez combinaciones de escala, cámara y propósito diferentes usando una llamada textual a Cloudflare, sin nuevas imágenes. Sin embargo, varias acciones propuestas fueron demasiado vagas (p. ej., «Gas composition» y «Orbital period»). Se ha endurecido la validación para exigir descripciones de acciones físicas visibles de 6 a 22 palabras y una corrección textual acotada. Aún es necesaria otra prueba real de esta validación mejorada. Los planes no demuestran que las imágenes finales tengan variedad ni precisión científica.
