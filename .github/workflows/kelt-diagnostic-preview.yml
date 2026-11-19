@@ -1,10 +1,6 @@
 name: AutoStudio · Vista previa técnica KELT-9b sin regenerar imágenes
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'triggers/kelt9b-diagnostic-preview-2026-11-19.txt'
   pull_request:
     paths:
       - 'scripts/stage_diagnostic_preview.py'
