@@ -688,6 +688,11 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     "reviewer's complaint, is the ONLY positive factual source. "
                     "The ERROR describes unsupported or contradicted claims "
                     "to REMOVE, NEVER facts to illustrate or repeat. "
+                    "If a prior shot is duplicated, changing a few adjectives "
+                    "is NOT enough: depict a different narrated physical event, "
+                    "a different subject relationship, or a demonstrably "
+                    "different spatial composition. Keep the intended narration "
+                    "and existing camera scale, angle, and role. "
                     "When narration describes gas or molecules, illustrate "
                     "only the narrated gas or molecules, not invented solid "
                     "surfaces, landscapes or background worlds. Do not add "
@@ -815,7 +820,11 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     # candidate; never to invented facts, ambiguous critics,
                     # incorrect JSON or other failures.
                     if (attempt == 2 and
-                        re.match(r"^Scene \d+: Shot visible_action",str(exc))):
+                        (re.match(r"^Scene \d+: Shot visible_action",str(exc)) or
+                         repeated is not None)):
+                        # One more localized rewrite for a repeated physical
+                        # composition, not only for too-short descriptions.
+                        # All checks, including cross-batch uniqueness, remain.
                         attempts = 3
         else:
             # A malformed two-shot JSON response cannot be trusted or
