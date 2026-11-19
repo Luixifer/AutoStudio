@@ -703,8 +703,8 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(len(result),5)
         self.assertEqual(result[2]["visible_action"],corrected["visible_action"])
         self.assertEqual(result[3]["visible_action"],bad["shots"][1]["visible_action"])
-        self.assertIn("Aim for 10-16 English words",prompts[3])
-        self.assertIn("Aim for 10-16 English words",prompts[4])
+        self.assertIn("Aim for 10-16 words",prompts[3])
+        self.assertIn("Aim for 10-16 words",prompts[4])
         self.assertEqual(len(prompts),8)
 
     def test_underlength_three_attempts_still_blocks(self):
