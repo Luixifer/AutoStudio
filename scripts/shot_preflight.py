@@ -88,9 +88,22 @@ def validate_plan(plan, story):
         # shot. Demand an observable relationship/action before any generation.
         if not isinstance(action,str) or not 16<=len(action)<=200 or not 6<=len(action.split())<=MAX_WORDS:
             raise ValueError(f"Scene {i}: Shot visible_action must describe a concrete observable scene in 6-22 words")
-        if re.search(r"\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\b", action, re.I):
-            raise ValueError("Abstract visual shorthand is not an image-generation shot")
-        if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",subject+" "+action,re.I):
+        visual = subject+" "+action
+        # Both the subject and action must be drawable documentary content.
+        # The original 10-shot live output mistakenly passed a chart because
+        # only visible_action (not subject) was screened.
+        if re.search(r"\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\b", visual, re.I):
+            raise ValueError(f"Scene {i}: Forbidden diagram or graphic in a visual documentary shot")
+        # A talking head or pointing presenter is not a faithful illustration
+        # of a narration that only describes physical subjects/processes.
+        # This is conditional, not a blanket ban on scientific presenters.
+        spoken = scenes[i-1]["narration"]
+        if (re.search(r"\b(?:scientists?|presenters?|narrators?|speakers?|lecturers?|people|persons?|humans?|hands?|pointing|gestures?|gesturing|speaking)\b",visual,re.I)
+            and not re.search(r"\b(?:scientists?|presenters?|narrators?|speakers?|lecturers?|people|persons?|humans?|hands?|cient[ií]fic[oa]s?|presentador[ae]s?|narrador[ae]s?|personas?|human[oa]s?|manos?|investigador[ae]s?)\b",spoken,re.I)):
+            raise ValueError(f"Scene {i}: Unnarrated human presenter or gesture replaces the scientific subject")
+        if re.search(r"\b(?:explaining a concept|illustrating a concept|talking about an idea)\b",action,re.I):
+            raise ValueError(f"Scene {i}: Abstract explanation is not a concrete documentary image")
+        if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",visual,re.I):
             raise ValueError("Plan contains forbidden graphic content")
         # A repeated scale+angle+role is the most blatant duplication, and
         # must be fixed before image-generation requests.
@@ -257,6 +270,12 @@ def review_story_consistency(story, shots, request, account, token):
         "are SUPPORTED. "
         "FAIL for an explicit contradiction or a prominent invented factual "
         "object, material, terrain, named place, organism, or spatial relation. "
+        "Also FAIL when the PRIMARY subject or action is unrelated to the "
+        "specific narration scene, even if the shot resembles its general topic. "
+        "For example, a scientist talking or a diagram is NOT a cinematic image "
+        "of a planet unless the narration actually discusses that scientist or diagram. "
+        "A generic glowing planet is NOT an illustration of a narrated molecular "
+        "reaction or orbital-period comparison. "
         "Examples: a gaseous world described without ground must not gain rocky "
         "terrain; a distant galaxy not in the script must not be invented. "
         "Do not FAIL for camera angles, ordinary lighting, visual metaphors, "
@@ -532,22 +551,25 @@ def _read_checkpoint(path, story, token):
         # complete preceding independently-reviewed batches. Structural
         # corruption, invalid HMAC, altered story and invalid schemas still
         # fail closed rather than silently rewinding.
-        checked = validate_plan(
-            {"shots":shots}, {"scenes":_scene_list(story)[:len(shots)]})
         try:
+            checked = validate_plan(
+                {"shots":shots}, {"scenes":_scene_list(story)[:len(shots)]})
             check_explicit_story_constraints(story, checked)
         except ValueError as exc:
             contradicted = re.match(
                 r"^Scene (\d+) (?:implies|introduces)\b", str(exc))
-            if not contradicted:
+            invalid_visual = re.match(
+                r"^Scene (\d+): (?:Forbidden diagram or graphic|Unnarrated human presenter|Abstract explanation)\b",
+                str(exc))
+            if not contradicted and not invalid_visual:
                 raise
-            first_invalid = int(contradicted.group(1))
+            first_invalid = int((contradicted or invalid_visual).group(1))
             if not 1 <= first_invalid <= len(shots):
                 raise
             keep = first_invalid - 1
             # Never keep half of an originally two-shot reviewed batch.
             keep -= keep % size
-            safe = checked[:keep]
+            safe = shots[:keep]
             if safe:
                 validate_plan({"shots":safe},
                               {"scenes":_scene_list(story)[:len(safe)]})
@@ -660,7 +682,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 "scale: "+",".join(SCALES)+". angle: "+",".join(ANGLES)+
                 ". role: "+",".join(ROLES)+". "
                 "Each visible_action must be 6-22 English words describing "
-                "a concrete physical action or relationship, no charts or captions. "
+                "a concrete physical action or relationship. Subject and action "
+                "must depict the PARTICULAR narrated phenomenon, not a generic "
+                "planet, a speaker, a diagram, charts or captions. "
                 "Only show facts supported by EACH batch narration below; do not "
                 "invent materials, terrain, galaxies, locations or physical surfaces. "
                 "NEGATIVE STATEMENTS in narration prohibit, rather than request, "
@@ -839,6 +863,15 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     str(exc))
                 if grounding and local_index is None:
                     local_index = int(grounding.group(1))
+                presentation = re.search(
+                    r"^Scene (\d+): (?:Forbidden diagram or graphic|Unnarrated human presenter|Abstract explanation)\b",
+                    str(exc))
+                if presentation and local_index is None:
+                    index = int(presentation.group(1))
+                    if 1 <= index <= len(batch):
+                        local_index = index
+                    elif start < index <= start+len(batch):
+                        local_index = index-start
                 # Localize a deterministic contradiction using the absolute
                 # scene number. Previously this fell back to rewriting the
                 # whole batch, often preserving the forbidden surface.
