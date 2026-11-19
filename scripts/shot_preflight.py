@@ -877,7 +877,12 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     proposed=[dict(item,scene=start+item["scene"])
                               for item in parsed["shots"]
                               if isinstance(item,dict) and type(item.get("scene")) is int]
-                    if len(proposed)==len(batch):
+                    if (len(proposed)==len(batch) and
+                        [x["scene"] for x in proposed] ==
+                        list(range(start+1,start+len(batch)+1)) and
+                        all(x.get("scale") in SCALES and
+                            x.get("angle") in ANGLES and
+                            x.get("role") in ROLES for x in proposed)):
                         normalized=_fix_only_current_camera_angle_collisions(
                             accepted+proposed,len(accepted))
                         parsed={"shots":[dict(item,scene=i+1)
