@@ -1,0 +1,74 @@
+name: AutoStudio · Preproduccion global 10 planos sin FLUX
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/storywide-shot-preflight-2026-11-19.txt'
+  pull_request:
+    paths:
+      - 'scripts/shot_preflight.py'
+      - 'tests/test_shot_preflight.py'
+      - '.github/workflows/storywide-shot-preflight.yml'
+permissions:
+  contents: read
+  issues: write
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Comprobaciones offline y sintaxis
+        run: |
+          python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -v
+          python -m py_compile scripts/shot_preflight.py scripts/visual_autopilot.py
+      - name: Producir plan completo de KELT-9b solo en TEXTO
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out preflight/shot-plan.json
+      - name: Guardar plan, no generar imagenes
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Plan-Cinematografico-10-Escenas
+          path: preflight/shot-plan.json
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Publicar resultado sin pedir archivos
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/preflight_report.md
+          from pathlib import Path
+          import json,os
+          print("### AutoStudio · Plan cinematográfico global (sin generar imágenes)")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Trabajo:",os.environ["JOB_STATUS"])
+          print("- Nuevas imágenes FLUX: **0**")
+          p=Path("preflight/shot-plan.json")
+          if p.exists():
+              data=json.loads(p.read_text(encoding="utf-8"))
+              shots=data["shots"]
+              print("- Planes de escena completos:",len(shots))
+              print("- Combinaciones (escala/ángulo/función) distintas:",len({(s["scale"],s["angle"],s["role"]) for s in shots}))
+              for s in shots[:12]:
+                  print("- Plano",s["scene"],":",s["scale"],"/",s["angle"],"/",s["role"],
+                        "|",s["subject"][:95])
+              print("- Listo para publicar:",False)
+          else:
+              print("- Resultado: plan no producido o rechazado; consultar registro de ejecución")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/preflight_report.md
