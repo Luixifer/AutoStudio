@@ -240,8 +240,7 @@ def review_story_consistency(story, shots, request, account, token):
     for attempt in range(2):
         prompt = critic if not attempt else (
             "Your previous response could not be parsed. Previous verdict was malformed. "
-            "Answer the same question using 
-            "only a COMPLETE JSON object: "
+            "Answer the same question using only a COMPLETE JSON object: "
             '{"decision":"PASS","issues":[]} or '
             '{"decision":"FAIL","issues":[{"scene":1,"issue":"clear contradiction"}]}. '
             "No prose, no markdown, no missing fields. Do not ignore any "
