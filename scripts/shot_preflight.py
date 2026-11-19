@@ -354,8 +354,6 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
     scenes = _scene_list(story)
     if not isinstance(chunk_size, int) or not 1 <= chunk_size <= 4:
         raise ValueError("Invalid bounded shot batch size")
-    numbered = "\n".join(f"{i}. {item['narration']}"
-                          for i, item in enumerate(scenes, 1))
     accepted = []
     for start in range(0, len(scenes), chunk_size):
         batch = scenes[start:start+chunk_size]
@@ -367,32 +365,31 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                       "subject":x["subject"],"visible_action":x["visible_action"]}
                      for x in accepted]
             request_text = (
-                "Plan cinematic scientific documentary stills for ONLY the next "+
-                str(len(batch))+" scenes. Return ONLY JSON object with key shots; "
-                "scene numbering must restart at 1 within THIS batch. "
-                "Each shot needs scene, scale, angle, role, subject, visible_action. "
-                "Valid scale: "+",".join(SCALES)+"; angle: "+",".join(ANGLES)+
-                "; role: "+",".join(ROLES)+". visible_action must be 6-22 "
-                "English words, concrete visible objects and physical relationships. "
-                "Do not add galaxies, dust, terrain, animals, labels, graphics, "
-                "structures or other facts absent from the narration. "
-                "No repeated combination of scale/angle/role or near-duplicate "
-                "visible actions, including previous batches. Avoid generic gas "
-                "swirls and vortex compositions. Do not copy or renumber prior shots. "
-                "Your response is a single COMPLETE JSON object for this batch, "
-                "not for the whole film.\\n"
-                "Documentary title: "+str(story.get("title","Documentary"))[:160]+
-                "\\nWHOLE SCRIPT for context (do not illustrate extra facts):\\n"+
-                numbered+"\\nBATCH SCRIPT (local scene numbers):\\n"+
+                "Return exactly one valid JSON object and nothing else. "
+                "The object MUST contain shots, a list of EXACTLY "+
+                str(len(batch))+" objects, with scene numbering 1 to "+
+                str(len(batch))+". Do not add extra scenes. "
+                "Each shot has keys scene (integer), scale, angle, role, "
+                "subject and visible_action. "
+                "scale: "+",".join(SCALES)+". angle: "+",".join(ANGLES)+
+                ". role: "+",".join(ROLES)+". "
+                "Each visible_action must be 6-22 English words describing "
+                "a concrete physical action or relationship, no charts or captions. "
+                "Only show facts supported by EACH batch narration below; do not "
+                "invent materials, terrain, galaxies, locations or physical surfaces. "
+                "Avoid repeated composition, viewpoint or actions from earlier shots. "
+                "No text outside JSON.\n"
+                "TITLE: "+str(story.get("title","Documentary"))[:160]+
+                "\nBATCH SCRIPT (local scene numbers):\n"+
                 "\n".join(f"{i}. {item['narration']}"
                           for i,item in enumerate(batch,1))+
-                "\\nPREVIOUS APPROVED SHOTS (must not repeat):\\n"+
+                "\nPREVIOUS APPROVED SHOTS (do not repeat):\n"+
                 json.dumps(prior,ensure_ascii=False)
             )
             if reason is not None:
                 request_text += (
-                    "\\nPREVIOUS BATCH FAILED VALIDATION: "+str(reason)[:500]+
-                    "\\nRegenerate ONLY this batch with corrected, distinct "
+                    "\nPREVIOUS BATCH FAILED VALIDATION: "+str(reason)[:500]+
+                    "\nRegenerate ONLY this batch with corrected, distinct "
                     "and narration-grounded visible actions. Return valid JSON."
                 )
             response = request(MODEL, {"messages":[{"role":"user",
@@ -400,6 +397,11 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                 "temperature":0.1}, account, token)
             try:
                 parsed = parse_reply(_extract_text(response))
+                if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
+                    if len(parsed["shots"]) != len(batch):
+                        raise ValueError("Shot count mismatch: expected "+
+                                         str(len(batch))+", received "+
+                                         str(len(parsed["shots"])))
                 local = validate_plan(parsed,chunk_story)
                 current = [dict(item,scene=start+item["scene"]) for item in local]
                 candidate = accepted+current
