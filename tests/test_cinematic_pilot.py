@@ -55,6 +55,32 @@ class CinematicPilotTests(unittest.TestCase):
                          "account", "token", live=True, generator=fake)
             self.assertEqual(calls, [])
 
+    def test_live_uses_two_reviewers_with_hydrogen_specific_scope(self):
+        from tests.test_vision_gemma import jpeg
+        original=_story()
+        planned=_plan()
+        calls=[]
+        def fake_scout(_img, _narration, _prompt, _account, _token, *, scene_kind):
+            calls.append(scene_kind)
+            return {"decision":"FAIL" if scene_kind=="hydrogen" else "PASS",
+                    "evidence":"The claimed object cannot be established in the pixels."}
+        with tempfile.TemporaryDirectory() as root:
+            with patch.object(cp, "_read_checkpoint", return_value=(planned, 2)), \
+                 patch.object(cp, "validate_plan", return_value=planned), \
+                 patch.object(cp, "check_explicit_story_constraints", return_value=True):
+                result=cp.pilot(
+                    original,Path(root)/"checkpoint",Path(root)/"out",
+                    "account","token",live=True,
+                    generator=lambda *_args: jpeg(),
+                    reviewer=lambda *_args: {"decision":"PASS",
+                          "evidence":"Potentially acceptable image"},
+                    scout_reviewer=fake_scout)
+            self.assertEqual(calls,["orbit","hydrogen","orbit"])
+            self.assertEqual(result["completed_image_requests"],3)
+            self.assertEqual(result["scenes"][1]["independent_review"]["automated_result"],"FAIL")
+            self.assertFalse(result["ready_to_publish"])
+            self.assertFalse(result["youtube_enabled"])
+
     def test_dry_run_preserves_publication_gate(self):
         story = _story()
         with tempfile.TemporaryDirectory() as root:
