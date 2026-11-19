@@ -30,6 +30,52 @@ def jpeg():
          +b"\xff\xd9"+b"\x00"*8)
 
 class ShotPlanTests(unittest.TestCase):
+    def test_camera_collision_resolves_only_new_angles_and_keeps_prefix_frozen(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean currents pull warm water toward northern shores."},
+            {"narration":"Rain falls from clouds over the water surface."},
+            {"narration":"Strong winds bend ocean waves in different directions."},
+            {"narration":"The moon rises as daylight disappears over the ocean."},
+            {"narration":"Seafoam gathers along a breaking coastal wave."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean currents",
+                 "Warm ocean currents flow slowly toward the distant northern coastline."),
+            shot(2,"close","frontal","detail","Falling rain",
+                 "Raindrops splash into the dark seawater beneath thick gray clouds.")]}
+        second={"shots":[
+            shot(1,"wide","side","establish","Wind driven wave",
+                 "A gust of wind bends rolling ocean waves into angled ridges."),
+            shot(2,"extreme_wide","overhead","contrast","Moonlit sea",
+                 "The bright moon rises above the dark water at dusk.")]}
+        last={"shots":[shot(1,"extreme_close","low","consequence","Wave foam",
+                           "White foam gathers around the crest of a breaking wave.")]}
+        replies=[first,{"decision":"PASS","issues":[]},second,
+                 {"decision":"PASS","issues":[]},last,{"decision":"PASS","issues":[]}]
+        def fake(*_args):
+            return {"response":json.dumps(replies.pop(0))}
+        output=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(output),5)
+        self.assertEqual(output[0]["angle"],"side")
+        self.assertNotEqual(output[2]["angle"],"side")
+        self.assertEqual(output[2]["scale"],"wide")
+        self.assertEqual(output[2]["role"],"establish")
+        self.assertEqual(output[2]["visible_action"],
+                         second["shots"][0]["visible_action"])
+
+    def test_camera_tuple_helper_never_overwrites_frozen_accepted_shots(self):
+        frozen=[shot(1,"wide","side","establish","Ocean currents",
+                     "Warm currents flow toward a distant northern shoreline.")]
+        duplicate=shot(2,"wide","side","establish","Ocean wave",
+                       "A broad wind gust bends a rolling seawater wave.")
+        result=planner._fix_only_current_camera_angle_collisions(
+            frozen+[duplicate],len(frozen))
+        self.assertEqual(result[0],frozen[0])
+        self.assertEqual(result[1]["scale"],duplicate["scale"])
+        self.assertEqual(result[1]["role"],duplicate["role"])
+        self.assertNotEqual(result[1]["angle"],duplicate["angle"])
+        self.assertEqual(result[1]["visible_action"],duplicate["visible_action"])
+        self.assertEqual(duplicate["angle"],"side")
+
     def test_three_identical_central_subjects_in_four_scenes_rejected(self):
         story={"scenes":[
             {"narration":"A distant ocean stretches toward the far horizon."},
