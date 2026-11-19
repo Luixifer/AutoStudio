@@ -80,15 +80,48 @@ def validate_plan(plan, story):
     return result
 
 def parse_reply(content):
+    """Accept one complete JSON object, even with a harmless text wrapper.
+
+    Fail closed on truncation, non-object JSON, or multiple objects.
+    Never guess or fill missing model output.
+    """
     if not isinstance(content,str):
         raise ValueError("Shot planner output is not text")
     clean=content.strip()
-    if clean.startswith("```"):
-        clean=re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$","",clean,flags=re.I).strip()
+    if not clean or len(clean)>100_000:
+        raise ValueError("Shot planner returned invalid JSON")
+    fence=chr(96)*3
+    if clean.startswith(fence):
+        clean=clean[len(fence):].strip()
+        if clean.lower().startswith("json"):
+            clean=clean[4:].strip()
+        if clean.endswith(fence):
+            clean=clean[:-len(fence)].strip()
     try:
-        return json.loads(clean)
-    except (ValueError,TypeError) as exc:
-        raise ValueError("Shot planner returned invalid JSON") from exc
+        value=json.loads(clean)
+    except (ValueError,TypeError):
+        decoder=json.JSONDecoder()
+        candidates=[]
+        for index,char in enumerate(clean):
+            if char!="{":
+                continue
+            try:
+                candidate,end=decoder.raw_decode(clean,index)
+            except ValueError:
+                continue
+            if not isinstance(candidate,dict):
+                continue
+            prefix,suffix=clean[:index],clean[end:]
+            if ("{" in prefix or "}" in prefix or
+                    "{" in suffix or "}" in suffix):
+                raise ValueError("Shot planner returned invalid JSON")
+            candidates.append(candidate)
+        if len(candidates)!=1:
+            raise ValueError("Shot planner returned invalid JSON")
+        value=candidates[0]
+    if not isinstance(value,dict):
+        raise ValueError("Shot planner returned invalid JSON")
+    return value
 
 def check_explicit_story_constraints(story, shots):
     """Reject a few *explicit* script contradictions before consulting an LLM.
@@ -397,8 +430,10 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
             if reason is not None:
                 request_text += (
                     "\nPREVIOUS BATCH FAILED VALIDATION: "+str(reason)[:500]+
-                    "\nRegenerate ONLY this batch with corrected, distinct "
-                    "and narration-grounded visible actions. Return valid JSON."
+                    "\nReturn ONLY one COMPLETE JSON object with exactly "+
+                    str(len(batch))+" shots. No prose, markdown, or partial "
+                    "JSON. This is the final bounded retry; never guess "
+                    "unsupported scientific content."
                 )
             if repair_local is not None and previous_batch is not None:
                 request_text = (
