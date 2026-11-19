@@ -1,0 +1,86 @@
+name: AutoStudio - professional shot editorial preflight one-shot
+on:
+  push:
+    branches:
+      - test/strict-editorial-real-live-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: All offline preflight tests
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore old green plan to force verified editorial rewind
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44537027675 --repo "$REPO" --name AutoStudio-Gemma-Structured-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Real Cloudflare text-only preflight under strict editorial policy
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/editorial-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Preserve approved new prefix on any outcome
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Strict-Editorial-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 21
+          if-no-files-found: ignore
+      - name: Preserve full plan only on success
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Strict-Editorial-Plan
+          path: /tmp/editorial-plan.json
+          retention-days: 21
+          if-no-files-found: ignore
+      - name: Publish technical status to issue, NOT YouTube
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          from pathlib import Path
+          import json,os
+          print("### AutoStudio · primera prueba de preproducción con criterio editorial estricto")
+          print("- GitHub Actions:",os.environ["RUN_URL"])
+          print("- Estado:",os.environ["STATUS"])
+          print("- Nuevas imágenes FLUX: 0; publicación: desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas editoriales comprobadas y conservadas:",len(d["accepted_shots"]))
+          else:
+              print("- Ningún bloque nuevo aprobado")
+          p=Path("/tmp/editorial-plan.json")
+          if p.exists():
+              d=json.loads(p.read_text())
+              print("- Plan completo:",len(d["shots"]))
+              for x in d["shots"]:
+                  print("- Escena",x["scene"],x["subject"],"|",x["visible_action"])
+              print("- Ciencia verificada por fuentes externas:",d["scientific_facts_verified"])
+              print("- Listo para publicación:",d["ready_to_publish"])
+          else:
+              print("- Documento todavía incompleto; no autorizar generación de imágenes")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
