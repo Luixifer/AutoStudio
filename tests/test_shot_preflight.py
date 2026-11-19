@@ -211,6 +211,34 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(len(calls),2)
         self.assertIn("previous response could not be parsed",calls[1])
 
+
+    def test_critic_requests_compact_strict_json_with_complete_grounding(self):
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload)
+            return {"response":json.dumps({"decision":"PASS","issues":[]})}
+        self.assertTrue(planner.review_story_consistency(STORY,VALID["shots"],fake,
+                                                          "account","token"))
+        self.assertEqual(len(calls),1)
+        prompt=calls[0]["messages"][0]["content"]
+        self.assertIn("Narration:",prompt)
+        self.assertIn("Shots:",prompt)
+        self.assertIn("Moon's gravity",prompt)
+        self.assertIn("Cloud droplets",prompt)
+        self.assertIn("invented factual",prompt)
+        self.assertEqual(calls[0]["max_tokens"],450)
+
+    def test_compact_critic_second_verdict_still_fails_closed(self):
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return {"response":"The shots seem good."}
+        with self.assertRaisesRegex(ValueError,"invalid verdict"):
+            planner.review_story_consistency(STORY,VALID["shots"],fake,"account","token")
+        self.assertEqual(len(calls),2)
+        self.assertIn("Previous verdict was malformed",calls[1])
+        self.assertIn("Moon's gravity",calls[1])
+
     def test_critic_never_turns_missing_or_invalid_content_into_pass(self):
         for bad in ({"response":""}, {"metadata":{"decision":"PASS","issues":[]}},
                     {"response":'{"decision":"PASS","issues":[{"scene":1,"issue":"Contradiction!"}]}'},
