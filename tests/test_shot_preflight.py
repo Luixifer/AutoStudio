@@ -771,6 +771,56 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(len(prompts),7)
 
 
+
+    def test_explicit_groundless_gas_world_rejects_lava_even_if_negated_in_script(self):
+        story={"title":"Gaseous world","scenes":[
+            {"narration":"Es un planeta enorme compuesto principalmente por gas."},
+            {"narration":"Aqui no hay un suelo de lava, solo una atmosfera gaseosa."}]}
+        shots=[
+            shot(1,"wide","side","establish","Planet and atmosphere",
+                 "A giant gaseous planet fills the frame with visible clouds."),
+            shot(2,"close","frontal","detail","Molten lava layer",
+                 "Molten lava flows over rocky terrain underneath a hot atmosphere.")]
+        with self.assertRaisesRegex(ValueError,"implies lava or rocky"):
+            planner.check_explicit_story_constraints(story,shots)
+        grounded=[shots[0],shot(2,"close","frontal","detail",
+                 "Atmospheric gas","Gas moves within the thick atmospheric layers of the giant planet.")]
+        self.assertTrue(planner.check_explicit_story_constraints(story,grounded))
+
+    def test_explicit_no_lava_error_repairs_only_global_offender(self):
+        story={"title":"Gas","scenes":[
+            {"narration":"A giant gaseous planet orbits a bright star."},
+            {"narration":"The star shines onto its atmosphere."},
+            {"narration":"There is no solid ground on this gas giant."},
+            {"narration":"Heat passes through its thick atmosphere."},
+            {"narration":"No solid surface or lava exists anywhere on this gas giant."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Gas planet and star",
+                 "A giant gaseous planet orbits a bright nearby star."),
+            shot(2,"close","frontal","detail","Atmospheric illumination",
+                 "Light from the nearby star strikes the gaseous atmosphere.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Gaseous atmosphere",
+                 "Layers of atmospheric gas move around the giant planet."),
+            shot(2,"extreme_wide","overhead","contrast","Gas motion",
+                 "Warm gas flows across the giant planet's upper atmosphere.")]}
+        third={"shots":[shot(1,"extreme_close","low","consequence",
+                             "Lava surface","Molten lava appears beneath thick gas layers on the planet.")]}
+        patch={"subject":"Gas planet outer atmosphere",
+               "visible_action":"Thick atmospheric gas surrounds the planet without any solid features."}
+        replies=[first,{"decision":"PASS","issues":[]},
+                 second,{"decision":"PASS","issues":[]},third,
+                 patch,{"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(replies.pop(0))}
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(result),5)
+        self.assertEqual(result[4]["visible_action"],patch["visible_action"])
+        self.assertEqual(result[3]["visible_action"],second["shots"][1]["visible_action"])
+        self.assertIn("implies lava or rocky",prompts[5])
+
     def test_grounding_critic_fail_repairs_only_offending_shot(self):
         story={"title":"Planet documentary","scenes":[
             {"narration":"A gaseous giant planet circles a nearby star."},

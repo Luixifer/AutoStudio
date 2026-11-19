@@ -154,6 +154,14 @@ def check_explicit_story_constraints(story, shots):
         subject=str(shot.get("subject","")).lower()
         action=str(shot.get("visible_action","")).lower()
         if describes_gas_world and denies_ground and "star" not in subject and "estrella" not in subject:
+            # An explicitly groundless gas planet cannot acquire lava,
+            # molten rock, a crust or rocky terrain just because the script
+            # mentions those objects in a NEGATED sentence.
+            if re.search(r"\b(?:lava|molten (?:rock|ground)|rocky (?:surface|crust|terrain)|solid crust)\b",
+                         subject+" "+action):
+                raise ValueError(
+                    f"Scene {shot['scene']} implies lava or rocky terrain on a gaseous subject, "
+                    "contradicting an explicit no-ground script")
             if re.search(r"\b(?:solid surface|hot surface|rocky ground|terrain|rocky landscape|lava ground)\b",action):
                 raise ValueError(
                     f"Scene {shot['scene']} implies solid ground or terrain on a gaseous subject, "
@@ -683,6 +691,15 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     str(exc))
                 if grounding and local_index is None:
                     local_index = int(grounding.group(1))
+                # Localize a deterministic contradiction using the absolute
+                # scene number. Previously this fell back to rewriting the
+                # whole batch, often preserving the forbidden surface.
+                contradiction = re.search(
+                    r"^Scene (\d+) (?:implies|introduces)\b", str(exc))
+                if contradiction and local_index is None:
+                    global_scene = int(contradiction.group(1))
+                    if start < global_scene <= start+len(batch):
+                        local_index = global_scene-start
                 repeated = re.search(
                     r"^Near-duplicate visible action in scenes (\d+) and (\d+);",
                     str(exc))
