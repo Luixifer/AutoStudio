@@ -71,6 +71,41 @@ def parse_reply(content):
     except (ValueError,TypeError) as exc:
         raise ValueError("Shot planner returned invalid JSON") from exc
 
+def check_explicit_story_constraints(story, shots):
+    """Reject a few *explicit* script contradictions before consulting an LLM.
+
+    These are narrow general semantic safeguards, not an attempt to infer
+    comprehensive scientific truth or KELT-specific scene scripts.
+    """
+    scenes=_scene_list(story)
+    full=" ".join(s["narration"] for s in scenes).lower()
+    # Distinguish an explicit no-ground gaseous world from a star whose
+    # surface may legitimately be discussed in the same documentary.
+    describes_gas_world=bool(re.search(
+        r"(?:mundo gaseoso|planeta[^.]{0,100}(?:gas|gaseoso)|gaseous planet|gas giant)",
+        full))
+    denies_ground=bool(re.search(
+        r"(?:no hay (?:un )?suelo|sin superficie s[oó]lida|no solid (?:surface|ground)|without solid ground)",
+        full))
+    unsupported_materials={
+        "dust":("dust","polvo"),
+        "galaxy":("galaxy","galaxia"),
+    }
+    for shot in shots:
+        subject=str(shot.get("subject","")).lower()
+        action=str(shot.get("visible_action","")).lower()
+        if describes_gas_world and denies_ground and "star" not in subject and "estrella" not in subject:
+            if re.search(r"\b(?:solid surface|hot surface|rocky ground|terrain|rocky landscape|lava ground)\b",action):
+                raise ValueError(
+                    f"Scene {shot['scene']} implies solid ground or terrain on a gaseous subject, "
+                    "contradicting an explicit no-ground script")
+        for term,(english,spanish) in unsupported_materials.items():
+            if (re.search(r"\b"+(r"dust(?:y)?" if term=="dust" else re.escape(english))+r"\b",action)
+                    and english not in full and spanish not in full):
+                raise ValueError(
+                    f"Scene {shot['scene']} introduces unsupported {term}, absent from the narration")
+    return True
+
 def review_story_consistency(story, shots, request, account, token):
     """Independent TEXT-only cross-scene reviewer; no scientific certification.
 
@@ -182,6 +217,7 @@ def build_plan(story,request,account,token):
         last_reply=_extract_text(response)
         try:
             shots=validate_plan(parse_reply(last_reply),story)
+            check_explicit_story_constraints(story, shots)
             review_story_consistency(story, shots, request, account, token)
             return shots
         except ValueError as exc:
