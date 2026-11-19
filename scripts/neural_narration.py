@@ -27,7 +27,7 @@ def words_from_phonemes(text,spoken):
     return result
 
 class NeuralNarrator:
-    def __init__(self,directory=None):
+    def __init__(self,directory=None,voice='ef_dora'):
         import numpy as np
         import onnxruntime as rt
         import espeakng_loader
@@ -44,14 +44,16 @@ class NeuralNarrator:
         session=rt.InferenceSession(str(directory/'kokoro-v1.0.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
         self.engine=Kokoro.from_session(session,str(directory/'voices-v1.0.bin'),EspeakConfig(lib_path=espeakng_loader.get_library_path(),data_path=espeakng_loader.get_data_path()))
         if not self.engine.has_timings:raise RuntimeError('Model has no durations; no fallback to estimated subtitles.')
-        if 'ef_dora' not in self.engine.get_voices():raise RuntimeError('Requested Spanish voice absent.')
+        if voice not in ('ef_dora','em_alex','em_santa'):raise ValueError('Unsupported Spanish Kokoro voice.')
+        if voice not in self.engine.get_voices():raise RuntimeError('Requested Spanish voice absent.')
+        self.voice=voice
     def synthesize(self,text,target):
         import numpy as np
-        audio,rate,spoken=self.engine.create_timed(text,voice='ef_dora',lang='es',speed=.88,trim=True,sentence_pause=.18,clause_pause=.07)
+        audio,rate,spoken=self.engine.create_timed(text,voice=self.voice,lang='es',speed=.88,trim=True,sentence_pause=.18,clause_pause=.07)
         words=words_from_phonemes(text,spoken)
         if not np.all(np.isfinite(audio)) or not len(audio):raise ValueError('Invalid neural audio.')
         if words[-1]['end']>len(audio)/rate+.01:raise ValueError('Timings extend beyond actual audio.')
         target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
         with wave.open(str(target),'wb') as f:
             f.setnchannels(1);f.setsampwidth(2);f.setframerate(rate);f.writeframes((np.clip(audio,-1,1)*32767).astype('<i2').tobytes())
-        return {'engine':'Kokoro ONNX 0.6.1, local CPU','model':'Kokoro 82M v1.0','voice':'ef_dora','locale_requested':'es-ES','phonemizer_language':'es (Castilian Spanish)','speed':.88,'sample_rate':rate,'timing_method':'model phoneme durations mapped at explicit word boundaries','words':words,'model_sha256':self.hashes,'accent_reviewed_by_human':False,'paid_inference_api':False}
+        return {'engine':'Kokoro ONNX 0.6.1, local CPU','model':'Kokoro 82M v1.0','voice':self.voice,'locale_requested':'es-ES','phonemizer_language':'es (Castilian Spanish)','speed':.88,'sample_rate':rate,'timing_method':'model phoneme durations mapped at explicit word boundaries','words':words,'model_sha256':self.hashes,'accent_reviewed_by_human':False,'paid_inference_api':False}
