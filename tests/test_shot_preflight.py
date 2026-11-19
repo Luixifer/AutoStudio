@@ -1,0 +1,108 @@
+"""Story-wide visual shot preflight: fail before FLUX, generic across topics."""
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+from scripts import shot_preflight as planner
+from scripts import visual_autopilot as auto
+
+STORY={"schema":3,"title":"Tides and clouds","scenes":[
+    {"narration":"The Moon's gravity drives Earth's rising ocean tides."},
+    {"narration":"Water evaporates from the ocean and rises into the atmosphere."},
+    {"narration":"Water vapor condenses into droplets inside moving clouds."}]}
+
+def shot(i,scale,angle,role,subject,action):
+    return {"scene":i,"scale":scale,"angle":angle,"role":role,
+            "subject":subject,"visible_action":action}
+
+VALID={"shots":[
+    shot(1,"wide","overhead","establish","Earth and ocean tides",
+         "The ocean shoreline is visible from an orbital distance."),
+    shot(2,"medium","side","process","Water above the ocean",
+         "Water vapor rises upward from a sea surface."),
+    shot(3,"close","frontal","detail","Cloud droplets in atmosphere",
+         "Tiny droplets gather as vapor condenses into cloud formations.")]}
+
+def jpeg():
+    return (b"\xff\xd8\xff\xc0\x00\x11\x08"
+         +(512).to_bytes(2,"big")*2+b"\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00"
+         +b"\xff\xd9"+b"\x00"*8)
+
+class ShotPlanTests(unittest.TestCase):
+    def test_validates_unique_compositions_and_preserves_scene_order(self):
+        result=planner.validate_plan(VALID,STORY)
+        self.assertEqual(len(result),3)
+        self.assertEqual(result[1]["role"],"process")
+        self.assertIn("overhead",planner.shot_context(result[0]))
+
+    def test_repetition_and_wrong_scene_count_fail_before_generation(self):
+        duplicate=json.loads(json.dumps(VALID))
+        duplicate["shots"][1]["scale"]="wide"
+        duplicate["shots"][1]["angle"]="overhead"
+        duplicate["shots"][1]["role"]="establish"
+        with self.assertRaisesRegex(ValueError,"Repeated"):
+            planner.validate_plan(duplicate,STORY)
+        with self.assertRaisesRegex(ValueError,"number"):
+            planner.validate_plan({"shots":VALID["shots"][:2]},STORY)
+
+    def test_parse_code_fence_and_schema_fail_closed(self):
+        result=planner.parse_reply("```json\n"+json.dumps(VALID)+"\n```")
+        self.assertEqual(len(planner.validate_plan(result,STORY)),3)
+        with self.assertRaisesRegex(ValueError,"invalid JSON"):
+            planner.parse_reply("Certainly, here are ten shots.")
+
+    def test_build_plan_is_one_text_call_and_has_no_topic_templates(self):
+        calls=[]
+        def fake_request(model,payload,account,token):
+            calls.append((model,payload))
+            return {"response":json.dumps(VALID)}
+        result=planner.build_plan(STORY,fake_request,"a"*32,"test")
+        self.assertEqual(len(result),3)
+        self.assertEqual(len(calls),1)
+        text=calls[0][1]["messages"][0]["content"]
+        self.assertIn("The Moon's gravity",text)
+        self.assertIn("Water vapor",text)
+        self.assertNotIn("KELT-9b",text)
+
+    def test_invalid_plan_issues_no_flux_requests(self):
+        with tempfile.TemporaryDirectory() as t:
+            path=Path(t)/"story.json"
+            path.write_text(json.dumps(STORY))
+            flux=[]
+            with patch.dict("os.environ",{"CLOUDFLARE_ACCOUNT_ID":"a"*32,
+                                       "CLOUDFLARE_API_TOKEN":"test"}):
+                with self.assertRaisesRegex(ValueError,"Repeated"):
+                    auto.run(path,Path(t)/"out",live=True,max_attempts=1,request_budget=3,
+                        shot_planner=lambda *args:planner.validate_plan(
+                            {"shots":[VALID["shots"][0]]*3},STORY),
+                        director=lambda *a:"A scientifically plausible image of the Earth and ocean.",
+                        generator=lambda *a:flux.append(1))
+            self.assertEqual(flux,[])
+            report=json.loads((Path(t)/"out"/"visual-supervision-manifest.json").read_text())
+            self.assertEqual(report["completed_requests"],0)
+
+    def test_valid_plan_drives_all_scene_prompts_without_extra_flux(self):
+        with tempfile.TemporaryDirectory() as t:
+            path=Path(t)/"story.json"
+            path.write_text(json.dumps(STORY))
+            prompts=[]
+            def director(narration,title,previous,account,token):
+                prompts.append(previous)
+                return "A scientific exterior view with an accurately depicted ocean and atmospheric layer."
+            def vision(image,narration,prompt,account,token):
+                return {"decision":"PASS","evidence":"A unique scientific scene of water and atmospheric activity."}
+            with patch.dict("os.environ",{"CLOUDFLARE_ACCOUNT_ID":"a"*32,
+                                       "CLOUDFLARE_API_TOKEN":"test"}):
+                result=auto.run(path,Path(t)/"out",live=True,max_attempts=1,request_budget=3,
+                                shot_planner=lambda *a:planner.validate_plan(VALID,STORY),
+                                director=director,generator=lambda *a:jpeg(),vision=vision)
+            self.assertTrue(result["preflight_validated"])
+            self.assertEqual(len(prompts),3)
+            self.assertIn("overhead",prompts[0])
+            self.assertIn("process",prompts[1])
+            self.assertIn("detail",prompts[2])
+            self.assertEqual(result["completed_requests"],3)
+
+if __name__=="__main__":
+    unittest.main()
