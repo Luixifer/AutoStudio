@@ -18,9 +18,13 @@ jobs:
         run: |
           python -m pip install Pillow imageio-ffmpeg
       - name: Test scene geometry before rendering
-        run: python -m unittest tests.test_procedural_orbit -v
+        run: python -m unittest tests.test_procedural_orbit tests.test_procedural_molecule -v
       - name: Render actual short H264 preview
         run: python -m scripts.procedural_orbit --out /tmp/orbit-preview
+      - name: Render real dissociation and recombination motion
+        run: |
+          python -m scripts.procedural_molecule --mode dissociation --out /tmp/orbit-preview
+          python -m scripts.procedural_molecule --mode recombination --out /tmp/orbit-preview
       - name: Verify real decoded video and manifest
         run: |
           python - <<'PY'
@@ -42,7 +46,20 @@ jobs:
           assert abs(meta['fps']-24)<0.01,meta
           decoded=sum(1 for _ in reader)
           assert decoded==120,decoded
-          print('PASS: 120 actual decoded video frames, 1280x720, 24fps and verified hash')
+          for mode in ('dissociation','recombination'):
+              path=root/f'hydrogen-{mode}.mp4'
+              assert path.is_file()
+              metadata=json.loads((root/f'hydrogen-{mode}-manifest.json').read_text())
+              assert metadata['frames']==120
+              assert metadata['sha256']==hashlib.sha256(path.read_bytes()).hexdigest()
+              assert not metadata['electron_stripping_depicted']
+              assert not metadata['ready_to_publish']
+              stream=imageio_ffmpeg.read_frames(str(path))
+              head=next(stream)
+              assert head['size']==(1280,720)
+              assert sum(1 for _ in stream)==120
+          print('PASS: three actual decoded H264 clips, each 120 frames, 1280x720 at 24fps')
+
           PY
       - name: Archive MP4, still and manifest, never publish
         if: ${{ always() }}
@@ -53,5 +70,8 @@ jobs:
             /tmp/orbit-preview/orbit-preview.mp4
             /tmp/orbit-preview/orbit-first-frame.jpg
             /tmp/orbit-preview/orbit-manifest.json
+            /tmp/orbit-preview/hydrogen-*.mp4
+            /tmp/orbit-preview/hydrogen-*.jpg
+            /tmp/orbit-preview/hydrogen-*-manifest.json
           retention-days: 14
           if-no-files-found: warn
