@@ -1,0 +1,144 @@
+name: AutoStudio · Finalizar KELT-9b con imagenes guardadas
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/kelt9b-last-scene-2026-11-19.txt'
+  pull_request:
+    paths:
+      - 'scripts/recover_supervised_images.py'
+      - 'tests/test_recover_supervised_images.py'
+      - '.github/workflows/finish-kelt-scene1.yml'
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  finish-kelt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: development
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e722cf94007e326fd6a4537ad57ebbc60b43faa9
+          path: engine
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Probar integridad y recuperacion sin Cloudflare
+        working-directory: development
+        run: |
+          python -m unittest tests.test_recover_supervised_images tests.test_stage_supervised tests.test_vision_gemma -v
+          python -m py_compile scripts/recover_supervised_images.py
+      - name: Recuperar las DIEZ imágenes ya existentes (nueva generacion 0)
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p original-recovered
+          gh run download 44479983730 --repo "$GITHUB_REPOSITORY" \
+            --name "AutoStudio-KELT9b-Recuperacion-Supervisada" --dir original-recovered
+          find original-recovered -maxdepth 4 -name visual-supervision-manifest.json -print
+          test "$(find original-recovered -name visual-supervision-manifest.json | wc -l)" -eq 1
+          echo "SOURCE_MANIFEST=$(find original-recovered -name visual-supervision-manifest.json)" >> "$GITHUB_ENV"
+      - name: Revisar ÚNICAMENTE la escena 1 con Gemma 4
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: development
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.recover_supervised_images \
+            --manifest "../$SOURCE_MANIFEST" --out ../all-approved-art \
+            --scenes 10 --retry-scenes 1
+      - name: Preparar las diez imágenes aprobadas para el motor de vídeo
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: development
+        run: |
+          python -m scripts.stage_supervised \
+            --storyboard ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --manifest ../all-approved-art/visual-supervision-manifest.json \
+            --out ../reviewed-storyboard
+      - name: Instalar FFmpeg y voz Álex
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Renderizar documental 60 FPS y verificar QA técnico
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: engine
+        run: |
+          python -m scripts.personal_prepare ../reviewed-storyboard/storyboard.json --out ../prepared
+          python -m scripts.personal_editor ../prepared/input/studio-ready.json --out ../final-render
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("../final-render/quality-report.json").read_text(encoding="utf-8"))
+          assert q["technical_passed"] and not q["ready_to_publish"] and not q["youtube_enabled"]
+          assert Path("../final-render/autostudio-personal-REVIEW.mp4").stat().st_size>100_000
+          print("KELT9B_ALL_SCENES_VIDEO_OK",q["sha256"])
+          PY
+      - name: Guardar pruebas, imágenes y vídeo, sin publicación
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-KELT9b-10-Escenas-Recuperadas
+          path: |
+            all-approved-art/recovery-report.json
+            all-approved-art/visual-supervision-manifest.json
+            all-approved-art/*.jpg
+            all-approved-art/*.png
+            reviewed-storyboard/storyboard.json
+            reviewed-storyboard/image-staging-report.json
+            final-render/autostudio-personal-REVIEW.mp4
+            final-render/quality-report.json
+            final-render/contacto-planos.jpg
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Dejar resultado automático en GitHub Issue 20
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RESULT: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python - <<'PY' > /tmp/final-kelt-report.md
+          import os,json
+          from pathlib import Path
+          print("### KELT-9b · Última escena y documental sin regenerar imágenes")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Trabajo:",os.environ["RESULT"])
+          print("- Nuevas imágenes FLUX: **0**")
+          p=Path("all-approved-art/recovery-report.json")
+          if p.exists():
+              d=json.loads(p.read_text(encoding="utf-8"))
+              print("- Escenas IA aprobadas:",d.get("approved_scenes"),"/",d.get("total_scenes"))
+              print("- Revisiones adicionales:",d.get("reinspection_requests"))
+              v=json.loads(Path("all-approved-art/visual-supervision-manifest.json").read_text(encoding="utf-8"))
+              x=v["scenes"][0]["candidates"][0]["vision"]
+              print("- Escena 1:",x.get("decision"),"-",str(x.get("evidence","")).replace("\n"," ")[:200])
+          else:
+              print("- Informe de revisión: no creado")
+          q=Path("final-render/quality-report.json")
+          if q.exists():
+              qa=json.loads(q.read_text(encoding="utf-8"))
+              print("- QA técnico del MP4:",qa.get("technical_passed"))
+              print("- Vídeo:", "autostudio-personal-REVIEW.mp4" if qa.get("technical_passed") else "no aprobado")
+              print("- Listo para publicar automáticamente:",False)
+          else:
+              print("- MP4: pendiente/no generado")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/final-kelt-report.md
