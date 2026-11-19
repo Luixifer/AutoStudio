@@ -20,11 +20,11 @@ def parse_scout(answer):
     if not isinstance(answer, str):
         answer = ""
     patterns = {
-        key: re.findall(r"(?im)^\\s*" + key +
-                        r":\\s*(PASS|FAIL|UNSURE|YES|NO)\\s*$", answer)
+        key: re.findall(r"(?im)^\s*" + key +
+                        r":\s*(PASS|FAIL|UNSURE|YES|NO)\s*$", answer)
         for key in ("DECISION", "STAR", "GAS_PLANET")
     }
-    evidence = re.findall(r"(?im)^\\s*EVIDENCE:\\s*(.{12,350})\\s*$", answer)
+    evidence = re.findall(r"(?im)^\s*EVIDENCE:\s*(.{12,350})\s*$", answer)
     if (len(patterns["DECISION"]) != 1 or not evidence or
             len(evidence) != 1 or patterns["DECISION"][0] not in _ALLOWED):
         return {"decision": "UNSURE", "evidence": "Unparseable Scout verdict.",
@@ -59,12 +59,12 @@ def evaluate_scout(image_bytes, narration, expected_visual, account, token):
         "star from the caption, prompt or generic space aesthetic. "
         "If one object is missing or visibly wrong mark FAIL. "
         "If uncertain, UNSURE, never PASS. "
-        "Answer EXACTLY four lines:\\n"
-        "STAR: YES or NO or UNSURE\\n"
-        "GAS_PLANET: YES or NO or UNSURE\\n"
-        "DECISION: PASS or FAIL or UNSURE\\n"
-        "EVIDENCE: a concrete visible observation (12-200 characters).\\n"
-        "Original narration: " + narration[:520] + "\\n"
+        "Answer EXACTLY four lines:\n"
+        "STAR: YES or NO or UNSURE\n"
+        "GAS_PLANET: YES or NO or UNSURE\n"
+        "DECISION: PASS or FAIL or UNSURE\n"
+        "EVIDENCE: a concrete visible observation (12-200 characters).\n"
+        "Original narration: " + narration[:520] + "\n"
         "Desired visual (not evidence): " + expected_visual[:700]
     )
     response = _request(SCOUT_MODEL, {
