@@ -1,0 +1,5 @@
+# Optional offline speech/audio QA. Never installed on the standard render job.
+# Both models execute on CPU; downloaded weights are cached by the CI workflow.
+faster-whisper==1.2.1
+silero-vad[onnx-cpu]==6.2.3
+numpy>=2.1,<3
