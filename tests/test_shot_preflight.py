@@ -63,13 +63,14 @@ class ShotPlanTests(unittest.TestCase):
 
     def test_bounded_plan_repair_before_any_image_generation(self):
         calls=[]
-        answers=[{"response":"not JSON"},{"response":json.dumps(VALID)}]
+        answers=[{"response":"not JSON"},{"response":json.dumps(VALID)},
+                 {"response":json.dumps({"decision":"PASS","issues":[]})}]
         def model(*args):
             calls.append(args)
             return answers.pop(0)
         result=planner.build_plan(STORY,model,"a"*32,"test")
         self.assertEqual(len(result),3)
-        self.assertEqual(len(calls),2)
+        self.assertEqual(len(calls),3)
         self.assertIn("PREVIOUS PLAN REJECTED",calls[1][1]["messages"][0]["content"])
 
     def test_invalid_twice_fails_closed(self):
@@ -81,18 +82,50 @@ class ShotPlanTests(unittest.TestCase):
             planner.build_plan(STORY,model,"a"*32,"test")
         self.assertEqual(len(calls),2)
 
-    def test_build_plan_is_one_text_call_and_has_no_topic_templates(self):
+    def test_build_plan_runs_a_separate_narration_consistency_review(self):
         calls=[]
         def fake_request(model,payload,account,token):
             calls.append((model,payload))
-            return {"response":json.dumps(VALID)}
+            if len(calls)==1:
+                return {"response":json.dumps(VALID)}
+            return {"response":json.dumps({"decision":"PASS","issues":[]})}
         result=planner.build_plan(STORY,fake_request,"a"*32,"test")
         self.assertEqual(len(result),3)
-        self.assertEqual(len(calls),1)
+        self.assertEqual(len(calls),2)
+        self.assertIn("consistency reviewer",calls[1][1]["messages"][0]["content"])
         text=calls[0][1]["messages"][0]["content"]
         self.assertIn("The Moon's gravity",text)
         self.assertIn("Water vapor",text)
         self.assertNotIn("KELT-9b",text)
+
+    def test_grounding_failure_repairs_entire_shot_list_once(self):
+        calls=[]
+        answers=[
+            {"response":json.dumps(VALID)},
+            {"response":json.dumps({"decision":"FAIL","issues":[
+                {"scene":1,"issue":"An unsupported physical surface appears in the shot."}]})},
+            {"response":json.dumps(VALID)},
+            {"response":json.dumps({"decision":"PASS","issues":[]})}]
+        def model(*args):
+            calls.append(args)
+            return answers.pop(0)
+        shotlist=planner.build_plan(STORY,model,"a"*32,"test")
+        self.assertEqual(len(shotlist),3)
+        self.assertEqual(len(calls),4)
+        self.assertIn("unsupported physical surface",calls[2][1]["messages"][0]["content"])
+
+    def test_grounding_failure_twice_blocks_all_generation(self):
+        calls=[]
+        fail={"response":json.dumps({"decision":"FAIL","issues":[
+            {"scene":1,"issue":"Unsupported geographic setting for the first scene."}]})}
+        outputs=[{"response":json.dumps(VALID)},fail,
+                 {"response":json.dumps(VALID)},fail]
+        def model(*args):
+            calls.append(args)
+            return outputs.pop(0)
+        with self.assertRaisesRegex(ValueError,"failed preflight twice"):
+            planner.build_plan(STORY,model,"a"*32,"test")
+        self.assertEqual(len(calls),4)
 
     def test_invalid_plan_issues_no_flux_requests(self):
         with tempfile.TemporaryDirectory() as t:
