@@ -88,14 +88,14 @@ class ShotPlanTests(unittest.TestCase):
         story={"scenes":[{"narration":
             "Ionization removes electrons from atmospheric atoms under strong radiation."}]}
         shotdata=[shot(1,"wide","side","process","Ionized atmospheric gas",
-                       "Radiation removes electrons from the atmospheric gas atoms.")]}
+                       "Radiation removes electrons from the atmospheric gas atoms.")]
         self.assertTrue(planner.check_explicit_story_constraints(story,shotdata))
 
     def test_other_gas_processes_not_mistaken_for_ionization(self):
         story={"scenes":[{"narration":
             "Heat splits hydrogen molecules into separate atoms of hydrogen."}]}
         shotdata=[shot(1,"wide","side","process","Hydrogen molecules",
-                       "Hydrogen molecules separate into individual atoms inside the gas.")]}
+                       "Hydrogen molecules separate into individual atoms inside the gas.")]
         self.assertTrue(planner.check_explicit_story_constraints(story,shotdata))
 
     def test_three_identical_central_subjects_in_four_scenes_rejected(self):
