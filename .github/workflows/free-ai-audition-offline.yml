@@ -6,6 +6,11 @@ on:
       - "scripts/free_ai_audition.py"
       - "tests/test_free_ai_audition.py"
       - ".github/workflows/free-ai-audition-offline.yml"
+  pull_request:
+    paths:
+      - "scripts/free_ai_audition.py"
+      - "tests/test_free_ai_audition.py"
+      - ".github/workflows/free-ai-audition-offline.yml"
   workflow_dispatch:
 permissions:
   contents: read
