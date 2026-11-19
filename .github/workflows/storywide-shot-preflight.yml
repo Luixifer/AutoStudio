@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'triggers/science-grounded-shot-preflight-2026-11-19.txt'
+  push:
+    branches: [main]
+    paths:
       - 'triggers/narration-critic-calibrated-2026-11-19.txt'
   pull_request:
     paths:
