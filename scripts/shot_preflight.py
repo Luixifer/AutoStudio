@@ -502,7 +502,7 @@ def _read_checkpoint(path, story, token):
             check_explicit_story_constraints(story, checked)
         except ValueError as exc:
             contradicted = re.match(
-                r"^Scene (\\d+) (?:implies|introduces)\\b", str(exc))
+                r"^Scene (\d+) (?:implies|introduces)\b", str(exc))
             if not contradicted:
                 raise
             first_invalid = int(contradicted.group(1))
