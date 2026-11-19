@@ -52,6 +52,25 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(report["scenes"][1]["candidates"][0]["vision"]["decision"],"PASS")
         self.assertEqual(report["scenes"][0]["candidates"][0]["original_vision"]["decision"],"UNSURE")
 
+    def test_only_scene_one_rechecked_after_scene_ten_approved(self):
+        self.scenes[9]["approved"]=True
+        self.scenes[9]["status"]="approved"
+        self.scenes[9]["candidates"][0]["status"]="approved"
+        self.scenes[9]["candidates"][0]["vision"]={
+            "decision":"PASS","evidence":"Gaseous atmosphere visible"}
+        self.write()
+        inspected=[]
+        def vision(image,narration,prompt,account,token):
+            inspected.append(narration)
+            return {"decision":"PASS","evidence":"Gas globe and luminous star visible"}
+        result=recover(self.manifest,self.root/"final",
+            account="a"*32,token="test",reviewer=vision,
+            allowed_retry_scenes=(1,))
+        self.assertEqual(len(inspected),1)
+        self.assertTrue(result["all_scenes_approved"])
+        self.assertEqual(result["new_image_requests"],0)
+        self.assertEqual(result["reinspection_requests"],1)
+
     def test_unsure_remains_blocked_with_all_images_preserved(self):
         def vision(*a):
             return {"decision":"UNSURE","evidence":"No usable model output"}
