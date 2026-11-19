@@ -25,6 +25,8 @@ on:
       - 'tests/test_recheck_visual_artifact.py'
       - 'scripts/visual_distinctness.py'
       - 'tests/test_visual_distinctness.py'
+      - 'scripts/shot_preflight.py'
+      - 'tests/test_shot_preflight.py'
       - '.github/workflows/supervised-kelt-video.yml'
 permissions:
   contents: read
@@ -55,8 +57,8 @@ jobs:
       - name: Comprobar tests del director y supervisor sin consumir cuota
         working-directory: development
         run: |
-          python -m unittest tests.test_image_generation tests.test_image_staging tests.test_visual_autopilot tests.test_stage_supervised tests.test_visual_diagnostics tests.test_vision_gemma tests.test_recheck_visual_artifact tests.test_visual_distinctness -v
-          python -m py_compile scripts/visual_autopilot.py scripts/stage_supervised.py scripts/vision_gemma.py scripts/visual_distinctness.py
+          python -m unittest tests.test_image_generation tests.test_image_staging tests.test_visual_autopilot tests.test_stage_supervised tests.test_visual_diagnostics tests.test_vision_gemma tests.test_recheck_visual_artifact tests.test_visual_distinctness tests.test_shot_preflight -v
+          python -m py_compile scripts/visual_autopilot.py scripts/stage_supervised.py scripts/vision_gemma.py scripts/visual_distinctness.py scripts/shot_preflight.py
       - name: Planificacion automática del guion, creación y análisis visual
         working-directory: development
         env:
