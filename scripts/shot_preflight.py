@@ -46,7 +46,7 @@ def validate_plan(plan, story):
         # shot. Demand an observable relationship/action before any generation.
         if not isinstance(action,str) or not 16<=len(action)<=200 or not 6<=len(action.split())<=MAX_WORDS:
             raise ValueError("Shot visible_action must describe a concrete observable scene in 6-22 words")
-        if re.search(r"\\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\\b", action, re.I):
+        if re.search(r"\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\b", action, re.I):
             raise ValueError("Abstract visual shorthand is not an image-generation shot")
         if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",subject+" "+action,re.I):
             raise ValueError("Plan contains forbidden graphic content")
