@@ -458,12 +458,28 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
             try:
                 parsed = parse_reply(_extract_text(response))
                 if repair_local is not None:
-                    if (not isinstance(parsed,dict) or
-                        set(parsed)!={"subject","visible_action"} or
-                        not all(isinstance(parsed[k],str) for k in parsed)):
+                    original=previous_batch["shots"][repair_local-1]
+                    # Some models repeat the original shot's metadata instead
+                    # of returning only the two requested fields. Accept that
+                    # redundant wrapper ONLY if all frozen metadata matches.
+                    if isinstance(parsed,dict) and set(parsed)=={"shots"}:
+                        arr=parsed["shots"]
+                        if not isinstance(arr,list) or len(arr)!=1:
+                            raise ValueError("Single-shot batch repair returned invalid fields")
+                        parsed=arr[0]
+                    if not isinstance(parsed,dict):
+                        raise ValueError("Single-shot batch repair returned invalid fields")
+                    frozen={"scene","scale","angle","role"}
+                    editable={"subject","visible_action"}
+                    if (not editable.issubset(parsed) or
+                        set(parsed)-editable-frozen or
+                        any(parsed.get(k)!=original[k]
+                            for k in frozen if k in parsed) or
+                        not all(isinstance(parsed[k],str) for k in editable)):
                         raise ValueError("Single-shot batch repair returned invalid fields")
                     repaired = {"shots":[dict(item) for item in previous_batch["shots"]]}
-                    repaired["shots"][repair_local-1].update(parsed)
+                    repaired["shots"][repair_local-1].update({
+                        key:parsed[key] for key in editable})
                     parsed = repaired
                 if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
                     if len(parsed["shots"]) != len(batch):
