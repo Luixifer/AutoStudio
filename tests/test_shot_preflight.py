@@ -378,7 +378,8 @@ class ShotPlanTests(unittest.TestCase):
             shot(1,"medium","high","process","Ocean mist","mist"),
             shot(2,"extreme_wide","overhead","contrast","Wind-driven waves",
                  "Wind pushes small wave crests across an open sea.")]}
-        patch={"subject":"Ocean mist rising upward",
+        patch={"scene":1,"scale":"medium","angle":"high","role":"process",
+               "subject":"Ocean mist rising upward",
                "visible_action":"A thin layer of ocean mist rises from warm coastal water."}
         batch3={"shots":[shot(1,"extreme_close","low","consequence","Sea foam",
                               "Foam gathers along the edge of a shallow ocean wave.")]}
@@ -394,6 +395,23 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(result[2]["visible_action"],patch["visible_action"])
         self.assertEqual(result[3]["visible_action"],batch2["shots"][1]["visible_action"])
         self.assertIn("Fix ONLY the subject",calls[3])
+
+    def test_full_shot_repair_cannot_change_frozen_camera_metadata(self):
+        story={"scenes":[
+            {"narration":"Clouds float across the ocean over the summer season."}
+            for _ in range(5)]}
+        batch={"shots":[
+            shot(1,"wide","side","establish","Ocean clouds","clouds"),
+            shot(2,"close","frontal","detail","Ocean cloud edge",
+                 "A long white cloud moves over the sea surface.")]}
+        patch={"scene":1,"scale":"close","angle":"side","role":"establish",
+               "subject":"Clouds over water",
+               "visible_action":"Clouds drift above the distant ocean water below."}
+        replies=[batch,patch]
+        def fake(*args):
+            return {"response":json.dumps(replies.pop(0))}
+        with self.assertRaisesRegex(ValueError,"Single-shot batch repair returned invalid fields"):
+            planner.build_plan(story,fake,"account","token")
 
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
