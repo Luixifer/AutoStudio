@@ -595,6 +595,76 @@ class ShotPlanTests(unittest.TestCase):
             self.assertEqual(len(calls),2)
             self.assertEqual(len(planner._read_checkpoint(cp,story,"secret")[0]),4)
 
+
+    def test_signed_old_prefix_rewinds_before_newly_disallowed_lava(self):
+        story={"title":"Gas world","scenes":[
+            {"narration":"A huge gaseous planet orbits a bright nearby star."},
+            {"narration":"Radiation from its star strikes the gaseous atmosphere."},
+            {"narration":"This gaseous planet has no solid ground or lava."},
+            {"narration":"Hydrogen splits into atoms inside the gas atmosphere."},
+            {"narration":"The night side cools as molecules begin to form."}]}
+        old=[
+            shot(1,"wide","side","establish","Gas planet and star",
+                 "A huge gaseous planet orbits the bright nearby star."),
+            shot(2,"close","frontal","detail","Stellar radiation",
+                 "Bright starlight reaches the extended gaseous atmosphere."),
+            shot(3,"medium","high","process","Lava on gas world",
+                 "Orange lava glows over rocky terrain on the gas planet."),
+            shot(4,"extreme_wide","overhead","contrast","Hydrogen split",
+                 "Hydrogen molecules separate into atoms within the hot gas."),
+            shot(5,"extreme_close","low","consequence","Night gas",
+                 "Hydrogen atoms become molecules in the cooler night atmosphere.")
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"old.json"
+            # Emulate an authentic historical checkpoint signed under the old
+            # rules, without weakening the current checkpoint writer.
+            payload={"version":planner.CHECKPOINT_VERSION,
+                     "story_sha256":planner._story_digest(story),
+                     "batch_size":1,"accepted_shots":old,
+                     "ready_to_publish":False,"scientific_facts_verified":False}
+            signed={**payload,"signature":planner._checkpoint_signature(payload,"secret")}
+            cp.write_text(json.dumps(signed))
+            shots,size=planner._read_checkpoint(cp,story,"secret")
+            self.assertEqual(size,1)
+            self.assertEqual(shots,old[:2])
+            # A forged or stale checkpoint is still rejected without rewind.
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner._read_checkpoint(cp,story,"wrong-secret")
+            different=dict(story,title="Changed title")
+            with self.assertRaisesRegex(ValueError,"Untrusted"):
+                planner._read_checkpoint(cp,different,"secret")
+
+    def test_signed_two_scene_batches_rewind_to_complete_review_boundary(self):
+        story={"title":"Gas world","scenes":[
+            {"narration":"A huge gaseous planet orbits a bright nearby star."},
+            {"narration":"Radiation from its star strikes the gaseous atmosphere."},
+            {"narration":"Hot gas floats above the giant planet."},
+            {"narration":"This gaseous planet has no solid ground or lava."},
+            {"narration":"Hydrogen splits into atoms inside the gas atmosphere."},
+            {"narration":"The night side cools as molecules begin to form."}]}
+        old=[
+            shot(1,"wide","side","establish","Gas planet and star",
+                 "A gaseous planet orbits its bright nearby star."),
+            shot(2,"close","frontal","detail","Stellar radiation",
+                 "Bright starlight reaches the gaseous atmosphere."),
+            shot(3,"medium","high","process","Moving gas",
+                 "Thick layers of gas drift across the giant planet."),
+            shot(4,"extreme_wide","overhead","contrast","Molten lava world",
+                 "Molten lava appears beneath the gas atmosphere."),
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"old.json"
+            payload={"version":planner.CHECKPOINT_VERSION,
+                     "story_sha256":planner._story_digest(story),
+                     "batch_size":2,"accepted_shots":old,
+                     "ready_to_publish":False,"scientific_facts_verified":False}
+            cp.write_text(json.dumps({**payload,
+                        "signature":planner._checkpoint_signature(payload,"secret")}))
+            shots,size=planner._read_checkpoint(cp,story,"secret")
+            self.assertEqual(size,2)
+            self.assertEqual(shots,old[:2])
+
     def test_checkpoint_rejects_modified_story_and_forged_shots(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Long ocean waves roll toward a sandy shoreline."},

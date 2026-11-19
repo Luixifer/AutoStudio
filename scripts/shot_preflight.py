@@ -487,11 +487,36 @@ def _read_checkpoint(path, story, token):
         shots = data["accepted_shots"]
         if not isinstance(shots, list) or not 1 <= len(shots) <= len(_scene_list(story)):
             raise ValueError("Invalid checkpoint scene count")
-        checked = validate_plan(
-            {"shots":shots}, {"scenes":_scene_list(story)[:len(shots)]})
-        check_explicit_story_constraints(story, checked)
         if len(shots) != len(_scene_list(story)) and len(shots) % size:
             raise ValueError("Checkpoint does not end on a complete batch")
+        # A formerly accepted, authenticated checkpoint can become invalid
+        # when explicit narration constraints are strengthened. NEVER reuse
+        # the invalid scene or anything after it. Rewind only the
+        # deterministic named factual contradiction, while preserving the
+        # complete preceding independently-reviewed batches. Structural
+        # corruption, invalid HMAC, altered story and invalid schemas still
+        # fail closed rather than silently rewinding.
+        checked = validate_plan(
+            {"shots":shots}, {"scenes":_scene_list(story)[:len(shots)]})
+        try:
+            check_explicit_story_constraints(story, checked)
+        except ValueError as exc:
+            contradicted = re.match(
+                r"^Scene (\d+) (?:implies|introduces)\b", str(exc))
+            if not contradicted:
+                raise
+            first_invalid = int(contradicted.group(1))
+            if not 1 <= first_invalid <= len(shots):
+                raise
+            keep = first_invalid - 1
+            # Never keep half of an originally two-shot reviewed batch.
+            keep -= keep % size
+            safe = checked[:keep]
+            if safe:
+                validate_plan({"shots":safe},
+                              {"scenes":_scene_list(story)[:len(safe)]})
+                check_explicit_story_constraints(story, safe)
+            return safe, size
         return checked, size
     except (OSError, UnicodeError, TypeError, KeyError, json.JSONDecodeError,
             ValueError) as exc:
