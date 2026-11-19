@@ -69,6 +69,24 @@ class AutopilotTests(unittest.TestCase):
         self.assertFalse(r["all_scenes_approved"])
         self.assertTrue(all(s["status"]=="needs_human_review" for s in r["scenes"]))
 
+    def test_replans_repeated_visual_composition_without_extra_images(self):
+        calls=[]
+        repeated="A swirling gas tunnel around a bright central light, strongly luminous and cinematic."
+        alternative="Wide exterior view of an orbital planet disk and its nearby stellar companion."
+        def director(narration,title,prior,account,token):
+            calls.append((narration,prior))
+            if len(calls)==3:
+                return alternative
+            return repeated
+        with patch.dict("os.environ",{"CLOUDFLARE_API_TOKEN":"test","CLOUDFLARE_ACCOUNT_ID":"a"*32}):
+            r=auto.run(self.story,self.root/"distinct",live=True,max_attempts=1,request_budget=2,
+                director=director, generator=lambda *args:fake_jpeg(),
+                vision=lambda *args:{"decision":"PASS","evidence":"Visible subject and perspective."})
+        self.assertEqual(len(calls),3)
+        self.assertEqual(r["completed_requests"],2)
+        self.assertTrue(r["scenes"][1]["replanned_for_visual_variety"])
+        self.assertEqual(r["scenes"][1]["image_prompt"],alternative)
+
     def test_retry_only_once(self):
         calls=[]
         def supervisor(*a):
