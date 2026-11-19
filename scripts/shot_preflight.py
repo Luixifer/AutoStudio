@@ -115,7 +115,10 @@ def parse_reply(content):
             if ("{" in prefix or "}" in prefix or
                     "{" in suffix or "}" in suffix):
                 raise ValueError("Shot planner returned invalid JSON")
+            # The outer complete object has been found; nested braces belong
+            # to this object, not to independent reply candidates.
             candidates.append(candidate)
+            break
         if len(candidates)!=1:
             raise ValueError("Shot planner returned invalid JSON")
         value=candidates[0]
