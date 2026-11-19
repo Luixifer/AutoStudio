@@ -1,0 +1,58 @@
+name: AutoStudio · Motor orbital 3D conceptual (prueba aislada)
+on:
+  push:
+    branches:
+      - feat/procedural-orbit-engine-20261119
+permissions:
+  contents: read
+jobs:
+  render-orbit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install local rendering tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          python -m pip install Pillow
+      - name: Test scene geometry before rendering
+        run: python -m unittest tests.test_procedural_orbit -v
+      - name: Render actual short H264 preview
+        run: python -m scripts.procedural_orbit --out /tmp/orbit-preview
+      - name: Verify video stream, frame rate and report
+        run: |
+          python - <<'PY'
+          import json,subprocess,hashlib
+          from pathlib import Path
+          root=Path('/tmp/orbit-preview')
+          video=root/'orbit-preview.mp4'
+          manifest=json.loads((root/'orbit-manifest.json').read_text())
+          probe=json.loads(subprocess.check_output([
+              'ffprobe','-v','error','-of','json','-show_streams',
+              '-show_format',str(video)],text=True))
+          v=[s for s in probe['streams'] if s['codec_type']=='video']
+          assert len(v)==1 and v[0]['codec_name']=='h264'
+          assert (v[0]['width'],v[0]['height'])==(1280,720)
+          assert v[0]['avg_frame_rate']=='24/1'
+          assert manifest['frames']==120 and manifest['not_to_scale']
+          assert not manifest['ready_to_publish'] and not manifest['youtube_enabled']
+          assert manifest['sha256']==hashlib.sha256(video.read_bytes()).hexdigest()
+          subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(video),
+                          '-f','null','-'],check=True,timeout=60)
+          print('PASS: 120 actual video frames, 1280x720, 24fps, H264, full decode')
+          PY
+      - name: Archive MP4, still and manifest, never publish
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Orbita-Procedural-5s-Revision
+          path: |
+            /tmp/orbit-preview/orbit-preview.mp4
+            /tmp/orbit-preview/orbit-first-frame.jpg
+            /tmp/orbit-preview/orbit-manifest.json
+          retention-days: 14
+          if-no-files-found: warn
