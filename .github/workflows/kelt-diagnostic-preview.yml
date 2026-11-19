@@ -1,0 +1,129 @@
+name: AutoStudio · Vista previa técnica KELT-9b sin regenerar imágenes
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'triggers/kelt9b-diagnostic-preview-2026-11-19.txt'
+  pull_request:
+    paths:
+      - 'scripts/stage_diagnostic_preview.py'
+      - 'tests/test_stage_diagnostic_preview.py'
+      - '.github/workflows/kelt-diagnostic-preview.yml'
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: development
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e722cf94007e326fd6a4537ad57ebbc60b43faa9
+          path: engine
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: uploads
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Validar staging diagnostico sin peticiones a IA
+        working-directory: development
+        run: |
+          python -m unittest tests.test_stage_diagnostic_preview tests.test_image_staging -v
+          python -m py_compile scripts/stage_diagnostic_preview.py
+      - name: Recuperar imágenes guardadas (0 llamadas FLUX)
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source-artifact
+          gh run download 44480858428 --repo "$GITHUB_REPOSITORY" \
+             --name "AutoStudio-KELT9b-10-Escenas-Recuperadas" --dir source-artifact
+          test "$(find source-artifact -name visual-supervision-manifest.json | wc -l)" -eq 1
+          echo "SOURCE_MANIFEST=$(find source-artifact -name visual-supervision-manifest.json)" >> "$GITHUB_ENV"
+      - name: Preparar vista previa claramente NO aprobada
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: development
+        run: |
+          python -m scripts.stage_diagnostic_preview \
+            --storyboard ../uploads/requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --manifest "../$SOURCE_MANIFEST" --out ../preview-storyboard
+      - name: Preparar voz Álex y FFmpeg
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check -r requirements-neural.txt
+          python scripts/fetch_voice.py
+      - name: Render de PREVISUALIZACION sin autorizar publicacion
+        if: ${{ github.event_name != 'pull_request' }}
+        working-directory: engine
+        run: |
+          python -m scripts.personal_prepare ../preview-storyboard/storyboard.json --out ../prepared
+          python -m scripts.personal_editor ../prepared/input/studio-ready.json --out ../preview-render
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil
+          path=Path("../preview-render/quality-report.json")
+          q=json.loads(path.read_text(encoding="utf-8"))
+          assert q.get("technical_passed") is True
+          assert q.get("youtube_enabled") is False
+          assert q.get("ready_to_publish") is False
+          src=Path("../preview-render/autostudio-personal-REVIEW.mp4")
+          assert src.stat().st_size>100_000
+          dst=Path("../preview-output/AutoStudio-KELT9b-PREVIA-DIAGNOSTICO.mp4")
+          dst.parent.mkdir(exist_ok=True)
+          shutil.copyfile(src,dst)
+          print("PREVIEW_TECHNICAL_QA_PASS",q.get("sha256"))
+          PY
+      - name: Guardar MP4 y trazabilidad (sin publicar)
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-KELT9b-DIAGNOSTICO-NO-PUBLICAR
+          path: |
+            preview-output/AutoStudio-KELT9b-PREVIA-DIAGNOSTICO.mp4
+            preview-render/quality-report.json
+            preview-storyboard/diagnostic-preview-report.json
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Informar directamente en GitHub Issue 20
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RESULT: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/preview-status.md
+          from pathlib import Path
+          import os,json
+          print("### KELT-9b · PREVISUALIZACIÓN TÉCNICA, NO APROBADA PARA PUBLICAR")
+          print("- GitHub Actions:",os.environ["RUN_URL"])
+          print("- Trabajo:",os.environ["RESULT"])
+          print("- Imágenes FLUX generadas de nuevo: **0**")
+          p=Path("preview-storyboard/diagnostic-preview-report.json")
+          if p.exists():
+              d=json.loads(p.read_text(encoding="utf-8"))
+              print("- Escenas reutilizadas:",d.get("scenes"))
+              print("- Rechazos o dudas originales:",{k:v for k,v in d["source_image_qa"].items() if v!="PASS"})
+              print("- Aprobación editorial:",False)
+          q=Path("preview-render/quality-report.json")
+          if q.exists():
+              x=json.loads(q.read_text(encoding="utf-8"))
+              print("- MP4 creado:",Path("preview-output/AutoStudio-KELT9b-PREVIA-DIAGNOSTICO.mp4").exists())
+              print("- QA técnico:",x.get("technical_passed",False))
+              print("- Listo para publicar:",False)
+          else:
+              print("- MP4: no disponible, revisar fallo técnico")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/preview-status.md
