@@ -60,6 +60,20 @@ def run_candidate(key, prompt, account, token, opener=None):
             if isinstance(message, dict):
                 text = message.get("content")
     if not isinstance(text, str) or not text.strip():
+        # gpt-oss can use the OpenAI Responses-style output envelope.
+        outputs = result.get("output")
+        chunks = []
+        if isinstance(outputs, list):
+            for entry in outputs:
+                if not isinstance(entry, dict) or entry.get("type") != "message":
+                    continue
+                for part in entry.get("content", []):
+                    if isinstance(part, dict) and part.get("type") == "output_text":
+                        value = part.get("text")
+                        if isinstance(value, str) and value.strip():
+                            chunks.append(value.strip())
+        text = "\n".join(chunks)
+    if not isinstance(text, str) or not text.strip():
         raise ValueError("Missing usable model review")
     return text.strip()[:6000]
 
