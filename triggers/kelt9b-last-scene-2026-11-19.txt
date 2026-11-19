@@ -1,0 +1,1 @@
+Single-use instruction: reuse the 10 verified images from GitHub Actions 44479983730. Re-inspect ONLY scene 1 with Gemma, no FLUX image generations. Render reviewed MP4 only if all 10 have image PASS. Never publish to YouTube. Report result in GitHub Issue 20.
