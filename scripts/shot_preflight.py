@@ -368,12 +368,37 @@ def _build_plan_whole(story,request,account,token):
                      str(last_error))
 
 
+def _retry_timed_out_text_request(request):
+    """Retry one transient text timeout; no images or approval bypasses.
+
+    The exact same prompt is retried once. Structural and independent
+    semantic checks still run on the returned content, and exhausted
+    timeouts abort preproduction before FLUX.
+    """
+    import urllib.error
+
+    def guarded(model, payload, account, token):
+        for attempt in range(2):
+            try:
+                return request(model, payload, account, token)
+            except TimeoutError:
+                if attempt:
+                    raise
+            except urllib.error.URLError as exc:
+                if not isinstance(exc.reason, TimeoutError) or attempt:
+                    raise
+        raise RuntimeError("Unreachable text retry state")
+
+    return guarded
+
+
 def build_plan(story, request, account, token):
     """Use short, sequential requests for long stories, preserving all guards."""
     scenes = _scene_list(story)
+    guarded_request = _retry_timed_out_text_request(request)
     if len(scenes) <= 4:
-        return _build_plan_whole(story, request, account, token)
-    return _build_plan_chunks(story, request, account, token)
+        return _build_plan_whole(story, guarded_request, account, token)
+    return _build_plan_chunks(story, guarded_request, account, token)
 
 
 def _build_plan_chunks(story, request, account, token, chunk_size=2,
