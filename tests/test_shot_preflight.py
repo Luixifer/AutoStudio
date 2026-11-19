@@ -501,6 +501,72 @@ class ShotPlanTests(unittest.TestCase):
             self.assertEqual(planner.build_plan(story,no_requests,"account","secret",
                                                 checkpoint_path=cp),shots)
 
+    def test_resume_normalizes_only_exact_absolute_scene_ids(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Tidal waves form along the deep ocean shore."},
+            {"narration":"Rain droplets fall into the ocean surface."},
+            {"narration":"Cloud vapors condense above the wide blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a long coastal shoreline."}]}
+        prefix=[
+            shot(1,"wide","side","establish","Ocean tides",
+                 "Tidal waves form along the deep ocean shore."),
+            shot(2,"close","frontal","detail","Rain at sea",
+                 "Rain droplets fall into the ocean surface."),
+            shot(3,"medium","high","process","Cloud vapors",
+                 "Cloud vapors condense above the wide blue sea."),
+            shot(4,"extreme_wide","overhead","contrast","Sea foam",
+                 "Sea foam spreads across a moving wavefront.")]
+        absolute={"shots":[shot(5,"extreme_close","low","consequence",
+                               "Moonlit coastline",
+                               "The moon illuminates a long coastal shoreline.")]}
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"resume.json"
+            planner._write_checkpoint(cp,story,prefix,1,"secret")
+            replies=[absolute,{"decision":"PASS","issues":[]}]
+            calls=[]
+            def model(_model,payload,*_args):
+                calls.append(payload["messages"][0]["content"])
+                return {"response":json.dumps(replies.pop(0))}
+            output=planner.build_plan(story,model,"account","secret",
+                                      checkpoint_path=cp)
+            self.assertEqual(len(output),5)
+            self.assertEqual(output[-1]["scene"],5)
+            self.assertEqual(len(calls),2)
+            self.assertEqual(output[:4],prefix)
+
+    def test_resume_rejects_incorrect_absolute_scene_number(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Tidal waves form along the deep ocean shore."},
+            {"narration":"Rain droplets fall into the ocean surface."},
+            {"narration":"Cloud vapors condense above the wide blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a long coastal shoreline."}]}
+        prefix=[
+            shot(1,"wide","side","establish","Ocean tides",
+                 "Tidal waves form along the deep ocean shore."),
+            shot(2,"close","frontal","detail","Rain at sea",
+                 "Rain droplets fall into the ocean surface."),
+            shot(3,"medium","high","process","Cloud vapors",
+                 "Cloud vapors condense above the wide blue sea."),
+            shot(4,"extreme_wide","overhead","contrast","Sea foam",
+                 "Sea foam spreads across a moving wavefront.")]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"resume.json"
+            planner._write_checkpoint(cp,story,prefix,1,"secret")
+            bad={"shots":[shot(99,"extreme_close","low","consequence",
+                               "Moonlit coastline",
+                               "The moon illuminates a long coastal shoreline.")]}
+            calls=[]
+            def model(*_args):
+                calls.append(1)
+                return {"response":json.dumps(bad)}
+            with self.assertRaisesRegex(ValueError,"failed twice"):
+                planner.build_plan(story,model,"account","secret",
+                                   checkpoint_path=cp)
+            self.assertEqual(len(calls),2)
+            self.assertEqual(len(planner._read_checkpoint(cp,story,"secret")[0]),4)
+
     def test_checkpoint_rejects_modified_story_and_forged_shots(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Long ocean waves roll toward a sandy shoreline."},

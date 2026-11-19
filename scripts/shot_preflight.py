@@ -637,6 +637,16 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                         raise ValueError("Shot count mismatch: expected "+
                                          str(len(batch))+", received "+
                                          str(len(parsed["shots"])))
+                    # When a resumed model uses absolute scene indices
+                    # instead of requested local indices, only a complete
+                    # exact ascending match may be normalized. Any missing,
+                    # repeated, shuffled or invented indices still fail.
+                    got = [x.get("scene") if isinstance(x,dict) else None
+                           for x in parsed["shots"]]
+                    absolute = list(range(start+1,start+len(batch)+1))
+                    if start > 0 and got == absolute:
+                        parsed = {"shots":[dict(item,scene=i)
+                                           for i,item in enumerate(parsed["shots"],1)]}
                 local = validate_plan(parsed,chunk_story)
                 current = [dict(item,scene=start+item["scene"]) for item in local]
                 candidate = accepted+current
