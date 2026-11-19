@@ -95,7 +95,7 @@ def check_explicit_story_constraints(story, shots):
         subject=str(shot.get("subject","")).lower()
         action=str(shot.get("visible_action","")).lower()
         if describes_gas_world and denies_ground and "star" not in subject and "estrella" not in subject:
-            if re.search(r"\b(?:solid surface|hot surface|rocky ground|terrain|rocky landscape|lava ground)\\b",action):
+            if re.search(r"\b(?:solid surface|hot surface|rocky ground|terrain|rocky landscape|lava ground)\b",action):
                 raise ValueError(
                     f"Scene {shot['scene']} implies solid ground or terrain on a gaseous subject, "
                     "contradicting an explicit no-ground script")
