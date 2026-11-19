@@ -71,6 +71,60 @@ def parse_reply(content):
     except (ValueError,TypeError) as exc:
         raise ValueError("Shot planner returned invalid JSON") from exc
 
+def review_story_consistency(story, shots, request, account, token):
+    """Independent TEXT-only cross-scene reviewer; no scientific certification.
+
+    Reject unsupported or contradicted factual scene details BEFORE image
+    generation. The same model can still make mistakes, so this does not
+    replace editorial and scientific review of the finished documentary.
+    """
+    scenes=_scene_list(story)
+    narrative="\\n".join(str(i)+". "+scene["narration"] for i,scene in enumerate(scenes,1))
+    critic=(
+        "You are a skeptical STORY-ONLY factual consistency reviewer. "
+        "Compare EVERY scene's proposed subject and visible_action with the FULL narration. "
+        "Reject any shot that contradicts any explicit fact in the complete narration or "
+        "introduces an unsupported physical feature, surface, setting, material, location, "
+        "object, source of light or scientific process as established fact. "
+        "A camera angle is artistic and need not appear in narration; do not reject angles. "
+        "Use ONLY the supplied narration, no external research or scientific assertions. "
+        "For example, when the script describes a gaseous object without ground, "
+        "a shot implying solid terrain must be rejected. "
+        "A scene must NOT use visual geography absent from the whole story, such as "
+        "invented galaxies or locations. "
+        "Do not claim numerical values unless the narration states them, including "
+        "values written as words in Spanish. "
+        "If uncertain whether a depicted fact is supported, reject it rather than invent it. "
+        'Return ONLY JSON object {"decision":"PASS" or "FAIL",'
+        '"issues":[{"scene":1,"issue":"unsupported claim"}]}. '
+        " For PASS, issues MUST be empty. If FAIL, give concrete corrections for up to "
+        "six scenes in issues. No Markdown.\\n"
+        "Narration:\\n"+narrative+"\\nProposed shots:\\n"+
+        json.dumps(shots,ensure_ascii=False)
+    )
+    from scripts.visual_autopilot import _extract_text
+    response=request(MODEL,{"messages":[{"role":"user","content":critic}],
+                   "max_tokens":950,"temperature":0.0},account,token)
+    result=parse_reply(_extract_text(response))
+    if not isinstance(result,dict) or result.get("decision") not in ("PASS","FAIL") or not isinstance(result.get("issues"),list):
+        raise ValueError("Narration-grounding reviewer returned an invalid verdict")
+    issues=result["issues"]
+    if result["decision"]=="PASS":
+        if issues:
+            raise ValueError("Narration-grounding reviewer returned contradictory PASS with issues")
+        return True
+    if not issues or len(issues)>len(shots):
+        raise ValueError("Narration-grounding reviewer rejected without valid issues")
+    detail=[]
+    for i in issues:
+        if (not isinstance(i,dict) or type(i.get("scene")) is not int
+                or not 1<=i["scene"]<=len(shots) or
+                not isinstance(i.get("issue"),str) or not 8<=len(i["issue"])<=300):
+            raise ValueError("Invalid narration-grounding issue")
+        detail.append("scene "+str(i["scene"])+": "+i["issue"][:200])
+    raise ValueError("Story-grounding review FAIL: "+"; ".join(detail)[:950])
+
+
 def build_plan(story,request,account,token):
     scenes=_scene_list(story)
     numbered="\n".join(f"{i}. {s['narration']}" for i,s in enumerate(scenes,1))
@@ -117,7 +171,9 @@ def build_plan(story,request,account,token):
                                 "max_tokens":max_tokens,"temperature":0.15},account,token)
         last_reply=_extract_text(response)
         try:
-            return validate_plan(parse_reply(last_reply),story)
+            shots=validate_plan(parse_reply(last_reply),story)
+            review_story_consistency(story, shots, request, account, token)
+            return shots
         except ValueError as exc:
             last_error=exc
     raise ValueError("Shot planner failed preflight twice; no image generation: "+
