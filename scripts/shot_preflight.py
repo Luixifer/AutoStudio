@@ -588,9 +588,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     "Fix ONLY the subject and visible_action of ONE documentary "
                     "shot. Return JSON object with exactly subject and "
                     "visible_action string keys. visible_action MUST contain "
-                    "Aim for 10-16 English words (absolute limit 6-22), showing "
-                    "concrete visible subjects and 
-                    "their physical relationship. The NARRATION, not the "
+                    "6-22 English words. Aim for 10-16 words showing concrete "
+                    "visible subjects and their physical relationship. "
+                    "The NARRATION, not the "
                     "reviewer's complaint, is the ONLY positive factual source. "
                     "The ERROR describes unsupported or contradicted claims "
                     "to REMOVE, NEVER facts to illustrate or repeat. "
