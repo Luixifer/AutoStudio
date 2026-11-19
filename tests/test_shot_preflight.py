@@ -98,6 +98,17 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("Water vapor",text)
         self.assertNotIn("KELT-9b",text)
 
+    def test_critic_prompt_respects_accurate_paraphrases(self):
+        recorded=[]
+        def fake(model,payload,account,token):
+            recorded.append(payload["messages"][0]["content"])
+            return {"response":json.dumps({"decision":"PASS","issues":[]})}
+        self.assertTrue(planner.review_story_consistency(
+            STORY,planner.validate_plan(VALID,STORY),fake,"a"*32,"test"))
+        self.assertIn("translations",recorded[0])
+        self.assertIn("supported",recorded[0].lower())
+        self.assertIn("Water evaporates",recorded[0])
+
     def test_grounding_failure_repairs_entire_shot_list_once(self):
         calls=[]
         answers=[
