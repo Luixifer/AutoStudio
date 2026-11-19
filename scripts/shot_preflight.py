@@ -250,6 +250,17 @@ def check_explicit_story_constraints(story, shots):
                 raise ValueError(
                     f"Scene {shot['scene']} implies solid ground or terrain on a gaseous subject, "
                     "contradicting an explicit no-ground script")
+        # A depicted ionization/electron-stripping event is a specific
+        # physical claim, not generic scenery. Require the narration to
+        # explicitly discuss ionization, ions or electrons (ES/EN).
+        # This safeguard is independent of topic, including planets,
+        # laboratories and materials documentaries.
+        if (re.search(r"\b(?:ioniz(?:e[ds]?|ation|ing)|ionis(?:e[ds]?|ation|ing)|ionizaci[oó]n|ionizad[oa]s?|electrons?|electrones?)\b",
+                      subject+" "+action,re.I)
+            and not re.search(r"\b(?:ioniz\w*|ionis\w*|ions?|iones|electrons?|electrones?)\b",
+                              full,re.I)):
+            raise ValueError(
+                f"Scene {shot['scene']} introduces unsupported ionization or electron processes, absent from the narration")
         for term,(english,spanish) in unsupported_materials.items():
             if (re.search(r"\b"+(r"dust(?:y)?" if term=="dust" else re.escape(english))+r"\b",action)
                     and english not in full and spanish not in full):

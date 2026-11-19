@@ -76,6 +76,28 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(result[1]["visible_action"],duplicate["visible_action"])
         self.assertEqual(duplicate["angle"],"side")
 
+    def test_unnarrated_ionization_cannot_appear_in_scientific_closing_shot(self):
+        story={"scenes":[{"narration":
+            "A fascinating planet drifts among distant stars and nebulae."}]}
+        shotdata=[shot(1,"wide","side","establish","Planetary gas atmosphere",
+                       "The planet's gas is ionized and electrons are stripped away by radiation.")]
+        with self.assertRaisesRegex(ValueError,"unsupported ionization"):
+            planner.check_explicit_story_constraints(story,shotdata)
+
+    def test_ionization_is_allowed_if_narrated(self):
+        story={"scenes":[{"narration":
+            "Ionization removes electrons from atmospheric atoms under strong radiation."}]}
+        shotdata=[shot(1,"wide","side","process","Ionized atmospheric gas",
+                       "Radiation removes electrons from the atmospheric gas atoms.")]
+        self.assertTrue(planner.check_explicit_story_constraints(story,shotdata))
+
+    def test_other_gas_processes_not_mistaken_for_ionization(self):
+        story={"scenes":[{"narration":
+            "Heat splits hydrogen molecules into separate atoms of hydrogen."}]}
+        shotdata=[shot(1,"wide","side","process","Hydrogen molecules",
+                       "Hydrogen molecules separate into individual atoms inside the gas.")]
+        self.assertTrue(planner.check_explicit_story_constraints(story,shotdata))
+
     def test_three_identical_central_subjects_in_four_scenes_rejected(self):
         story={"scenes":[
             {"narration":"A distant ocean stretches toward the far horizon."},
