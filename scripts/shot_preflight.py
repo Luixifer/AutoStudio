@@ -139,6 +139,34 @@ def validate_plan(plan, story):
                        "subject":subject.strip(),"visible_action":action.strip()})
     return result
 
+def _fix_only_current_camera_angle_collisions(shots, frozen_count):
+    """Vary the angle of an unapproved shot, never its narrated content.
+
+    If a model repeats an exact camera tuple used earlier, find the next
+    unused viewpoint with the SAME scale and narrative role. Previously
+    accepted scenes remain frozen. If no angle fits, fail closed in the
+    subsequent standard validator instead of silently relaxing uniqueness.
+    """
+    result=[dict(shot) for shot in shots]
+    used=set()
+    for i,item in enumerate(result):
+        triple=(item["scale"],item["angle"],item["role"])
+        if triple in used and i >= frozen_count:
+            old_angle=item["angle"]
+            # Prefer minimally different framing: traverse stable available
+            # viewpoints from the original angle, not random metadata.
+            alternatives=(ANGLES[(ANGLES.index(old_angle)+offset)%len(ANGLES)]
+                          for offset in range(1,len(ANGLES)))
+            for angle in alternatives:
+                candidate=(item["scale"],angle,item["role"])
+                if candidate not in used:
+                    item["angle"]=angle
+                    triple=candidate
+                    break
+        used.add(triple)
+    return result
+
+
 def parse_reply(content):
     """Accept one complete JSON object, even with a harmless text wrapper.
 
@@ -840,6 +868,20 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     if start > 0 and got == absolute:
                         parsed = {"shots":[dict(item,scene=i)
                                            for i,item in enumerate(parsed["shots"],1)]}
+                # A camera tuple may be repeated by the text planner even
+                # when the described physical action is distinct. Resolve
+                # only CAMERA ANGLE on unapproved shots with the same scale
+                # and narrative role; never touch any accepted shots or the
+                # proposed scene content. Then run every original validator.
+                if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
+                    proposed=[dict(item,scene=start+item["scene"])
+                              for item in parsed["shots"]
+                              if isinstance(item,dict) and type(item.get("scene")) is int]
+                    if len(proposed)==len(batch):
+                        normalized=_fix_only_current_camera_angle_collisions(
+                            accepted+proposed,len(accepted))
+                        parsed={"shots":[dict(item,scene=i+1)
+                                         for i,item in enumerate(normalized[len(accepted):])]}
                 local = validate_plan(parsed,chunk_story)
                 current = [dict(item,scene=start+item["scene"]) for item in local]
                 candidate = accepted+current
