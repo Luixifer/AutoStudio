@@ -333,6 +333,40 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("medium / high / process",prompts[4])
         self.assertIn("FORBIDDEN",prompts[2])
 
+
+    def test_short_action_in_second_chunk_repaired_without_rewriting_other_shots(self):
+        story={"title":"Ocean processes","scenes":[
+            {"narration":"Ocean waves roll upward along the rugged shoreline."},
+            {"narration":"Rain drops fall into coastal sea water from clouds."},
+            {"narration":"Ocean mist rises from warm water into the atmosphere."},
+            {"narration":"Wind pushes wave crests across the open ocean."},
+            {"narration":"Sea foam gathers near the shoreline at dawn."}]}
+        batch1={"shots":[
+            shot(1,"wide","side","establish","Coastal waves",
+                 "Ocean waves roll up against the nearby shoreline."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall from clouds onto coastal water.")]}
+        batch2={"shots":[
+            shot(1,"medium","high","process","Ocean mist","mist"),
+            shot(2,"extreme_wide","overhead","contrast","Wind-driven waves",
+                 "Wind pushes small wave crests across an open sea.")]}
+        patch={"subject":"Ocean mist rising upward",
+               "visible_action":"A thin layer of ocean mist rises from warm coastal water."}
+        batch3={"shots":[shot(1,"extreme_close","low","consequence","Sea foam",
+                              "Foam gathers along the edge of a shallow ocean wave.")]}
+        answers=[batch1,{"decision":"PASS","issues":[]},
+                 batch2,patch,{"decision":"PASS","issues":[]},
+                 batch3,{"decision":"PASS","issues":[]}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(answers.pop(0))}
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(result),5)
+        self.assertEqual(result[2]["visible_action"],patch["visible_action"])
+        self.assertEqual(result[3]["visible_action"],batch2["shots"][1]["visible_action"])
+        self.assertIn("Fix ONLY the subject",calls[3])
+
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
             "Tidal waves form along the distant ocean shore.",
