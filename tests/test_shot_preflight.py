@@ -30,6 +30,75 @@ def jpeg():
          +b"\xff\xd9"+b"\x00"*8)
 
 class ShotPlanTests(unittest.TestCase):
+    def test_single_scene_invalid_json_uses_one_final_schema_request(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"The moon rises above a quiet coastal ocean."},
+            {"narration":"Sea water shines under the distant night sky."},
+            {"narration":"Cloud droplets gather above the open ocean."},
+            {"narration":"Wind pushes foamy waves toward a sandy beach."},
+            {"narration":"Moonlight illuminates distant rocks near the sea."}]}
+        prefix=[
+            shot(1,"wide","side","establish","Rising moon",
+                 "The bright moon slowly rises above the dark coastal horizon."),
+            shot(2,"close","frontal","detail","Water and moonlight",
+                 "Moonlight forms a shimmering reflection across the quiet seawater."),
+            shot(3,"medium","high","process","Cloud droplets",
+                 "Small droplets gather in clouds above the wide open ocean."),
+            shot(4,"extreme_wide","overhead","contrast","Foamy breaking wave",
+                 "Wind pushes white ocean foam toward the sandy coast.") ]
+        complete={"scene":1,"scale":"extreme_close","angle":"low",
+                  "role":"consequence","subject":"Moonlit coastal rocks",
+                  "visible_action":"Moonlight casts pale reflections onto distant coastal rocks near the sea."}
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"checkpoint.json"
+            planner._write_checkpoint(cp,story,prefix,1,"token")
+            replies=["{bad","{bad",{"response":complete},
+                     {"decision":"PASS","issues":[]}]
+            calls=[]
+            def fake(model,payload,*_args):
+                calls.append((model,payload))
+                item=replies.pop(0)
+                return item if isinstance(item,dict) and "response" in item else {
+                    "response":item if isinstance(item,str) else json.dumps(item)}
+            result=planner.build_plan(story,fake,"account","token",checkpoint_path=cp)
+            self.assertEqual(len(result),5)
+            self.assertEqual(result[:4],prefix)
+            self.assertEqual(calls[2][0],planner.CRITIC_MODEL)
+            self.assertEqual(calls[2][1]["response_format"]["json_schema"],
+                             planner.SHOT_FULL_SCHEMA)
+            self.assertEqual(result[4]["visible_action"],complete["visible_action"])
+
+    def test_single_scene_schema_request_missing_fields_fails_closed(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"The moon rises above a quiet coastal ocean."},
+            {"narration":"Sea water shines under the distant night sky."},
+            {"narration":"Cloud droplets gather above the open ocean."},
+            {"narration":"Wind pushes foamy waves toward a sandy beach."},
+            {"narration":"Moonlight illuminates distant rocks near the sea."}]}
+        prefix=[
+            shot(1,"wide","side","establish","Rising moon",
+                 "The bright moon slowly rises above the dark coastal horizon."),
+            shot(2,"close","frontal","detail","Water and moonlight",
+                 "Moonlight forms a shimmering reflection across the quiet seawater."),
+            shot(3,"medium","high","process","Cloud droplets",
+                 "Small droplets gather in clouds above the wide open ocean."),
+            shot(4,"extreme_wide","overhead","contrast","Foamy breaking wave",
+                 "Wind pushes white ocean foam toward the sandy coast.") ]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"checkpoint.json"
+            planner._write_checkpoint(cp,story,prefix,1,"token")
+            replies=["{bad","{bad",{"response":{"scene":1,"subject":"Missing metadata"}}]
+            calls=[]
+            def fake(model,payload,*_args):
+                calls.append((model,payload))
+                item=replies.pop(0)
+                return item if isinstance(item,dict) and "response" in item else {
+                    "response":item}
+            with self.assertRaises(ValueError):
+                planner.build_plan(story,fake,"account","token",checkpoint_path=cp)
+            self.assertEqual(len(calls),3)
+            self.assertEqual(len(planner._read_checkpoint(cp,story,"token")[0]),4)
+
     def test_camera_collision_resolves_only_new_angles_and_keeps_prefix_frozen(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Ocean currents pull warm water toward northern shores."},
