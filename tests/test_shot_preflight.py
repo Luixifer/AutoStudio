@@ -1227,6 +1227,79 @@ class ShotPlanTests(unittest.TestCase):
             planner.build_plan(story,fake,"account","token")
         self.assertEqual(len(calls),5)
 
+
+    def test_final_duplicate_repair_uses_constrained_gemma(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along the coastal sea surface."},
+            {"narration":"Rain droplets fall from clouds toward the water."},
+            {"narration":"Wind moves the sea into diagonal ridges nearshore."},
+            {"narration":"The moon rises over the ocean at night."},
+            {"narration":"A wave breaks into foam against the coast."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along the coastal sea surface."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall from clouds toward the water.")]}
+        repeated={"shots":[
+            shot(1,"medium","high","process","Ocean waves",
+                 "Ocean waves move along the coastal sea surface."),
+            shot(2,"extreme_wide","overhead","contrast","Night sea",
+                 "The moon rises over the ocean at night.")]}
+        bad={"subject":"Ocean waves",
+             "visible_action":"Ocean waves move along the coastal sea surface."}
+        patch={"subject":"Wind driven surface ridges",
+               "visible_action":"Wind pushes the nearshore water into distinct long diagonal ridges."}
+        last={"shots":[shot(1,"extreme_close","low","consequence",
+                            "Breaking wave foam",
+                            "A wave breaks into white foam against the coast.")]}
+        replies=[first,{"decision":"PASS","issues":[]},repeated,bad,
+                 {"response":patch},{"decision":"PASS","issues":[]},
+                 last,{"decision":"PASS","issues":[]}]
+        requests=[]
+        def fake(model,payload,*_args):
+            requests.append((model,payload))
+            data=replies.pop(0)
+            return data if isinstance(data,dict) and "response" in data else {
+                "response":json.dumps(data)}
+        shots=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(shots),5)
+        self.assertEqual(shots[2]["visible_action"],patch["visible_action"])
+        self.assertEqual(requests[4][0],planner.CRITIC_MODEL)
+        self.assertEqual(requests[4][1]["response_format"]["json_schema"],
+                         planner.SHOT_PATCH_SCHEMA)
+        self.assertNotIn("max_tokens",requests[4][1])
+
+    def test_constrained_patch_missing_fields_still_rejects(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along the coastal sea surface."},
+            {"narration":"Rain droplets fall from clouds toward the water."},
+            {"narration":"Wind moves the sea into diagonal ridges nearshore."},
+            {"narration":"The moon rises over the ocean at night."},
+            {"narration":"A wave breaks into foam against the coast."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along the coastal sea surface."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall from clouds toward the water.")]}
+        repeated={"shots":[
+            shot(1,"medium","high","process","Ocean waves",
+                 "Ocean waves move along the coastal sea surface."),
+            shot(2,"extreme_wide","overhead","contrast","Night sea",
+                 "The moon rises over the ocean at night.")]}
+        same={"subject":"Ocean waves",
+              "visible_action":"Ocean waves move along the coastal sea surface."}
+        replies=[first,{"decision":"PASS","issues":[]},repeated,same,
+                 {"response":{"visible_action":"Invalid incomplete patch"}}]
+        calls=[]
+        def fake(model,payload,*_args):
+            calls.append((model,payload))
+            value=replies.pop(0)
+            return value if "response" in value else {"response":json.dumps(value)}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),5)
+        self.assertEqual(calls[4][0],planner.CRITIC_MODEL)
+
     def test_third_bounded_duplicate_patch_still_fails_closed(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Ocean waves move along a coastal sea surface."},
