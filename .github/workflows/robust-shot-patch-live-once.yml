@@ -1,0 +1,82 @@
+name: AutoStudio - verify robust shot repair live once
+on:
+  push:
+    branches:
+      - test/robust-patch-live-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  text:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Verify offline tests
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Recover seven authentic approved scenes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44535249072 --repo "$REPO" --name AutoStudio-Duplicate-Recovery-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Plan remaining scenes with Cloudflare text only
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/shot-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Save signed checkpoint on any outcome
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Current-Approved-Shots
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Save full shot plan only if created
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Plan-Completo-Verificado
+          path: /tmp/shot-plan.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Log progress on GitHub issue
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          import json,os
+          from pathlib import Path
+          print("### AutoStudio · prueba de reparación con JSON alternativo y reintento")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Estado:",os.environ["STATUS"])
+          print("- Imágenes: 0; publicación automática: desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.is_file():
+              data=json.loads(cp.read_text())
+              print("- Escenas aprobadas conservadas:",len(data["accepted_shots"]))
+          out=Path("/tmp/shot-plan.json")
+          if out.is_file():
+              data=json.loads(out.read_text())
+              print("- Plan textual aprobado:",len(data["shots"]))
+              print("- Verificación científica externa:",data["scientific_facts_verified"])
+              print("- Publicación autorizada:",data["ready_to_publish"])
+          else:
+              print("- Plan textual incompleto; imágenes bloqueadas")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
