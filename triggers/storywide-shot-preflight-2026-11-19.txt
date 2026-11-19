@@ -1,0 +1,1 @@
+One text-only preproduction validation of ten KELT-9b narrated scenes: ten camera plans, unique shot signatures, zero image generation, no YouTube publication. Summarize directly in GitHub Issue #20.
