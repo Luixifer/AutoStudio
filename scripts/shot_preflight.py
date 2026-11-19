@@ -448,7 +448,7 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                 repair_local = None
                 previous_batch = None
                 match = re.search(
-                    r"^Scene (\\d+): Shot visible_action",str(exc))
+                    r"^Scene (\d+): Shot visible_action",str(exc))
                 if (match and isinstance(parsed,dict) and
                     isinstance(parsed.get("shots"),list) and
                     len(parsed["shots"])==len(batch) and
