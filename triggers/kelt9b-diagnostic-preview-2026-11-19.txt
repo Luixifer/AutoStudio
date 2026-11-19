@@ -1,0 +1,1 @@
+Single-use technical diagnostic preview. Reuse cached frames from GitHub run 44480858428; render voice Alex MP4 with editorial approval false and YouTube disabled, zero Workers AI image requests.
