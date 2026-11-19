@@ -707,6 +707,72 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("DUPLICATED EARLIER SHOT",prompts[3])
         self.assertEqual(len(prompts),7)
 
+
+    def test_grounding_critic_fail_repairs_only_offending_shot(self):
+        story={"title":"Planet documentary","scenes":[
+            {"narration":"A gaseous giant planet circles a nearby star."},
+            {"narration":"A nearby star shines onto the gas atmosphere."},
+            {"narration":"The planet has no solid surface, only gas."},
+            {"narration":"Heat separates hydrogen molecules inside the gas atmosphere."},
+            {"narration":"On the night side hydrogen molecules form again."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Gas giant and star",
+                 "A giant gas planet moves through space near a bright star."),
+            shot(2,"close","frontal","detail","Illuminated gas atmosphere",
+                 "Starlight falls across the moving atmospheric gas layers.")]}
+        bad={"shots":[
+            shot(1,"medium","high","process","Rocky planet surface",
+                 "A rocky planet surface glows beneath a bright orange atmosphere."),
+            shot(2,"extreme_wide","overhead","contrast","Hydrogen dissociation",
+                 "Hydrogen molecules separate into atoms inside the hot gas atmosphere.")]}
+        patch={"subject":"Gas giant atmospheric layers",
+               "visible_action":"Dense atmospheric gas moves around the planet without any solid ground."}
+        last={"shots":[shot(1,"extreme_close","low","consequence","Hydrogen recombination",
+                            "Hydrogen atoms join into molecules inside the cooler night atmosphere.")]}
+        replies=[first,{"decision":"PASS","issues":[]},bad,
+                 {"decision":"FAIL","issues":[{"scene":1,
+                     "issue":"Rocky surface contradicts the entirely gaseous planet."}]},
+                 patch,{"decision":"PASS","issues":[]},
+                 last,{"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(replies.pop(0))}
+        shots=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(shots),5)
+        self.assertEqual(shots[2]["visible_action"],patch["visible_action"])
+        self.assertEqual(shots[3]["visible_action"],bad["shots"][1]["visible_action"])
+        self.assertIn("Rocky surface contradicts",prompts[4])
+        self.assertEqual(len(prompts),8)
+
+    def test_grounding_critic_repeat_fail_never_approves_shot(self):
+        story={"title":"Gas world","scenes":[
+            {"narration":"A gaseous planet orbits a nearby bright star."},
+            {"narration":"The bright star illuminates the planet atmosphere."},
+            {"narration":"This gaseous world has no solid surface."},
+            {"narration":"Hot atmospheric gas flows on the illuminated side."},
+            {"narration":"The dark hemisphere cools into the night."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Gaseous planet",
+                 "A planet made of swirling gas orbits near a bright star."),
+            shot(2,"close","frontal","detail","Stellar radiation",
+                 "A nearby bright star shines onto the gaseous atmosphere.")]}
+        wrong={"shots":[
+            shot(1,"medium","high","process","Rocky surface",
+                 "A rocky surface appears beneath the bright planetary sky."),
+            shot(2,"extreme_wide","overhead","contrast","Hot atmosphere",
+                 "Atmospheric gas flows across the planet on the illuminated side.")]}
+        verdict={"decision":"FAIL","issues":[{"scene":1,
+                 "issue":"Solid rocky surface contradicts the gaseous planet."}]}
+        replies=[first,{"decision":"PASS","issues":[]},wrong,verdict,
+                 {"subject":"Rocky surface","visible_action":
+                  "A rocky surface appears beneath the bright planetary sky."},
+                 verdict]
+        def fake(*_args):
+            return {"response":json.dumps(replies.pop(0))}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+
     def test_cross_batch_duplicate_repair_still_rejects_same_action(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Ocean waves move across a coastal sea surface."},
