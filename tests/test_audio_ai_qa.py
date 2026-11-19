@@ -5,6 +5,7 @@ import unittest
 import wave
 from pathlib import Path
 from unittest.mock import patch
+from unittest.mock import patch
 
 from scripts import audio_ai_qa as audio
 
@@ -21,6 +22,14 @@ def write_clip(path, seconds=2):
 
 
 class AudioQualityTests(unittest.TestCase):
+    def setUp(self):
+        # Exercise timing, matching and review logic without requiring FFmpeg
+        # or any AI runtime in offline unit tests. Real CI integration uses
+        # genuine FFmpeg, Whisper and Silero with an actual Spanish WAV.
+        self._original_pcm16=audio.pcm16
+        self._pcm_patch=patch.object(audio,"pcm16",return_value=[0.0]*32000)
+        self._pcm_patch.start()
+        self.addCleanup(self._pcm_patch.stop)
     def test_spanish_accents_and_case_are_normalized(self):
         self.assertEqual(audio.word_accuracy(
             "KELT nueve bé, ¡qué extraño!", "kelt nueve be que extrano"),1.0)
@@ -70,7 +79,7 @@ class AudioQualityTests(unittest.TestCase):
 
     def test_rejects_missing_file(self):
         with self.assertRaises(ValueError):
-            audio.pcm16("/missing/sample.wav")
+            self._original_pcm16("/missing/sample.wav")
 
 
 if __name__=="__main__":
