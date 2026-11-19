@@ -18,6 +18,7 @@ class GemmaVisionTests(unittest.TestCase):
         self.assertEqual(verdict["decision"],"PASS")
         args=r.call_args.args
         self.assertEqual(args[0],vision_gemma.GEMMA_VISION_MODEL)
+        self.assertGreaterEqual(args[1]["max_tokens"], 1500)
         parts=args[1]["messages"][0]["content"]
         self.assertEqual(parts[1]["type"],"image_url")
         self.assertTrue(parts[1]["image_url"]["url"].startswith("data:image/jpeg;base64,"))

@@ -95,7 +95,7 @@ def evaluate_gemma(image_bytes, narration, scene_prompt, account, token):
             {"type": "text", "text": instruction},
             {"type": "image_url", "image_url": {"url": image_uri}}
         ]}],
-        "max_tokens": 640,
+        "max_tokens": 1600,
         "temperature": 0,
         "reasoning_effort": "none"
     }, account, token)
