@@ -1,0 +1,1 @@
+Run the upgraded 10-scene semantic visual plan validation with text-only Cloudflare inference, no FLUX images, report result to issue #20. One-time trigger.
