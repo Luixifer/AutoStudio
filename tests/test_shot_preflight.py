@@ -463,7 +463,7 @@ class ShotPlanTests(unittest.TestCase):
         patch={"scene":1,"scale":"close","angle":"side","role":"establish",
                "subject":"Clouds over water",
                "visible_action":"Clouds drift above the distant ocean water below."}
-        replies=[batch,patch]
+        replies=[batch,patch,patch]
         def fake(*args):
             return {"response":json.dumps(replies.pop(0))}
         with self.assertRaisesRegex(ValueError,"Single-shot batch repair returned invalid fields"):
