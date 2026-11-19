@@ -180,7 +180,7 @@ def _scenes(story):
     return scenes,title
 
 def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
-        director=plan_scene, generator=generate_cloudflare, vision=None):
+        director=plan_scene, generator=generate_cloudflare, vision=None, shot_planner=None):
     """Run a bounded visual loop; always write manifest, even after partial failure."""
     if not 1<=max_attempts<=MAX_RETRIES+1 or not 1<=request_budget<=48:
         raise ValueError("Invalid generation budget")
@@ -200,6 +200,9 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
         vision_model="@cf/google/gemma-4-26b-a4b-it"
     else:
         vision_model="injected_vision_evaluator"
+    from scripts.shot_preflight import build_plan, shot_context
+    if shot_planner is None and director is plan_scene:
+        shot_planner=build_plan
     out=Path(out_path)
     out.mkdir(parents=True,exist_ok=True)
     report={"schema":2,"mode":"live" if live else "dry-run",
@@ -211,7 +214,16 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
             "youtube_enabled":False,"all_scenes_approved":False,"scenes":[]}
     identity=""
     prior_visual=[]
+    plan=None
     try:
+        # Plan the ENTIRE storyboard before spending any image-generation quota.
+        # An invalid or repeated composition aborts before FLUX is called.
+        if live and shot_planner is not None:
+            plan=shot_planner(story,_request,account,token)
+            report["preflight_shot_plan"]=plan
+            report["preflight_validated"]=True
+        else:
+            report["preflight_validated"]=False
         for idx,scene in enumerate(scenes,1):
             narration=scene["narration"]
             entry={"scene":idx,"narration":narration,"candidates":[],"approved":False}
@@ -219,18 +231,22 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
             if not live:
                 entry["status"]="planned"
                 continue
-            prompt=director(narration,title,identity,account,token)
+            shot_hint=shot_context(plan[idx-1]) if plan is not None else ""
+            context=(shot_hint+" Previous composition: "+identity) if shot_hint else identity
+            prompt=director(narration,title,context,account,token)
             if identity and difflib.SequenceMatcher(None, prompt.lower(), identity.lower()).ratio()>0.70:
                 # Re-plan composition once without spending any image-generation quota.
                 # Never bypass this with a deterministic manual per-topic shot list.
                 alternate=director(narration,title,
-                    "Avoid repeating this previous shot. Instead depict the NEW event in the current "
-                    "narration using a different camera scale, angle and spatial relationship. "
-                    +identity[:310],account,token)
+                    shot_hint+" Avoid repeating the previous shot; keep the exact shot scale, angle "
+                    "and narrative role specified. Change framing while remaining scientifically grounded. "
+                    +identity[:250],account,token)
                 if difflib.SequenceMatcher(None, alternate.lower(), identity.lower()).ratio()<difflib.SequenceMatcher(None,prompt.lower(),identity.lower()).ratio():
                     prompt=alternate
                     entry["replanned_for_visual_variety"]=True
             entry["image_prompt"]=prompt
+            if plan is not None:
+                entry["preflight_shot"]=plan[idx-1]
             identity=prompt[:350]
             for attempt in range(1,max_attempts+1):
                 refined=prompt
