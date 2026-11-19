@@ -1170,6 +1170,7 @@ class ShotPlanTests(unittest.TestCase):
             shot(2,"extreme_wide","overhead","contrast","Moonlight",
                  "Moonlight illuminates the wide sea surface at night.")]}
         answers=[first,{"decision":"PASS","issues":[]},second,
+                 {"subject":"Ocean waves","visible_action":repeated},
                  {"subject":"Ocean waves","visible_action":repeated}]
         calls=[]
         def fake(_model,payload,*_args):
@@ -1177,7 +1178,7 @@ class ShotPlanTests(unittest.TestCase):
             return {"response":json.dumps(answers.pop(0))}
         with self.assertRaisesRegex(ValueError,"failed twice"):
             planner.build_plan(story,fake,"account","token")
-        self.assertEqual(len(calls),4)
+        self.assertEqual(len(calls),5)
 
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
