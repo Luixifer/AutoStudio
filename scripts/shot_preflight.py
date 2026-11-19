@@ -208,37 +208,28 @@ def review_story_consistency(story, shots, request, account, token):
     """
     scenes=_scene_list(story)
     narrative="\\n".join(str(i)+". "+scene["narration"] for i,scene in enumerate(scenes,1))
+    # Keep this short: the free small language model sporadically truncates
+    # a long rubric and returns an unusable verdict. A short, self-contained
+    # prompt preserves the same independent factual check and fail-closed gate.
     critic=(
-        "You are a conservative STORY-ONLY CONTRADICTION reviewer for a documentary. "
-        "Your default verdict is PASS. Flag ONLY an explicit conflict with the narrated "
-        "facts or an invented, salient, specific object, material, terrain, location, "
-        "physical surface or spatial relationship stated as an established fact. "
-        "Read the ENTIRE narration before evaluating individual scenes. "
-        "The narration is in Spanish, proposed shots in English: recognize accurate "
-        "translations, paraphrases and visual metaphors for abstract concepts. "
-        "For example, if narration says an extreme nearby star irradiates a planet, "
-        "then showing a star shining onto that planet is SUPPORTED. If narration says "
-        "hydrogen molecules dissociate and reform, then visualizing that process is SUPPORTED. "
-        "If a narrated world is gaseous without solid ground, visible rocky terrain is "
-        "a clear CONTRADICTION. Inventing a named location, distant galaxy, dust, "
-        "landscape, building or life absent from the narration is also a material issue. "
-        "A side-by-side comparison with Earth MAY be appropriate when comparing durations "
-        "but Earth must not appear physically adjacent to the distant planet in the same sky. "
-        "Do NOT demand the exact narration words in every shot. "
-        "Do NOT reject camera angles, framing, reasonable cinematic lighting, atmospheric "
-        "interpretations, or descriptive prose merely because a detail is not literally "
-        "quoted in the script. Do NOT flag abstract physical relationships or supported "
-        "scientific processes as unsupported. "
-        "Ignore minor wording imperfections. If a scene is simply too vague rather than "
-        "contradictory, accept it; structural shot validation covers vagueness. "
-        "Reject only clearly material contradictions or invented facts. "
-        "Do not use outside knowledge to contradict this narration. "
-        'Return ONLY JSON object {"decision":"PASS" or "FAIL",'
-        '"issues":[{"scene":1,"issue":"unsupported claim"}]}. '
-        " For PASS, issues MUST be empty. If FAIL, give concrete corrections for up to "
-        "four material problems in issues. No Markdown.\\n"
-        "Narration:\\n"+narrative+"\\nProposed shots:\\n"+
-        json.dumps(shots,ensure_ascii=False)
+        "Review proposed documentary shots against ONLY the narration below. "
+        "The narration may be Spanish; shots are in English. Recognize faithful "
+        "translations and physically plausible depictions of narrated processes. "
+        "FAIL for an explicit contradiction or a prominent invented factual "
+        "object, material, terrain, named place, organism, or spatial relation. "
+        "Examples: a gaseous world described without ground must not gain rocky "
+        "terrain; a distant galaxy not in the script must not be invented. "
+        "Do not FAIL for camera angles, ordinary lighting, visual metaphors, "
+        "or a legitimate star-to-planet relationship described in the script. "
+        "Do not use outside science to override the supplied narration. "
+        "Return ONLY a compact JSON object with EXACTLY two keys: decision "
+        "('PASS' or 'FAIL') and issues (array). For PASS use an empty array. "
+        "For FAIL issues contains up to 4 objects with keys scene (integer, "
+        "numbered locally) and issue (specific factual contradiction). "
+        "Do not explain outside JSON.\\n"
+        "Narration:\\n"+narrative+
+        "\\nShots:\\n"+json.dumps(shots,ensure_ascii=False,
+                                     separators=(',',':'))
     )
     # One schema-only retry on malformed/truncated replies. Reuse the identical
     # narration and shots; never accept invalid output as PASS or call FLUX.
@@ -246,13 +237,15 @@ def review_story_consistency(story, shots, request, account, token):
     issues = None
     for attempt in range(2):
         prompt = critic if not attempt else (
-            critic + "\\nYour previous response could not be parsed. "
-            "Return one COMPLETE JSON object with decision PASS or FAIL and "
-            "issues as an array. No markdown, no explanations outside JSON. "
-            "Do not change the narration or proposed shots."
+            "Previous verdict was malformed. Answer the same question using "
+            "only a COMPLETE JSON object: "
+            '{"decision":"PASS","issues":[]} or '
+            '{"decision":"FAIL","issues":[{"scene":1,"issue":"clear contradiction"}]}. '
+            "No prose, no markdown, no missing fields. Do not ignore any "
+            "material factual conflict.\\n" + critic
         )
         response=request(MODEL,{"messages":[{"role":"user","content":prompt}],
-                       "max_tokens":1500,"temperature":0.0},account,token)
+                       "max_tokens":450,"temperature":0.0},account,token)
         try:
             decision,issues=_critic_response_object(response)
             break
