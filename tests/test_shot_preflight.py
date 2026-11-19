@@ -229,11 +229,14 @@ class ShotPlanTests(unittest.TestCase):
         long_story={"title":"General science film","scenes":[
             {"narration":f"Observable effect {i} happens in the ocean and the atmosphere."}
             for i in range(1,11)]}
+        events=["tidal crest","evaporating droplets","condensing mist","wind currents",
+                "rolling wavefronts","breaking foam","rising vapor","gathering clouds",
+                "falling rainfall","reflected moonlight"]
         original={"shots":[shot(i,["wide","medium","close","extreme_wide","extreme_close"][((i-1)%5)],
               ["side","frontal","low","overhead","high","three_quarter"][((i-1)%6)],
               ["establish","process","detail","contrast","consequence","relationship","transition"][((i-1)%7)],
               f"Ocean atmosphere unique subject number {i}",
-              f"Different ocean atmosphere event number {i} visible far beyond a distant galaxy.")
+              f"The {events[i-1]} appears above the ocean within a distant galaxy.")
               for i in range(1,11)]}
         self.assertGreater(len(json.dumps(original)),1200)
         corrected=json.loads(json.dumps(original))
