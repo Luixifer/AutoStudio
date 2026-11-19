@@ -463,7 +463,7 @@ class ShotPlanTests(unittest.TestCase):
         patch={"scene":1,"scale":"close","angle":"side","role":"establish",
                "subject":"Clouds over water",
                "visible_action":"Clouds drift above the distant ocean water below."}
-        replies=[batch,patch]
+        replies=[batch,patch,patch]
         def fake(*args):
             return {"response":json.dumps(replies.pop(0))}
         with self.assertRaisesRegex(ValueError,"Single-shot batch repair returned invalid fields"):
@@ -1123,6 +1123,109 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(result[3]["visible_action"],repetitive["shots"][1]["visible_action"])
         self.assertEqual(len(calls),8)
         self.assertIn("DUPLICATED EARLIER SHOT",calls[4])
+
+
+    def test_nested_single_shot_patch_with_frozen_global_index_is_allowed(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along the open sea coast."},
+            {"narration":"Heavy raindrops fall from storm clouds into the sea."},
+            {"narration":"Strong wind pushes water into a new wave pattern."},
+            {"narration":"The moon rises while light fades across the sea."},
+            {"narration":"Sea foam gathers along a curling breaking wave."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"close","frontal","detail","Rain at sea",
+                 "Heavy raindrops fall from storm clouds into the sea.")]}
+        repetitive={"shots":[
+            shot(1,"medium","high","process","Ocean surface",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"extreme_wide","overhead","contrast","Night ocean",
+                 "The moon rises while light fades across the sea.")]}
+        corrected={"shot":shot(3,"medium","high","process",
+                "Wind-formed water ridges",
+                "Strong wind pushes surface water into long diagonal ridges nearshore.")}
+        final={"shots":[shot(1,"extreme_close","low","consequence",
+                 "Breaking wave foam",
+                 "Sea foam gathers along the crest of a curling breaking wave.")]}
+        answers=[first,{"decision":"PASS","issues":[]},
+                 repetitive,corrected,{"decision":"PASS","issues":[]},
+                 final,{"decision":"PASS","issues":[]}]
+        def fake(*_args):
+            return {"response":json.dumps(answers.pop(0))}
+        output=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(output),5)
+        self.assertEqual(output[2]["scene"],3)
+        self.assertEqual(output[2]["visible_action"],
+                         corrected["shot"]["visible_action"])
+
+    def test_invalid_patch_shape_can_retry_once_but_must_pass_every_guard(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along the open sea coast."},
+            {"narration":"Heavy raindrops fall from storm clouds into the sea."},
+            {"narration":"Strong wind pushes water into a new wave pattern."},
+            {"narration":"The moon rises while light fades across the sea."},
+            {"narration":"Sea foam gathers along a curling breaking wave."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"close","frontal","detail","Rain at sea",
+                 "Heavy raindrops fall from storm clouds into the sea.")]}
+        repetitive={"shots":[
+            shot(1,"medium","high","process","Ocean surface",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"extreme_wide","overhead","contrast","Night ocean",
+                 "The moon rises while light fades across the sea.")]}
+        bad={"shot":{"subject":"Wind surface waves"}}
+        corrected={"shot":{"subject":"Wind and ocean ridges",
+                            "visible_action":
+                            "Strong wind pushes surface water into diagonal nearshore ridges."}}
+        final={"shots":[shot(1,"extreme_close","low","consequence",
+                 "Breaking wave foam",
+                 "Sea foam gathers along the crest of a curling breaking wave.")]}
+        answers=[first,{"decision":"PASS","issues":[]},
+                 repetitive,bad,corrected,
+                 {"decision":"PASS","issues":[]},final,{"decision":"PASS","issues":[]}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(answers.pop(0))}
+        shots=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(shots),5)
+        self.assertEqual(len(calls),8)
+        self.assertEqual(shots[2]["visible_action"],
+                         corrected["shot"]["visible_action"])
+        self.assertIn("Single-shot batch repair returned invalid fields",calls[4])
+
+    def test_malicious_patch_different_camera_role_cannot_be_approved(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along the open sea coast."},
+            {"narration":"Heavy raindrops fall from storm clouds into the sea."},
+            {"narration":"Strong wind pushes water into a new wave pattern."},
+            {"narration":"The moon rises while light fades across the sea."},
+            {"narration":"Sea foam gathers along a curling breaking wave."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"close","frontal","detail","Rain at sea",
+                 "Heavy raindrops fall from storm clouds into the sea.")]}
+        repetitive={"shots":[
+            shot(1,"medium","high","process","Ocean surface",
+                 "Ocean waves move along the open sea coast."),
+            shot(2,"extreme_wide","overhead","contrast","Night ocean",
+                 "The moon rises while light fades across the sea.")]}
+        altered={"shot":shot(3,"medium","high","establish",
+                            "Wind driven ocean ridges",
+                            "Strong wind pushes water into diagonal nearshore ridges.")}
+        answers=[first,{"decision":"PASS","issues":[]},
+                 repetitive,altered,altered]
+        calls=[]
+        def fake(*_args):
+            calls.append(1)
+            return {"response":json.dumps(answers.pop(0))}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),5)
 
     def test_third_bounded_duplicate_patch_still_fails_closed(self):
         story={"title":"Ocean","scenes":[
