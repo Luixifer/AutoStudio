@@ -99,9 +99,10 @@ class ShotPlanTests(unittest.TestCase):
             return {"response":'{"shots":['}
         with self.assertRaisesRegex(ValueError,"Shot batch 1 failed twice"):
             planner.build_plan(story,fake,"account","token")
-        self.assertEqual(len(prompts),2)
+        self.assertEqual(len(prompts),4)
         self.assertIn("final bounded retry",prompts[1])
         self.assertIn("exactly 2 shots",prompts[1])
+        self.assertIn("EXACTLY 1 objects",prompts[2])
 
     def test_abstract_two_word_actions_rejected(self):
         bad=json.loads(json.dumps(VALID))
@@ -413,6 +414,42 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Single-shot batch repair returned invalid fields"):
             planner.build_plan(story,fake,"account","token")
 
+
+    def test_malformed_second_batch_falls_back_to_one_scene_with_prefix(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Tidal waves form along the distant ocean shore."},
+            {"narration":"Rain droplets fall into the deep ocean surface."},
+            {"narration":"Cloud vapors condense above the blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a coastal shoreline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Tidal waves form along the distant ocean shore."),
+            shot(2,"close","frontal","detail","Ocean rainfall",
+                 "Rain droplets fall into the deep ocean surface.")]}
+        single=[
+            shot(1,"medium","high","process","Cloud vapors",
+                 "Cloud vapors condense above the open blue sea."),
+            shot(1,"extreme_wide","overhead","contrast","Sea foam",
+                 "Sea foam spreads across a moving wavefront."),
+            shot(1,"extreme_close","low","consequence","Moonlit coast",
+                 "The moon illuminates a distant coastal shoreline.")]
+        replies=[first,{"decision":"PASS","issues":[]},
+                 "{bad","{bad"]
+        for item in single:
+            replies.extend([{"shots":[item]},{"decision":"PASS","issues":[]}])
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            item=replies.pop(0)
+            return {"response":item if isinstance(item,str) else json.dumps(item)}
+        shots=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(shots),5)
+        self.assertEqual([x["scene"] for x in shots],[1,2,3,4,5])
+        self.assertEqual(len(calls),10)
+        self.assertIn("EXACTLY 1 objects",calls[4])
+        self.assertIn("wide / side / establish",calls[4])
+
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
             "Tidal waves form along the distant ocean shore.",
@@ -430,14 +467,15 @@ class ShotPlanTests(unittest.TestCase):
                  "Rain drops fall into the ocean surface below.")]}
         replies=[{"response":json.dumps(first)},
                  {"response":'{"decision":"PASS","issues":[]}'},
+                 {"response":"{broken"},{"response":"{broken"},
                  {"response":"{broken"},{"response":"{broken"}]
         calls=[]
         def fake(_model,payload,*_args):
             calls.append(payload["messages"][0]["content"])
             return replies.pop(0)
-        with self.assertRaisesRegex(ValueError,"Shot batch 2 failed twice"):
+        with self.assertRaisesRegex(ValueError,"Shot batch 3 failed twice"):
             planner.build_plan(story,fake,"account","token")
-        self.assertEqual(len(calls),4)
+        self.assertEqual(len(calls),6)
         self.assertIn("PREVIOUS BATCH FAILED",calls[-1])
 
     def test_invalid_plan_issues_no_flux_requests(self):

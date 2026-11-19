@@ -376,7 +376,8 @@ def build_plan(story, request, account, token):
     return _build_plan_chunks(story, request, account, token)
 
 
-def _build_plan_chunks(story, request, account, token, chunk_size=2):
+def _build_plan_chunks(story, request, account, token, chunk_size=2,
+                       initial_accepted=None, start_at=0):
     """Plan in <=2-scene batches; no FLUX or publication can be called here.
 
     Every completed prefix is structurally revalidated, including visual
@@ -390,8 +391,15 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
     scenes = _scene_list(story)
     if not isinstance(chunk_size, int) or not 1 <= chunk_size <= 4:
         raise ValueError("Invalid bounded shot batch size")
-    accepted = []
-    for start in range(0, len(scenes), chunk_size):
+    if start_at < 0 or start_at > len(scenes) or start_at % chunk_size:
+        raise ValueError("Invalid shot batch resume boundary")
+    accepted = list(initial_accepted or [])
+    if len(accepted) != start_at:
+        raise ValueError("Shot batch resume does not match accepted prefix")
+    if accepted:
+        validate_plan({"shots":accepted},{"scenes":scenes[:start_at]})
+        check_explicit_story_constraints(story,accepted)
+    for start in range(start_at, len(scenes), chunk_size):
         batch = scenes[start:start+chunk_size]
         chunk_story = {"title":story.get("title", "Documentary"),"scenes":batch}
         reason = None
@@ -511,6 +519,14 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                     repair_local=int(match.group(1))
                     previous_batch=parsed
         else:
+            # A malformed two-shot JSON response cannot be trusted or
+            # reconstructed. Instead ask for ONE scene at a time, preserving
+            # every previously approved shot and all cross-scene safeguards.
+            # This fallback is bounded: single-scene mode never recurses.
+            if chunk_size == 2 and "invalid JSON" in str(reason):
+                return _build_plan_chunks(
+                    story, request, account, token, chunk_size=1,
+                    initial_accepted=accepted, start_at=start)
             raise ValueError(
                 f"Shot batch {start//chunk_size+1} failed twice; no image generation: "+
                 str(reason))
