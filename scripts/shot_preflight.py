@@ -125,6 +125,40 @@ def check_explicit_story_constraints(story, shots):
                     f"Scene {shot['scene']} introduces unsupported {term}, absent from the narration")
     return True
 
+
+def _critic_response_object(response):
+    """Extract only known model text envelopes; never infer approval from metadata."""
+    def unwrap(value, depth=0):
+        if depth > 6:
+            raise ValueError("Narration reviewer response nested too deeply")
+        if isinstance(value, str):
+            parsed = parse_reply(value)
+            if not isinstance(parsed, dict):
+                raise ValueError("Narration reviewer must return an object")
+            return parsed
+        if isinstance(value, dict):
+            if "decision" in value or "issues" in value:
+                return value
+            for key in ("response", "answer", "text", "content", "output", "result"):
+                if key in value and value[key] not in (None, "", []):
+                    return unwrap(value[key], depth+1)
+            choices = value.get("choices")
+            if isinstance(choices, list) and choices:
+                first = choices[0]
+                if isinstance(first, dict):
+                    return unwrap(first.get("message", first), depth+1)
+        if isinstance(value, list) and len(value) == 1:
+            return unwrap(value[0], depth+1)
+        raise ValueError("Narration reviewer has no supported reply content")
+    result = unwrap(response)
+    decision = result.get("decision")
+    if isinstance(decision, str):
+        decision = decision.strip().upper()
+    issues = result.get("issues")
+    if decision not in ("PASS", "FAIL") or not isinstance(issues, list):
+        raise ValueError("Narration-grounding reviewer returned an invalid verdict")
+    return decision, issues
+
 def review_story_consistency(story, shots, request, account, token):
     """Independent TEXT-only cross-scene reviewer; no scientific certification.
 
@@ -166,14 +200,26 @@ def review_story_consistency(story, shots, request, account, token):
         "Narration:\\n"+narrative+"\\nProposed shots:\\n"+
         json.dumps(shots,ensure_ascii=False)
     )
-    from scripts.visual_autopilot import _extract_text
-    response=request(MODEL,{"messages":[{"role":"user","content":critic}],
-                   "max_tokens":950,"temperature":0.0},account,token)
-    result=parse_reply(_extract_text(response))
-    if not isinstance(result,dict) or result.get("decision") not in ("PASS","FAIL") or not isinstance(result.get("issues"),list):
-        raise ValueError("Narration-grounding reviewer returned an invalid verdict")
-    issues=result["issues"]
-    if result["decision"]=="PASS":
+    # One schema-only retry on malformed/truncated replies. Reuse the identical
+    # narration and shots; never accept invalid output as PASS or call FLUX.
+    decision = None
+    issues = None
+    for attempt in range(2):
+        prompt = critic if not attempt else (
+            critic + "\\nYour previous response could not be parsed. "
+            "Return one COMPLETE JSON object with decision PASS or FAIL and "
+            "issues as an array. No markdown, no explanations outside JSON. "
+            "Do not change the narration or proposed shots."
+        )
+        response=request(MODEL,{"messages":[{"role":"user","content":prompt}],
+                       "max_tokens":1500,"temperature":0.0},account,token)
+        try:
+            decision,issues=_critic_response_object(response)
+            break
+        except ValueError:
+            if attempt:
+                raise ValueError("Narration-grounding reviewer returned an invalid verdict") from None
+    if decision=="PASS":
         if issues:
             raise ValueError("Narration-grounding reviewer returned contradictory PASS with issues")
         return True

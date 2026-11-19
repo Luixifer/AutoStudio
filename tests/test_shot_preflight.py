@@ -155,6 +155,46 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("supported",recorded[0].lower())
         self.assertIn("Water evaporates",recorded[0])
 
+
+    def test_critic_accepts_known_nested_cloudflare_envelopes(self):
+        for response in (
+            {"response":'```json\n{"decision":"PASS","issues":[]}\n```'},
+            {"result":{"choices":[{"message":{"content":'{"decision":"PASS","issues":[]}'}}]}},
+            {"output":[{"text":'{"decision":"PASS","issues":[]}'}]},
+            {"response":'{"decision":" pass ","issues":[]}'},
+        ):
+            calls=[]
+            def fake(*args):
+                calls.append(1)
+                return response
+            self.assertTrue(planner.review_story_consistency(
+                STORY,planner.validate_plan(VALID,STORY),fake,"account","token"))
+            self.assertEqual(len(calls),1)
+
+    def test_critic_retries_malformed_reply_without_replanning(self):
+        replies=[{"response":'{"decision":"PA'},{"response":'{"decision":"PASS","issues":[]}'}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return replies.pop(0)
+        self.assertTrue(planner.review_story_consistency(
+            STORY,planner.validate_plan(VALID,STORY),fake,"account","token"))
+        self.assertEqual(len(calls),2)
+        self.assertIn("previous response could not be parsed",calls[1])
+
+    def test_critic_never_turns_missing_or_invalid_content_into_pass(self):
+        for bad in ({"response":""}, {"metadata":{"decision":"PASS","issues":[]}},
+                    {"response":'{"decision":"PASS","issues":[{"scene":1,"issue":"Contradiction!"}]}'},
+                    {"response":'{"decision":"MAYBE","issues":[]}'}):
+            calls=[]
+            def fake(*args):
+                calls.append(1)
+                return bad
+            with self.assertRaises(ValueError):
+                planner.review_story_consistency(
+                    STORY,planner.validate_plan(VALID,STORY),fake,"account","token")
+            self.assertGreaterEqual(len(calls),1)
+
     def test_grounding_failure_repairs_entire_shot_list_once(self):
         calls=[]
         answers=[
