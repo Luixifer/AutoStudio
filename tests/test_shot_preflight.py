@@ -250,7 +250,7 @@ class ShotPlanTests(unittest.TestCase):
         def fake(_model,payload,*_args):
             prompts.append(payload["messages"][0]["content"])
             return answers.pop(0)
-        result=planner.build_plan(story,fake,"account","token")
+        result=planner._build_plan_whole(story,fake,"account","token")
         self.assertEqual(len(result),10)
         self.assertEqual(len(prompts),3)
         self.assertIn("Repair ONE invalid documentary shot",prompts[1])
