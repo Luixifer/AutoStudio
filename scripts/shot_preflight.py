@@ -100,7 +100,7 @@ def check_explicit_story_constraints(story, shots):
                     f"Scene {shot['scene']} implies solid ground or terrain on a gaseous subject, "
                     "contradicting an explicit no-ground script")
         for term,(english,spanish) in unsupported_materials.items():
-            if (re.search(r"\b"+re.escape(english)+r"\b",action)
+            if (re.search(r"\b"+(r"dust(?:y)?" if term=="dust" else re.escape(english))+r"\b",action)
                     and english not in full and spanish not in full):
                 raise ValueError(
                     f"Scene {shot['scene']} introduces unsupported {term}, absent from the narration")
