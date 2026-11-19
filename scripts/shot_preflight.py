@@ -73,6 +73,7 @@ def validate_plan(plan, story):
         raise ValueError("Missing or wrong number of scene shot descriptions")
     known=set()
     prior_actions=[]
+    prior_subjects=[]
     result=[]
     for i,item in enumerate(plan["shots"],1):
         if not isinstance(item,dict) or item.get("scene")!=i:
@@ -105,6 +106,18 @@ def validate_plan(plan, story):
             raise ValueError(f"Scene {i}: Abstract explanation is not a concrete documentary image")
         if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",visual,re.I):
             raise ValueError("Plan contains forbidden graphic content")
+        # Three adjacent/nearby scenes with an identical central subject
+        # are usually three shots of the same object even with new camera
+        # metadata. Require a narrower narrated physical subject instead.
+        # Two repeats can be legitimate; apply the rule only on the third.
+        normalized_subject=re.sub(r"[^a-z0-9]+"," ",subject.lower()).strip()
+        earlier=[n for n,old in prior_subjects
+                 if old==normalized_subject and i-n<=4]
+        if len(earlier)>=2:
+            raise ValueError(
+                f"Repeated central subject in scenes {earlier[0]} and {i}; "
+                "show a distinct narrated physical subject or process")
+        prior_subjects.append((i,normalized_subject))
         # A repeated scale+angle+role is the most blatant duplication, and
         # must be fixed before image-generation requests.
         fingerprint=(scale,angle,role)
@@ -561,9 +574,12 @@ def _read_checkpoint(path, story, token):
             invalid_visual = re.match(
                 r"^Scene (\d+): (?:Forbidden diagram or graphic|Unnarrated human presenter|Abstract explanation)\b",
                 str(exc))
-            if not contradicted and not invalid_visual:
+            repetitive_subject = re.match(
+                r"^Repeated central subject in scenes \d+ and (\d+);",
+                str(exc))
+            if not contradicted and not invalid_visual and not repetitive_subject:
                 raise
-            first_invalid = int((contradicted or invalid_visual).group(1))
+            first_invalid = int((contradicted or invalid_visual or repetitive_subject).group(1))
             if not 1 <= first_invalid <= len(shots):
                 raise
             keep = first_invalid - 1
@@ -689,7 +705,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 "invent materials, terrain, galaxies, locations or physical surfaces. "
                 "NEGATIVE STATEMENTS in narration prohibit, rather than request, "
                 "the depicted objects. "+_story_visual_constraints(story)+
-                "Avoid repeated composition, viewpoint or actions from earlier shots. "
+                "Avoid repeated composition, central subjects, viewpoint or actions "
+                "from earlier shots; distinguish the SPECIFIC physical process "
+                "narrated in each scene, not just camera grammar. "
                 "Each scale/angle/role triple must be UNIQUE across all batches. "
                 "The following triples are FORBIDDEN and must not be selected: "+
                 json.dumps(forbidden,ensure_ascii=False)+". "
@@ -884,6 +902,19 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 repeated = re.search(
                     r"^Near-duplicate visible action in scenes (\d+) and (\d+);",
                     str(exc))
+                repeated_subject = re.search(
+                    r"^Repeated central subject in scenes (\d+) and (\d+);",
+                    str(exc))
+                if repeated_subject and local_index is None:
+                    prior_index = int(repeated_subject.group(1))
+                    repeated_index = int(repeated_subject.group(2))
+                    if start < repeated_index <= start+len(batch):
+                        local_index = repeated_index-start
+                        if prior_index <= len(accepted):
+                            duplicate_reference=accepted[prior_index-1]
+                        elif start < prior_index <= start+len(batch):
+                            if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
+                                duplicate_reference=parsed["shots"][prior_index-start-1]
                 if repeated:
                     prior_index = int(repeated.group(1))
                     repeated_index = int(repeated.group(2))
@@ -912,6 +943,7 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     if (attempt == 2 and
                         (re.match(r"^Scene \d+: Shot visible_action",str(exc)) or
                          repeated is not None or
+                         repeated_subject is not None or
                          grounding is not None)):
                         # One last schema-constrained repair is appropriate
                         # for a strictly named factual critic rejection too.

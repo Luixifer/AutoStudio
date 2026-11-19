@@ -30,6 +30,66 @@ def jpeg():
          +b"\xff\xd9"+b"\x00"*8)
 
 class ShotPlanTests(unittest.TestCase):
+    def test_three_identical_central_subjects_in_four_scenes_rejected(self):
+        story={"scenes":[
+            {"narration":"A distant ocean stretches toward the far horizon."},
+            {"narration":"Sunlight warms the shallow water close to the shore."},
+            {"narration":"The coastal water cools when evening approaches."},
+            {"narration":"Strong winds raise white foam over the sea."}]}
+        plan={"shots":[
+            shot(1,"wide","side","establish","Ocean surface",
+                 "Ocean water stretches toward the horizon under broad daylight."),
+            shot(2,"close","frontal","detail","Ocean surface",
+                 "Sunlight warms the shallow water along the sandy coastline."),
+            shot(3,"medium","high","process","Foam on the coast",
+                 "Wind makes pale foam travel toward a sandy shoreline."),
+            shot(4,"extreme_wide","overhead","contrast","Ocean surface",
+                 "Cool blue ocean water darkens slowly beneath evening clouds.")]}
+        with self.assertRaisesRegex(ValueError,"Repeated central subject in scenes 1 and 4"):
+            planner.validate_plan(plan,story)
+
+    def test_two_identical_subjects_can_show_distinct_physical_events(self):
+        story={"scenes":[
+            {"narration":"A distant ocean stretches toward the far horizon."},
+            {"narration":"Sunlight warms the shallow water close to the shore."}]}
+        plan={"shots":[
+            shot(1,"wide","side","establish","Ocean surface",
+                 "Ocean water stretches toward the horizon under broad daylight."),
+            shot(2,"close","frontal","detail","Ocean surface",
+                 "Sunlight warms the shallow water along the sandy coastline.")]}
+        self.assertEqual(len(planner.validate_plan(plan,story)),2)
+
+    def test_signed_legacy_plan_rewinds_at_third_repeated_subject(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"A distant ocean stretches toward the far horizon."},
+            {"narration":"Sunlight warms the shallow water close to the shore."},
+            {"narration":"Strong winds raise white foam over the coastal water."},
+            {"narration":"The coastal water cools when evening approaches."},
+            {"narration":"The moon shines above the dark ocean coastline."}]}
+        shots=[
+            shot(1,"wide","side","establish","Ocean surface",
+                 "Ocean water stretches toward the horizon under broad daylight."),
+            shot(2,"close","frontal","detail","Ocean surface",
+                 "Sunlight warms the shallow water along the sandy coastline."),
+            shot(3,"medium","high","process","Foam on the coast",
+                 "Wind makes pale foam travel toward a sandy shoreline."),
+            shot(4,"extreme_wide","overhead","contrast","Ocean surface",
+                 "Cool blue ocean water darkens slowly beneath evening clouds."),
+            shot(5,"extreme_close","low","consequence","Night sky and moon",
+                 "Moonlight illuminates the long coastline above the dark water.")]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"shots.json"
+            payload={"version":planner.CHECKPOINT_VERSION,
+                     "story_sha256":planner._story_digest(story),
+                     "batch_size":1,"accepted_shots":shots,
+                     "ready_to_publish":False,"scientific_facts_verified":False}
+            payload["signature"]=planner._checkpoint_signature(payload,"token")
+            cp.write_text(json.dumps(payload))
+            safe,size=planner._read_checkpoint(cp,story,"token")
+            self.assertEqual(size,1)
+            self.assertEqual(len(safe),3)
+            self.assertEqual(len(json.loads(cp.read_text())["accepted_shots"]),3)
+
     def test_live_scientist_and_diagram_shots_are_not_editorially_valid(self):
         story={"title":"Planet documentary","scenes":[
             {"narration":"A faraway planet is hotter than many stars."},
