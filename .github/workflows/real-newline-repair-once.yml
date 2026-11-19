@@ -1,0 +1,72 @@
+name: AutoStudio - real repaired prompt text-only once
+on:
+  push:
+    branches:
+      - test/real-newline-repair-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Run offline regression tests
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore latest safely reviewed checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44528144967 --repo "$REPO" --name AutoStudio-Positive-Gas-V6-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Resume real text-only preproduction
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/shot-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Save independently accepted prefix even on failure
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Newline-Repair-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Record outcome
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          import os,json
+          from pathlib import Path
+          print("### AutoStudio · prueba real de reparaciones con saltos de línea")
+          print("- Ejecución:",os.environ["RUN"])
+          print("- Resultado:",os.environ["STATUS"])
+          print("- FLUX: 0; YouTube: sin publicación")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas validadas en checkpoint:",len(d["accepted_shots"]))
+          p=Path("/tmp/shot-plan.json")
+          if p.exists():
+              d=json.loads(p.read_text())
+              print("- Escenas plan completo:",len(d["shots"]))
+          else:
+              print("- Preproducción no aprobada completamente")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
