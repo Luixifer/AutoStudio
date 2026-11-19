@@ -225,44 +225,47 @@ class ShotPlanTests(unittest.TestCase):
         self.assertEqual(len(calls),4)
 
 
-    def test_semantic_repair_keeps_complete_plan_including_last_scene(self):
-        long_story={"title":"General science film","scenes":[
-            {"narration":f"Observable effect {i} happens in the ocean and the atmosphere."}
-            for i in range(1,11)]}
+    def test_semantic_repair_changes_only_offending_scene(self):
         events=["tidal crest","evaporating droplets","condensing mist","wind currents",
                 "rolling wavefronts","breaking foam","rising vapor","gathering clouds",
                 "falling rainfall","reflected moonlight"]
+        story={"title":"Ocean documentary","scenes":[
+            {"narration":f"Ocean and atmosphere show {item} from above."}
+            for item in events]}
         original={"shots":[shot(i,["wide","medium","close","extreme_wide","extreme_close"][((i-1)%5)],
               ["side","frontal","low","overhead","high","three_quarter"][((i-1)%6)],
               ["establish","process","detail","contrast","consequence","relationship","transition"][((i-1)%7)],
-              f"Ocean atmosphere unique subject number {i}",
-              f"The {events[i-1]} appears above the ocean within a distant galaxy.")
+              f"Ocean scene {i} and its atmosphere",
+              f"The {events[i-1]} appears above the ocean during a different visible process.")
               for i in range(1,11)]}
-        self.assertGreater(len(json.dumps(original)),1200)
-        corrected=json.loads(json.dumps(original))
-        for item in corrected["shots"]:
-            item["visible_action"]=item["visible_action"].replace("distant galaxy","ocean atmosphere")
-        answers=[{"response":json.dumps(original)},{"response":json.dumps(corrected)},
+        original["shots"][0]["visible_action"]="The tidal crest appears above the ocean in a remote galaxy."
+        repaired={"subject":"Ocean waves and crest",
+                  "visible_action":"A tidal crest rises above the ocean near foaming water."}
+        answers=[{"response":json.dumps(original)},{"response":json.dumps(repaired)},
                  {"response":json.dumps({"decision":"PASS","issues":[]})}]
         prompts=[]
         def fake(_model,payload,*_args):
             prompts.append(payload["messages"][0]["content"])
             return answers.pop(0)
-        result=planner.build_plan(long_story,fake,"account","token")
+        result=planner.build_plan(story,fake,"account","token")
         self.assertEqual(len(result),10)
         self.assertEqual(len(prompts),3)
-        self.assertIn('"scene": 10',prompts[1])
+        self.assertIn("Repair ONE invalid documentary shot",prompts[1])
         self.assertIn("unsupported galaxy",prompts[1])
-        self.assertIn("FULL PREVIOUS PLAN",prompts[1])
+        self.assertEqual(result[1:],original["shots"][1:])
+        self.assertEqual(result[0]["visible_action"],repaired["visible_action"])
 
-    def test_semantic_repair_remains_fail_closed(self):
-        bad=json.loads(json.dumps(VALID))
-        bad["shots"][0]["visible_action"]="The whole planet lies inside an unsupported distant galaxy."
-        responses=[{"response":json.dumps(bad)},{"response":json.dumps(bad)}]
+    def test_semantic_repair_cannot_approve_unsupported_fact(self):
+        story={"scenes":[{"narration":"An ocean tide moves toward the coast."}]}
+        first={"shots":[shot(1,"wide","side","establish","Ocean tide",
+            "The tide moves toward a coast in a distant galaxy.")]}
+        bad_patch={"subject":"Ocean tide","visible_action":
+            "The ocean tide continues near a remote galaxy."}
+        outputs=[{"response":json.dumps(first)},{"response":json.dumps(bad_patch)}]
         def fake(*_args):
-            return responses.pop(0)
+            return outputs.pop(0)
         with self.assertRaisesRegex(ValueError,"failed preflight twice"):
-            planner.build_plan(STORY,fake,"account","token")
+            planner.build_plan(story,fake,"account","token")
 
     def test_invalid_plan_issues_no_flux_requests(self):
         with tempfile.TemporaryDirectory() as t:
