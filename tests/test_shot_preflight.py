@@ -466,14 +466,15 @@ class ShotPlanTests(unittest.TestCase):
                  "Rain drops fall into the ocean surface below.")]}
         replies=[{"response":json.dumps(first)},
                  {"response":'{"decision":"PASS","issues":[]}'},
+                 {"response":"{broken"},{"response":"{broken"},
                  {"response":"{broken"},{"response":"{broken"}]
         calls=[]
         def fake(_model,payload,*_args):
             calls.append(payload["messages"][0]["content"])
             return replies.pop(0)
-        with self.assertRaisesRegex(ValueError,"Shot batch 2 failed twice"):
+        with self.assertRaisesRegex(ValueError,"Shot batch 3 failed twice"):
             planner.build_plan(story,fake,"account","token")
-        self.assertEqual(len(calls),4)
+        self.assertEqual(len(calls),6)
         self.assertIn("PREVIOUS BATCH FAILED",calls[-1])
 
     def test_invalid_plan_issues_no_flux_requests(self):
