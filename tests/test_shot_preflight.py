@@ -226,7 +226,34 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("Moon's gravity",prompt)
         self.assertIn("Cloud droplets",prompt)
         self.assertIn("invented factual",prompt)
-        self.assertEqual(calls[0]["max_tokens"],450)
+        self.assertEqual(calls[0]["max_completion_tokens"],450)
+        self.assertEqual(calls[0]["chat_template_kwargs"],{"enable_thinking":False})
+        self.assertEqual(calls[0]["response_format"]["type"],"json_schema")
+
+
+    def test_gemma_critic_nested_reply_pass_and_schema(self):
+        calls=[]
+        def fake(model,payload,*_args):
+            calls.append((model,payload))
+            return {"choices":[{"message":{"role":"assistant",
+                     "content":json.dumps({"decision":"PASS","issues":[]})}}]}
+        self.assertTrue(planner.review_story_consistency(
+            STORY,VALID["shots"],fake,"account","token"))
+        self.assertEqual(len(calls),1)
+        self.assertEqual(calls[0][0],planner.CRITIC_MODEL)
+        self.assertNotEqual(planner.CRITIC_MODEL,planner.MODEL)
+        schema=calls[0][1]["response_format"]["json_schema"]
+        self.assertEqual(schema["properties"]["decision"]["enum"],["PASS","FAIL"])
+        self.assertEqual(schema["properties"]["issues"]["items"]["required"],["scene","issue"])
+
+    def test_gemma_critic_nested_fail_remains_blocking(self):
+        def fake(*_args):
+            return {"choices":[{"message":{"content":json.dumps({
+                "decision":"FAIL","issues":[{"scene":1,
+                    "issue":"An invented rocky surface contradicts the narration."}]})}}]}
+        with self.assertRaisesRegex(ValueError,"Story-grounding review FAIL"):
+            planner.review_story_consistency(STORY,VALID["shots"],fake,
+                                             "account","token")
 
     def test_compact_critic_second_verdict_still_fails_closed(self):
         calls=[]
