@@ -82,3 +82,5 @@ jobs:
               print("- Plan aún incompleto o rechazado")
           PY
           gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
+
+# Second run: verify recovery from the previous authenticated four-shot artifact.
