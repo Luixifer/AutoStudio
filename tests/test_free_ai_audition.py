@@ -1,5 +1,7 @@
 import unittest
-from scripts.free_ai_audition import MODELS, audition, candidate_payload
+import json
+from unittest.mock import patch
+from scripts.free_ai_audition import MODELS, audition, candidate_payload, run_candidate
 
 PROMPT = "Review this documentary storyboard for scientific plausibility and shot diversity."
 
@@ -37,6 +39,39 @@ class FreeAIAuditionTests(unittest.TestCase):
         self.assertEqual(seen, ["gpt_oss_20b"])
         self.assertFalse(report["editorial_approved"])
         self.assertFalse(report["publish_allowed"])
+
+    def test_responses_api_extracts_only_final_output_text(self):
+        payload = {"success": True, "result": {"output": [
+            {"type": "reasoning", "summary": [{"type": "summary_text", "text": "private"}]},
+            {"type": "message", "content": [{"type": "output_text", "text": "Check atmospheric claims."}]}
+        ]}}
+        class FakeResponse:
+            status = 200
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def read(self, limit):
+                return json.dumps(payload).encode()
+        result = run_candidate("gpt_oss_20b", PROMPT, "a"*32, "fake",
+                               opener=lambda req, timeout: FakeResponse())
+        self.assertEqual(result, "Check atmospheric claims.")
+
+    def test_provider_reasoning_only_is_not_accepted(self):
+        payload = {"success": True, "result": {"output": [
+            {"type": "reasoning", "summary": [{"type": "summary_text", "text": "no final answer"}]}
+        ]}}
+        class FakeResponse:
+            status = 200
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def read(self, limit):
+                return json.dumps(payload).encode()
+        with self.assertRaises(ValueError):
+            run_candidate("gpt_oss_20b", PROMPT, "a"*32, "fake",
+                          opener=lambda req, timeout: FakeResponse())
 
 if __name__ == "__main__":
     unittest.main()
