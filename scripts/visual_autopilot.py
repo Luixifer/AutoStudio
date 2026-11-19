@@ -210,6 +210,7 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
             "human_visual_approved":False,"scientific_facts_verified":False,
             "youtube_enabled":False,"all_scenes_approved":False,"scenes":[]}
     identity=""
+    prior_visual=[]
     try:
         for idx,scene in enumerate(scenes,1):
             narration=scene["narration"]
@@ -249,6 +250,23 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                 entry["candidates"].append(candidate)
                 assessment=vision(image,narration,refined,account,token)
                 report["vision_requests"]+=1
+                if assessment.get("decision")=="PASS":
+                    from scripts.visual_distinctness import compare_visual_evidence
+                    evidence=assessment.get("evidence","")
+                    if not isinstance(evidence,str) or len(evidence.strip())<12:
+                        assessment={"decision":"UNSURE",
+                                    "evidence":"Vision model PASS without sufficient observed evidence.",
+                                    "original_vision":assessment}
+                    else:
+                        repeated=compare_visual_evidence(evidence,prior_visual)
+                        if repeated:
+                            assessment={"decision":"FAIL",
+                                "evidence":"Composition appears repeated from scene "
+                                +str(repeated["prior_scene"])+". Change camera scale, viewpoint, "
+                                "composition and spatial arrangement.",
+                                "method":"cross_scene_visual_distinctness",
+                                "visual_similarity":repeated,
+                                "original_vision":assessment}
                 candidate["vision"]=assessment
                 # Reveal model verdict without printing account tokens or base64 images.
                 print(json.dumps({"scene":idx,"variant":attempt,
@@ -260,6 +278,7 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                 if assessment.get("decision")=="PASS":
                     candidate["status"]="approved"
                     entry["approved"]=True
+                    prior_visual.append((idx,assessment["evidence"]))
                     break
             entry["status"]="approved" if entry["approved"] else "needs_human_review"
     finally:
