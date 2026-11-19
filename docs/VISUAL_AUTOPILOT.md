@@ -4,7 +4,7 @@ Diseñado para trabajar con **cualquier narración de 1-24 escenas**, no contien
 
 ## Qué hace
 
-- **Preproducción global**: Antes de llamar a FLUX, Llama propone una secuencia entera de planos con escala, ángulo, propósito narrativo, sujeto y acción visible; el plan exige combinaciones cinematográficas diferentes. Si es inválido, se corrige como máximo una vez con texto y, si sigue fallando, no se crea ninguna imagen. Esto no valida científicamente cada plano.\n- **Director**: Llama a `@cf/meta/llama-3.1-8b-instruct-fp8` para interpretar el texto de cada escena y crear una descripción visual inédita. No necesita que escribas diez prompts manuales.
+- **Preproducción global**: Antes de llamar a FLUX, Llama propone una secuencia entera de planos con escala, ángulo, propósito narrativo, sujeto y acción visible; el plan exige combinaciones cinematográficas diferentes. Otra llamada de texto revisa cada escena frente al guion completo para detectar detalles materiales, físicos o geográficos inventados. Si es inválido o inconsistente, se corrige como máximo una vez con texto y, si sigue fallando, no se crea ninguna imagen. Esto no valida científicamente cada plano.\n- **Director**: Llama a `@cf/meta/llama-3.1-8b-instruct-fp8` para interpretar el texto de cada escena y crear una descripción visual inédita. No necesita que escribas diez prompts manuales.
 - **Generador**: Crea imágenes con FLUX.1 Schnell.
 - **Supervisor**: Envía la imagen *real* a `@cf/google/gemma-4-26b-a4b-it` para contrastar lo que es visible con la narración y la dirección. Exige `DECISION: PASS`, con observación visible; de otro modo la marca `needs_human_review`.
 - **Reintento**: Opcionalmente repite la escena, como máximo una vez, incorporando a las instrucciones el motivo del rechazo visual.
@@ -41,3 +41,7 @@ El primer ensayo de KELT-9b generó diez imágenes, ocho aprobadas individualmen
 ## Prueba de preproducción solo con texto (19/11/2026)
 
 La primera prueba real produjo diez combinaciones de escala, cámara y propósito diferentes usando una llamada textual a Cloudflare, sin nuevas imágenes. Sin embargo, varias acciones propuestas fueron demasiado vagas (p. ej., «Gas composition» y «Orbital period»). Se ha endurecido la validación para exigir descripciones de acciones físicas visibles de 6 a 22 palabras y una corrección textual acotada. Aún es necesaria otra prueba real de esta validación mejorada. Los planes no demuestran que las imágenes finales tengan variedad ni precisión científica.
+
+## Coherencia narrativa del plan visual (texto sin imágenes)
+
+El primer plan de diez escenas era visualmente variado en metadatos, pero la segunda versión incluyó detalles no apoyados por el guion: ubicación específica en la galaxia y una aparente superficie caliente del gigante gaseoso. Ahora un crítico independiente del mismo proveedor contrasta todas las escenas con la narración completa. Si encuentra contradicciones, el planificador recibe esos motivos y puede rehacer el plan una sola vez. Si el crítico devuelve un resultado inválido o vuelve a rechazar, no se llama a FLUX. Este control tampoco certifica precisión científica: sigue siendo IA textual y puede equivocarse; la validación de fuentes y humana permanece pendiente.
