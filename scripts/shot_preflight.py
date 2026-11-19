@@ -8,7 +8,6 @@ approval remains separate. Generic: no per-topic or KELT shot templates.
 from __future__ import annotations
 import json
 import re
-from collections import Counter
 from pathlib import Path
 
 SCALES = ("extreme_wide","wide","medium","close","extreme_close")
@@ -41,8 +40,14 @@ def validate_plan(plan, story):
             raise ValueError("Unrecognized cinematographic shot type")
         subject=item.get("subject")
         action=item.get("visible_action")
-        if any(not isinstance(v,str) or not 4<=len(v)<=200 or len(v.split())>MAX_WORDS for v in (subject,action)):
-            raise ValueError("Shot subject/action absent or overly verbose")
+        if not isinstance(subject,str) or not 4<=len(subject)<=200 or len(subject.split())>MAX_WORDS:
+            raise ValueError("Shot subject absent or overly verbose")
+        # FLUX cannot turn abstract nouns like "orbital period" into a clear
+        # shot. Demand an observable relationship/action before any generation.
+        if not isinstance(action,str) or not 16<=len(action)<=200 or not 6<=len(action.split())<=MAX_WORDS:
+            raise ValueError("Shot visible_action must describe a concrete observable scene in 6-22 words")
+        if re.search(r"\\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\\b", action, re.I):
+            raise ValueError("Abstract visual shorthand is not an image-generation shot")
         if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",subject+" "+action,re.I):
             raise ValueError("Plan contains forbidden graphic content")
         # A repeated scale+angle+role is the most blatant duplication, and
@@ -73,6 +78,11 @@ def build_plan(story,request,account,token):
         "Plan coherent but VISUALLY DIFFERENT still images for a scientific documentary. "
         "Think across ALL scenes first, not each in isolation. "
         "Each shot needs a distinctive camera scale, angle, narrative role, subject and visible action. "
+        "The visible_action MUST contain 6-22 English words describing EXACTLY what the camera "
+        "shows and the spatial relationship between the main subjects. Use tangible visible "
+        "objects, plausible physical processes and clear composition. "
+        "Avoid vague labels like 'orbital period', 'temperature map', 'gas composition', "
+        "'extreme environment', 'breaking apart', and any captions, diagrams or text. "
         "Only depict facts from the corresponding narration/title; do not add invented scientific claims, "
         "materials, environments, colors, life or objects not supported by those facts. "
         "Avoid abstract tunnels, generic vortex patterns, or identical central compositions when they "
@@ -80,6 +90,8 @@ def build_plan(story,request,account,token):
         "Select fields from these fixed vocabularies, but write subject/action in English. "
         "scale: "+",".join(SCALES)+". angle: "+",".join(ANGLES)+". role: "+",".join(ROLES)+". "
         "Do NOT reuse the same (scale, angle, role) combination in this video. "
+        "If the narration describes an abstract fact, illustrate it using the physical "
+        "subjects and relationship actually mentioned instead of adding an unsupported object. "
         "Return ONLY JSON object {\"shots\":[{\"scene\":1,\"scale\":\"wide\","
         "\"angle\":\"side\",\"role\":\"establish\",\"subject\":\"...\","
         "\"visible_action\":\"...\"}, ...]}. Exactly "+str(len(scenes))+
@@ -87,12 +99,29 @@ def build_plan(story,request,account,token):
         "Title: "+str(story.get("title","Documentary"))[:180]+"\nNarration scenes:\n"+numbered
     )
     max_tokens=min(4600,max(900,len(scenes)*190))
-    response=request(MODEL,{"messages":[{"role":"user","content":prompt}],
-                            "max_tokens":max_tokens,"temperature":0.2},account,token)
-    # Reuse the core model parser for Cloudflare result shape.
+    # One bounded repair request is permitted; never regenerate images while
+    # fixing an unusable whole-story shot outline.
     from scripts.visual_autopilot import _extract_text
-    plan=parse_reply(_extract_text(response))
-    return validate_plan(plan,story)
+    last_error=None
+    last_reply=""
+    for attempt in range(2):
+        user_prompt=prompt
+        if attempt:
+            user_prompt += (
+                "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:240]+
+                "\\nCorrect the invalid plan below, keeping its ten scene numbers "
+                "and the narration-grounded physical subjects. "
+                "Return the COMPLETE JSON object, not a patch.\\n"+
+                last_reply[:3600])
+        response=request(MODEL,{"messages":[{"role":"user","content":user_prompt}],
+                                "max_tokens":max_tokens,"temperature":0.15},account,token)
+        last_reply=_extract_text(response)
+        try:
+            return validate_plan(parse_reply(last_reply),story)
+        except ValueError as exc:
+            last_error=exc
+    raise ValueError("Shot planner failed preflight twice; no image generation: "+
+                     str(last_error))
 
 def shot_context(shot):
     return (f"SHOT PLAN, mandatory: {shot['scale']} camera scale; {shot['angle']} viewpoint; "
