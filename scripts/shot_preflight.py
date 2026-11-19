@@ -430,6 +430,7 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
         reason = None
         repair_local = None
         previous_batch = None
+        duplicate_reference = None
         for attempt in range(2):
             prior = [{"scene":x["scene"],"scale":x["scale"],
                       "angle":x["angle"],"role":x["role"],
@@ -483,7 +484,11 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     "NARRATION: "+batch[repair_local-1]["narration"]+"\\n"
                     "PREVIOUS SHOT: "+
                     json.dumps(previous_batch["shots"][repair_local-1],
-                               ensure_ascii=False)
+                               ensure_ascii=False)+
+                    ("\\nDUPLICATED EARLIER SHOT (do not repeat its concrete "
+                     "objects, composition or visible process): "+
+                     json.dumps(duplicate_reference,ensure_ascii=False)
+                     if duplicate_reference is not None else "")
                 )
             response = request(MODEL, {"messages":[{"role":"user",
                 "content":request_text}], "max_tokens":350 if repair_local else max(500,len(batch)*250),
@@ -534,14 +539,32 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 # a surgical content repair; malformed plans stay rejected.
                 repair_local = None
                 previous_batch = None
+                duplicate_reference = None
                 match = re.search(
                     r"^Scene (\d+): Shot visible_action",str(exc))
-                if (match and isinstance(parsed,dict) and
+                local_index = int(match.group(1)) if match else None
+                repeated = re.search(
+                    r"^Near-duplicate visible action in scenes (\d+) and (\d+);",
+                    str(exc))
+                if repeated:
+                    prior_index = int(repeated.group(1))
+                    repeated_index = int(repeated.group(2))
+                    if (start < repeated_index <= start+len(batch) and
+                        prior_index < repeated_index):
+                        local_index = repeated_index-start
+                        if prior_index <= len(accepted):
+                            duplicate_reference = accepted[prior_index-1]
+                        elif start < prior_index <= start+len(batch):
+                            if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
+                                duplicate_reference = parsed["shots"][prior_index-start-1]
+                if (local_index is not None and
+                    1 <= local_index <= len(batch) and
+                    isinstance(parsed,dict) and
                     isinstance(parsed.get("shots"),list) and
                     len(parsed["shots"])==len(batch) and
                     all(isinstance(item,dict) and item.get("scene")==j
                         for j,item in enumerate(parsed["shots"],1))):
-                    repair_local=int(match.group(1))
+                    repair_local=local_index
                     previous_batch=parsed
         else:
             # A malformed two-shot JSON response cannot be trusted or
