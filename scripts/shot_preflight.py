@@ -364,6 +364,8 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                       "angle":x["angle"],"role":x["role"],
                       "subject":x["subject"],"visible_action":x["visible_action"]}
                      for x in accepted]
+            forbidden = [" / ".join((x["scale"],x["angle"],x["role"]))
+                         for x in accepted]
             request_text = (
                 "Return exactly one valid JSON object and nothing else. "
                 "The object MUST contain shots, a list of EXACTLY "+
@@ -378,6 +380,10 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                 "Only show facts supported by EACH batch narration below; do not "
                 "invent materials, terrain, galaxies, locations or physical surfaces. "
                 "Avoid repeated composition, viewpoint or actions from earlier shots. "
+                "Each scale/angle/role triple must be UNIQUE across all batches. "
+                "The following triples are FORBIDDEN and must not be selected: "+
+                json.dumps(forbidden,ensure_ascii=False)+". "
+                "Also use distinct triples inside this batch. "
                 "No text outside JSON.\n"
                 "TITLE: "+str(story.get("title","Documentary"))[:160]+
                 "\nBATCH SCRIPT (local scene numbers):\n"+
