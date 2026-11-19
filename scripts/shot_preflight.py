@@ -39,6 +39,15 @@ CRITIC_SCHEMA = {
     },
     "required": ["decision", "issues"]
 }
+SHOT_PATCH_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "subject": {"type": "string"},
+        "visible_action": {"type": "string"}
+    },
+    "required": ["subject", "visible_action"],
+    "additionalProperties": False
+}
 MAX_SCENES = 24
 MAX_WORDS = 22
 ACTION_FILLER = frozenset("a an the and or of to from in on with without over under above below is are as at by into through seen visible camera view shows showing appears image picture scene shot close distant bright glowing illuminated light dramatic cinematic".split())
@@ -708,14 +717,40 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                      json.dumps(duplicate_reference,ensure_ascii=False)
                      if duplicate_reference is not None else "")
                 )
-            response = request(MODEL, {"messages":[{"role":"user",
-                "content":request_text}], "max_tokens":350 if repair_local else max(500,len(batch)*250),
-                "temperature":0.1}, account, token)
+            # A bounded, schema-constrained final repair uses a stronger
+            # existing Workers AI model. No new provider or paid API. The
+            # resulting fields still undergo every structural and factual
+            # gate; model JSON mode does NOT itself guarantee validity.
+            constrained_patch = attempt == 3 and repair_local is not None
+            if constrained_patch:
+                payload = {
+                    "messages":[{"role":"user","content":request_text}],
+                    "max_completion_tokens":400, "temperature":0.0,
+                    "chat_template_kwargs":{"enable_thinking":False},
+                    "response_format":{"type":"json_schema",
+                                       "json_schema":SHOT_PATCH_SCHEMA}
+                }
+                response = request(CRITIC_MODEL,payload,account,token)
+            else:
+                response = request(MODEL, {"messages":[{"role":"user",
+                    "content":request_text}],
+                    "max_tokens":350 if repair_local else max(500,len(batch)*250),
+                    "temperature":0.1}, account, token)
             attempted_repair_local = repair_local
             attempted_previous_batch = previous_batch
             attempted_duplicate_reference = duplicate_reference
             try:
-                parsed = parse_reply(_extract_text(response))
+                # The schema-constrained REST endpoint may return a parsed
+                # object in the response envelope instead of a JSON string.
+                # Only the schema-patch path unwraps this specific shape.
+                if (constrained_patch and isinstance(response,dict) and
+                    isinstance(response.get("response"),dict)):
+                    parsed = response["response"]
+                elif (constrained_patch and isinstance(response,dict) and
+                      {"subject","visible_action"}.issubset(response)):
+                    parsed = response
+                else:
+                    parsed = parse_reply(_extract_text(response))
                 if repair_local is not None:
                     original=previous_batch["shots"][repair_local-1]
                     # Some models repeat the original shot's metadata instead
