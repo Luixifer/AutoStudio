@@ -1020,6 +1020,41 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("to REMOVE, NEVER facts to illustrate",source)
         self.assertIn("NARRATION:",source)
 
+    def test_batch_repair_prompt_uses_actual_newline_separators(self):
+        story={"title":"Planet","scenes":[
+            {"narration":"The gaseous planet circles its bright parent star."},
+            {"narration":"The bright star shines onto the giant planet."},
+            {"narration":"Hydrogen molecules separate inside the hot gas atmosphere."},
+            {"narration":"The hot gas atmosphere expands around the planet."},
+            {"narration":"The night side atmosphere becomes cooler."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Giant planet and star",
+                 "The gaseous planet moves close to its bright parent star."),
+            shot(2,"medium","frontal","relationship","Starlight and atmosphere",
+                 "Bright starlight illuminates the planet atmosphere from one side.")]}
+        invalid={"shots":[
+            shot(1,"close","overhead","process","Hydrogen molecules",
+                 "Hydrogen separates."),
+            shot(2,"extreme_wide","high","contrast","Expanding atmosphere",
+                 "The planetary gas atmosphere spreads out toward the surrounding space.")]}
+        repaired={"subject":"Hydrogen molecules in atmosphere",
+                  "visible_action":"Hydrogen molecules split into atoms within the intensely hot planetary gas atmosphere."}
+        last={"shots":[shot(1,"extreme_close","low","detail","Night side gas",
+                            "The darker night side gas becomes cooler away from stellar illumination.")]}
+        answers=[first,{"decision":"PASS","issues":[]},invalid,repaired,
+                 {"decision":"PASS","issues":[]},last,{"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(answers.pop(0))}
+        shots=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(shots),5)
+        repair_prompt=prompts[3]
+        self.assertIn("\\nERROR: ",repair_prompt)
+        self.assertIn("\\nNARRATION: ",repair_prompt)
+        self.assertIn("\\nPREVIOUS SHOT: ",repair_prompt)
+        self.assertNotIn(r"\\nERROR:",repair_prompt)
+
     def test_grounding_critic_repeat_fail_never_approves_shot(self):
         story={"title":"Gas world","scenes":[
             {"narration":"A gaseous planet orbits a nearby bright star."},
