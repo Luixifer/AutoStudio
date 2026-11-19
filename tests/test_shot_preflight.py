@@ -98,6 +98,29 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("Water vapor",text)
         self.assertNotIn("KELT-9b",text)
 
+    def test_explicit_gaseous_world_cannot_acquire_hot_surface(self):
+        story={"scenes":[
+            {"narration":"Es un mundo gaseoso calentado por una estrella cercana."},
+            {"narration":"Aquí no hay un suelo de lava, solo una enorme atmósfera de gas."}]}
+        shots=[{"scene":1,"subject":"The illuminated planet side",
+                "visible_action":"A scorching hot surface glowing under the intense starlight."}]
+        with self.assertRaisesRegex(ValueError,"solid ground"):
+            planner.check_explicit_story_constraints(story,shots)
+        shots[0]["subject"]="The luminous star"
+        self.assertTrue(planner.check_explicit_story_constraints(story,shots))
+
+    def test_unsupported_dust_or_galaxy_fails_without_any_model_call(self):
+        story={"scenes":[{"narration":"Un planeta enorme compuesto por gas orbita una estrella."}]}
+        shot={"scene":1,"subject":"A gas planet",
+              "visible_action":"A swirl of dusty gas enveloping the gaseous planet."}
+        with self.assertRaisesRegex(ValueError,"dust"):
+            planner.check_explicit_story_constraints(story,[shot])
+        shot["visible_action"]="The planet appears in a remote galaxy with a blazing star."
+        with self.assertRaisesRegex(ValueError,"galaxy"):
+            planner.check_explicit_story_constraints(story,[shot])
+        shot["visible_action"]="A gas planet orbiting very close to its bright star."
+        self.assertTrue(planner.check_explicit_story_constraints(story,[shot]))
+
     def test_critic_prompt_respects_accurate_paraphrases(self):
         recorded=[]
         def fake(model,payload,account,token):
