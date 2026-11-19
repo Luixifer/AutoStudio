@@ -1,0 +1,1 @@
+One shot: revalidate ONLY scene 1 from ten cached KELT-9b images using Gemma longer output budget; zero FLUX image requests. Gate render on all ten visual passes, publish QA status in Issue #20, not YouTube.
