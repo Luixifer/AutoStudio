@@ -250,7 +250,7 @@ class ShotPlanTests(unittest.TestCase):
         def fake(_model,payload,*_args):
             prompts.append(payload["messages"][0]["content"])
             return answers.pop(0)
-        result=planner.build_plan(story,fake,"account","token")
+        result=planner._build_plan_whole(story,fake,"account","token")
         self.assertEqual(len(result),10)
         self.assertEqual(len(prompts),3)
         self.assertIn("Repair ONE invalid documentary shot",prompts[1])
@@ -269,6 +269,61 @@ class ShotPlanTests(unittest.TestCase):
             return outputs.pop(0)
         with self.assertRaisesRegex(ValueError,"failed preflight twice"):
             planner.build_plan(story,fake,"account","token")
+
+
+    def test_long_story_generates_small_batches_and_keeps_global_order(self):
+        details=[
+            ("wide","side","establish","Ocean waves","Ocean waves rise along the curved shoreline during a morning tide."),
+            ("close","frontal","detail","Cloud droplets","Small droplets collect inside thick clouds above the coastal ocean."),
+            ("medium","high","process","Ocean mist","Thin mist rises from warm water into the air overhead."),
+            ("extreme_wide","overhead","contrast","Moon and sea","The distant moon hangs above a wide view of the ocean."),
+            ("extreme_close","low","consequence","Rainfall","Heavy raindrops fall from a dark cloud onto the sea."),
+            ("medium","three_quarter","relationship","Sea and wind","Moving air pushes small wave crests across a broad surface.")
+        ]
+        story={"title":"Ocean processes","scenes":[{"narration":x[4]} for x in details]}
+        batches=[]
+        for offset in (0,2,4):
+            batches.append({"response":json.dumps({"shots":[
+                shot(j+1,*details[offset+j]) for j in range(2)]})})
+            batches.append({"response":json.dumps({"decision":"PASS","issues":[]})})
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return batches.pop(0)
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual([x["scene"] for x in result],list(range(1,7)))
+        self.assertEqual(len(calls),6)
+        self.assertIn("BATCH SCRIPT",calls[0])
+        self.assertIn("PREVIOUS APPROVED SHOTS",calls[2])
+        self.assertIn('"scene": 2',calls[2])
+        self.assertEqual(len(batches),0)
+
+    def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
+        lines=[
+            "Tidal waves form along the distant ocean shore.",
+            "Rain droplets fall into the deep ocean surface.",
+            "Cloud vapors condense above the blue sea.",
+            "Sea foam spreads across a moving wavefront.",
+            "The moon illuminates a coastal shoreline.",
+            "Moving air pushes a gentle sea current."
+        ]
+        story={"title":"Tides","scenes":[{"narration":x} for x in lines]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Waves at sea",
+                 "Tidal waves move above the shoreline at dawn."),
+            shot(2,"close","frontal","detail","Raindrops at sea",
+                 "Rain drops fall into the ocean surface below.")]}
+        replies=[{"response":json.dumps(first)},
+                 {"response":'{"decision":"PASS","issues":[]}'},
+                 {"response":"{broken"},{"response":"{broken"}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return replies.pop(0)
+        with self.assertRaisesRegex(ValueError,"Shot batch 2 failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),4)
+        self.assertIn("PREVIOUS BATCH FAILED",calls[-1])
 
     def test_invalid_plan_issues_no_flux_requests(self):
         with tempfile.TemporaryDirectory() as t:

@@ -235,7 +235,7 @@ def review_story_consistency(story, shots, request, account, token):
     raise ValueError("Story-grounding review FAIL: "+"; ".join(detail)[:950])
 
 
-def build_plan(story,request,account,token):
+def _build_plan_whole(story,request,account,token):
     scenes=_scene_list(story)
     numbered="\n".join(f"{i}. {s['narration']}" for i,s in enumerate(scenes,1))
     prompt=(
@@ -330,6 +330,95 @@ def build_plan(story,request,account,token):
             last_error=exc
     raise ValueError("Shot planner failed preflight twice; no image generation: "+
                      str(last_error))
+
+
+def build_plan(story, request, account, token):
+    """Use short, sequential requests for long stories, preserving all guards."""
+    scenes = _scene_list(story)
+    if len(scenes) <= 4:
+        return _build_plan_whole(story, request, account, token)
+    return _build_plan_chunks(story, request, account, token)
+
+
+def _build_plan_chunks(story, request, account, token, chunk_size=2):
+    """Plan in <=2-scene batches; no FLUX or publication can be called here.
+
+    Every completed prefix is structurally revalidated, including visual
+    diversity across batch boundaries. Only the current batch is retried.
+    Semantic checks use the complete narration for explicit constraints, and
+    a short independent story critic evaluates each batch. Any failure blocks
+    the whole plan; a partial plan is never returned as approved.
+    """
+    from scripts.visual_autopilot import _extract_text
+
+    scenes = _scene_list(story)
+    if not isinstance(chunk_size, int) or not 1 <= chunk_size <= 4:
+        raise ValueError("Invalid bounded shot batch size")
+    numbered = "\n".join(f"{i}. {item['narration']}"
+                          for i, item in enumerate(scenes, 1))
+    accepted = []
+    for start in range(0, len(scenes), chunk_size):
+        batch = scenes[start:start+chunk_size]
+        chunk_story = {"title":story.get("title", "Documentary"),"scenes":batch}
+        reason = None
+        for attempt in range(2):
+            prior = [{"scene":x["scene"],"scale":x["scale"],
+                      "angle":x["angle"],"role":x["role"],
+                      "subject":x["subject"],"visible_action":x["visible_action"]}
+                     for x in accepted]
+            request_text = (
+                "Plan cinematic scientific documentary stills for ONLY the next "+
+                str(len(batch))+" scenes. Return ONLY JSON object with key shots; "
+                "scene numbering must restart at 1 within THIS batch. "
+                "Each shot needs scene, scale, angle, role, subject, visible_action. "
+                "Valid scale: "+",".join(SCALES)+"; angle: "+",".join(ANGLES)+
+                "; role: "+",".join(ROLES)+". visible_action must be 6-22 "
+                "English words, concrete visible objects and physical relationships. "
+                "Do not add galaxies, dust, terrain, animals, labels, graphics, "
+                "structures or other facts absent from the narration. "
+                "No repeated combination of scale/angle/role or near-duplicate "
+                "visible actions, including previous batches. Avoid generic gas "
+                "swirls and vortex compositions. Do not copy or renumber prior shots. "
+                "Your response is a single COMPLETE JSON object for this batch, "
+                "not for the whole film.\\n"
+                "Documentary title: "+str(story.get("title","Documentary"))[:160]+
+                "\\nWHOLE SCRIPT for context (do not illustrate extra facts):\\n"+
+                numbered+"\\nBATCH SCRIPT (local scene numbers):\\n"+
+                "\n".join(f"{i}. {item['narration']}"
+                          for i,item in enumerate(batch,1))+
+                "\\nPREVIOUS APPROVED SHOTS (must not repeat):\\n"+
+                json.dumps(prior,ensure_ascii=False)
+            )
+            if reason is not None:
+                request_text += (
+                    "\\nPREVIOUS BATCH FAILED VALIDATION: "+str(reason)[:500]+
+                    "\\nRegenerate ONLY this batch with corrected, distinct "
+                    "and narration-grounded visible actions. Return valid JSON."
+                )
+            response = request(MODEL, {"messages":[{"role":"user",
+                "content":request_text}], "max_tokens":max(500,len(batch)*250),
+                "temperature":0.1}, account, token)
+            try:
+                parsed = parse_reply(_extract_text(response))
+                local = validate_plan(parsed,chunk_story)
+                current = [dict(item,scene=start+item["scene"]) for item in local]
+                candidate = accepted+current
+                prefix_story = {"scenes":scenes[:len(candidate)]}
+                validate_plan({"shots":candidate},prefix_story)
+                check_explicit_story_constraints(story,candidate)
+                review_story_consistency(chunk_story,local,request,account,token)
+                accepted = candidate
+                break
+            except ValueError as exc:
+                reason = exc
+        else:
+            raise ValueError(
+                f"Shot batch {start//chunk_size+1} failed twice; no image generation: "+
+                str(reason))
+    # Recheck all global structural and explicit narrative constraints.
+    result = validate_plan({"shots":accepted},story)
+    check_explicit_story_constraints(story,result)
+    return result
 
 def shot_context(shot):
     return (f"SHOT PLAN, mandatory: {shot['scale']} camera scale; {shot['angle']} viewpoint; "
