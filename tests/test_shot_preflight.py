@@ -46,6 +46,29 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"number"):
             planner.validate_plan({"shots":VALID["shots"][:2]},STORY)
 
+    def test_same_visible_action_with_different_camera_metadata_is_rejected(self):
+        story={"scenes":[
+            {"narration":"A gas giant is surrounded by a glowing cloud of gas."},
+            {"narration":"The giant's gas cloud swirls around its atmosphere."}]}
+        proposed={"shots":[
+            shot(1,"wide","frontal","establish","Gas giant and its atmosphere",
+                 "Swirling gas clouds surround a glowing giant planet with turbulent strands."),
+            shot(2,"close","side","process","Gas giant's atmosphere",
+                 "Turbulent swirling gas clouds surround a glowing giant planet with strands.")]}
+        with self.assertRaisesRegex(ValueError,"Near-duplicate visible action"):
+            planner.validate_plan(proposed,story)
+
+    def test_repeated_subject_with_new_physical_relationship_is_allowed(self):
+        story={"scenes":[
+            {"narration":"A gaseous planet is illuminated by its parent star."},
+            {"narration":"The gaseous planet travels on an orbit near its parent star."}]}
+        proposed={"shots":[
+            shot(1,"wide","frontal","establish","Planet and parent star",
+                 "A gas planet and bright parent star appear together in a wide view."),
+            shot(2,"medium","side","relationship","Planet in orbit",
+                 "A side view reveals the curved orbital path between the planet and star.")]}
+        self.assertEqual(len(planner.validate_plan(proposed,story)),2)
+
     def test_parse_code_fence_and_schema_fail_closed(self):
         result=planner.parse_reply("```json\n"+json.dumps(VALID)+"\n```")
         self.assertEqual(len(planner.validate_plan(result,STORY)),3)
