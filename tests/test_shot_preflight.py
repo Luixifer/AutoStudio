@@ -92,7 +92,7 @@ class ShotPlanTests(unittest.TestCase):
         result=planner.build_plan(STORY,fake_request,"a"*32,"test")
         self.assertEqual(len(result),3)
         self.assertEqual(len(calls),2)
-        self.assertIn("consistency reviewer",calls[1][1]["messages"][0]["content"])
+        self.assertIn("CONTRADICTION reviewer",calls[1][1]["messages"][0]["content"])
         text=calls[0][1]["messages"][0]["content"]
         self.assertIn("The Moon's gravity",text)
         self.assertIn("Water vapor",text)
