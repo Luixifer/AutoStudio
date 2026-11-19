@@ -1050,9 +1050,9 @@ class ShotPlanTests(unittest.TestCase):
         shots=planner.build_plan(story,fake,"account","token")
         self.assertEqual(len(shots),5)
         repair_prompt=prompts[3]
-        self.assertIn("\\nERROR: ",repair_prompt)
-        self.assertIn("\\nNARRATION: ",repair_prompt)
-        self.assertIn("\\nPREVIOUS SHOT: ",repair_prompt)
+        self.assertIn("\nERROR: ",repair_prompt)
+        self.assertIn("\nNARRATION: ",repair_prompt)
+        self.assertIn("\nPREVIOUS SHOT: ",repair_prompt)
         self.assertNotIn(r"\\nERROR:",repair_prompt)
 
     def test_grounding_critic_repeat_fail_never_approves_shot(self):
