@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
   issues: write
 jobs:
   check:
@@ -15,6 +16,31 @@ jobs:
           python-version: '3.12'
       - name: Test sin llamadas a modelos
         run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -v
+      - name: Recuperar ultimo bloque aprobado de GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          CURRENT_RUN: ${{ github.run_id }}
+          ARTIFACT: AutoStudio-Checkpoint-Textual
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .autostudio
+          previous=$(gh api "repos/$REPO/actions/artifacts?name=$ARTIFACT&per_page=100" |
+            jq -r --arg branch "$BRANCH" --arg current "$CURRENT_RUN" '
+              [.artifacts[] |
+                select(.expired == false and .workflow_run.head_branch == $branch) |
+                select((.workflow_run.id | tostring) != $current)]
+              | sort_by(.created_at) | last | .workflow_run.id // empty')
+          if [[ -n "$previous" ]]; then
+            echo "Recuperando checkpoint de ejecucion $previous"
+            gh run download "$previous" --repo "$REPO" \
+              --name "$ARTIFACT" --dir .autostudio
+            test -s .autostudio/shot-checkpoint.json
+          else
+            echo "No existe un checkpoint anterior; se empieza por la primera escena"
+          fi
       - name: Plan completo con IA de texto, SIN FLUX
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -22,7 +48,16 @@ jobs:
         run: |
           python -m scripts.shot_preflight \
             --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
-            --out /tmp/shot-plan.json
+            --out /tmp/shot-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Guardar bloques validados aunque Cloudflare falle
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AutoStudio-Checkpoint-Textual
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 30
+          if-no-files-found: ignore
       - name: Archivar plan sin generar imágenes
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
