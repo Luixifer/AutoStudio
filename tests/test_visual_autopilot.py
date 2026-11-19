@@ -91,8 +91,12 @@ class AutopilotTests(unittest.TestCase):
         calls=[]
         def supervisor(*a):
             calls.append(1)
+            accepted=("A closeup of turbulent atmospheric gas filaments with a star in the upper background."
+                      if len(calls)==2 else
+                      "A wide orbital perspective of a distant planet disk with a stellar companion to the left.")
             return {"decision":"PASS" if len(calls)%2==0 else "FAIL",
-                    "evidence":"Visible ground inconsistent with described gas"}
+                    "evidence":accepted if len(calls)%2==0 else
+                               "Visible rocky ground contradicts the described gas world."}
         with patch.dict("os.environ",{"CLOUDFLARE_API_TOKEN":"test","CLOUDFLARE_ACCOUNT_ID":"a"*32}):
             r=auto.run(self.story,self.root/"out",live=True,max_attempts=2,request_budget=4,
                 director=lambda *a:"Photorealistic gas, deep sky, strong space composition and luminous clouds",
