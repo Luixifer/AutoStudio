@@ -671,6 +671,69 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("EXACTLY 1 objects",calls[4])
         self.assertIn("wide / side / establish",calls[4])
 
+
+    def test_underlength_first_patch_gets_one_extra_surgical_attempt(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Tidal waves form along the deep ocean shore."},
+            {"narration":"Rain droplets fall into the deep ocean surface."},
+            {"narration":"Cloud vapors condense above the wide blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a long coastal shoreline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Tidal waves form along the deep ocean shore."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall into the deep ocean surface.")]}
+        bad={"shots":[
+            shot(1,"medium","high","process","Cloud vapors","Tiny vapor"),
+            shot(2,"extreme_wide","overhead","contrast","Moving foam",
+                 "Sea foam spreads across a moving wavefront.")]}
+        too_short={"subject":"Cloud vapors","visible_action":"Condensing clouds"}
+        corrected={"subject":"Cloud vapors condensing",
+                   "visible_action":"Small water droplets condense inside clouds above the open sea."}
+        last={"shots":[shot(1,"extreme_close","low","consequence",
+                            "Moonlit coast","The moon illuminates a long coastal shoreline.")]}
+        replies=[first,{"decision":"PASS","issues":[]},bad,too_short,corrected,
+                 {"decision":"PASS","issues":[]},last,{"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(replies.pop(0))}
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(result),5)
+        self.assertEqual(result[2]["visible_action"],corrected["visible_action"])
+        self.assertEqual(result[3]["visible_action"],bad["shots"][1]["visible_action"])
+        self.assertIn("Aim for 10-16 words",prompts[3])
+        self.assertIn("Aim for 10-16 words",prompts[4])
+        self.assertEqual(len(prompts),8)
+
+    def test_underlength_three_attempts_still_blocks(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Tidal waves form along the deep ocean shore."},
+            {"narration":"Rain droplets fall into the deep ocean surface."},
+            {"narration":"Cloud vapors condense above the wide blue sea."},
+            {"narration":"Sea foam spreads across a moving wavefront."},
+            {"narration":"The moon illuminates a long coastal shoreline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Tidal waves form along the deep ocean shore."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall into the deep ocean surface.")]}
+        bad={"shots":[
+            shot(1,"medium","high","process","Cloud vapors","Tiny vapor"),
+            shot(2,"extreme_wide","overhead","contrast","Moving foam",
+                 "Sea foam spreads across a moving wavefront.")]}
+        answers=[first,{"decision":"PASS","issues":[]},bad,
+                 {"subject":"Cloud vapors","visible_action":"Tiny vapor"},
+                 {"subject":"Cloud vapors","visible_action":"Tiny vapor"}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload)
+            return {"response":json.dumps(answers.pop(0))}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),5)
+
     def test_cross_batch_duplicate_repairs_only_repeated_scene(self):
         story={"title":"Ocean processes","scenes":[
             {"narration":"Ocean waves move across a coastal sea surface."},

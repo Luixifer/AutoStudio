@@ -539,7 +539,10 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
         repair_local = None
         previous_batch = None
         duplicate_reference = None
-        for attempt in range(2):
+        attempts = 2
+        attempt = 0
+        while attempt < attempts:
+            attempt += 1
             prior = [{"scene":x["scene"],"scale":x["scale"],
                       "angle":x["angle"],"role":x["role"],
                       "subject":x["subject"],"visible_action":x["visible_action"]}
@@ -585,8 +588,9 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                     "Fix ONLY the subject and visible_action of ONE documentary "
                     "shot. Return JSON object with exactly subject and "
                     "visible_action string keys. visible_action MUST contain "
-                    "6-22 English words showing concrete visible subjects and "
-                    "their physical relationship. The NARRATION, not the "
+                    "6-22 English words. Aim for 10-16 words showing concrete "
+                    "visible subjects and their physical relationship. "
+                    "The NARRATION, not the "
                     "reviewer's complaint, is the ONLY positive factual source. "
                     "The ERROR describes unsupported or contradicted claims "
                     "to REMOVE, NEVER facts to illustrate or repeat. "
@@ -702,6 +706,14 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                         for j,item in enumerate(parsed["shots"],1))):
                     repair_local=local_index
                     previous_batch=parsed
+                    # When the model's first correction is still too short,
+                    # allow ONE additional two-field correction. This applies
+                    # only to the exact, numbered, structurally parseable
+                    # candidate; never to invented facts, ambiguous critics,
+                    # incorrect JSON or other failures.
+                    if (attempt == 2 and
+                        re.match(r"^Scene \d+: Shot visible_action",str(exc))):
+                        attempts = 3
         else:
             # A malformed two-shot JSON response cannot be trusted or
             # reconstructed. Instead ask for ONE scene at a time, preserving
