@@ -276,7 +276,7 @@ def build_plan(story,request,account,token):
     for attempt in range(2):
         repair_scene=None
         if attempt and last_shots is not None and last_error is not None:
-            match=re.search(r"\\b[Ss]cene (\\d+) (?:introduces|implies)\\b",str(last_error))
+            match=re.search(r"\b[Ss]cene (\d+) (?:introduces|implies)\b",str(last_error))
             if match:
                 n=int(match.group(1))
                 if 1<=n<=len(last_shots):
