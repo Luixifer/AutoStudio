@@ -49,6 +49,17 @@ class AudioQualityTests(unittest.TestCase):
             self.assertTrue(result["review_needed"])
             self.assertGreaterEqual(len(result["warnings"]),2)
 
+    def test_missing_first_spoken_word_requires_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            wav=Path(tmp)/"audio.wav";write_clip(wav)
+            data=audio.assess(
+                wav,"Hola. Este es un ejemplo de voz para probar el sistema.",
+                transcription="Este es un ejemplo de voz para probar el sistema.",
+                speech_segments=[{"start":0.0,"end":1.9}])
+            self.assertLess(data["word_match_ratio"],.98)
+            self.assertTrue(data["review_needed"])
+            self.assertIn("Transcription differs from reference",data["warnings"])
+
     def test_rejects_invalid_segments_without_network(self):
         with tempfile.TemporaryDirectory() as tmp:
             wav=Path(tmp)/"audio.wav";write_clip(wav)
