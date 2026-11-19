@@ -1,0 +1,1 @@
+One real Cloudflare text-only test of ten concrete, narration-grounded KELT-9b shots. Validator rejects abstract labels, bounded plan repair once, zero FLUX images, report in issue #20.
