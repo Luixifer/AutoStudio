@@ -98,10 +98,12 @@ class ShotPlanTests(unittest.TestCase):
                                 shot_planner=lambda *a:planner.validate_plan(VALID,STORY),
                                 director=director,generator=lambda *a:jpeg(),vision=vision)
             self.assertTrue(result["preflight_validated"])
-            self.assertEqual(len(prompts),3)
-            self.assertIn("overhead",prompts[0])
-            self.assertIn("process",prompts[1])
-            self.assertIn("detail",prompts[2])
+            # The existing director may also replan a repeated image prompt,
+            # so multiple text calls are permitted, never extra FLUX.
+            self.assertGreaterEqual(len(prompts),3)
+            self.assertTrue(any("overhead" in p for p in prompts))
+            self.assertTrue(any("process" in p for p in prompts))
+            self.assertTrue(any("detail" in p for p in prompts))
             self.assertEqual(result["completed_requests"],3)
 
 if __name__=="__main__":
