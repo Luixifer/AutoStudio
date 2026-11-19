@@ -635,6 +635,49 @@ class ShotPlanTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"Untrusted"):
                 planner._read_checkpoint(cp,different,"secret")
 
+
+    def test_rewound_checkpoint_rewrites_signed_safe_prefix_immediately(self):
+        story={"title":"Gas planet","scenes":[
+            {"narration":"A huge gaseous planet orbits a nearby bright star."},
+            {"narration":"Its atmosphere receives intense light from the star."},
+            {"narration":"This gaseous world has no solid ground or lava."},
+            {"narration":"Heat travels through the planet's thick atmosphere."},
+            {"narration":"Hydrogen molecules separate within hot atmospheric gas."}]}
+        old=[
+            shot(1,"wide","side","establish","Planet by its star",
+                 "A huge gaseous planet orbits a nearby bright star."),
+            shot(2,"close","frontal","detail","Atmospheric illumination",
+                 "Light from the star reaches the gaseous atmosphere."),
+            shot(3,"medium","high","process","Lava on planet",
+                 "Molten lava pours across rocky surface beneath thick planetary gas.")]
+        with tempfile.TemporaryDirectory() as d:
+            cp=Path(d)/"old.json"
+            payload={"version":planner.CHECKPOINT_VERSION,
+                     "story_sha256":planner._story_digest(story),
+                     "batch_size":1,"accepted_shots":old,
+                     "ready_to_publish":False,"scientific_facts_verified":False}
+            cp.write_text(json.dumps({**payload,
+                     "signature":planner._checkpoint_signature(payload,"secret")}))
+            safe,size=planner._read_checkpoint(cp,story,"secret")
+            self.assertEqual(len(safe),2)
+            saved=json.loads(cp.read_text())
+            self.assertEqual(saved["accepted_shots"],safe)
+            self.assertEqual(len(planner._read_checkpoint(cp,story,"secret")[0]),2)
+            self.assertEqual(size,1)
+
+    def test_negative_story_constraints_pass_as_positive_only_gas_brief(self):
+        story={"title":"Gas planet","scenes":[
+            {"narration":"Se trata de un enorme planeta gaseoso."},
+            {"narration":"Aquí no hay un suelo de lava."},
+            {"narration":"El calor separa las moléculas de hidrógeno."},
+            {"narration":"La estrella ilumina el planeta gaseoso."},
+            {"narration":"La cara nocturna puede enfriarse."}]}
+        hint=planner._story_visual_constraints(story)
+        self.assertIn("atmospheric gas layers only",hint)
+        self.assertIn("not on a physical",hint)
+        self.assertNotIn("molten lava",hint)
+        self.assertNotIn("rocky terrain",hint)
+
     def test_signed_two_scene_batches_rewind_to_complete_review_boundary(self):
         story={"title":"Gas world","scenes":[
             {"narration":"A huge gaseous planet orbits a bright nearby star."},

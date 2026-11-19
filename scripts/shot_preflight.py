@@ -516,6 +516,15 @@ def _read_checkpoint(path, story, token):
                 validate_plan({"shots":safe},
                               {"scenes":_scene_list(story)[:len(safe)]})
                 check_explicit_story_constraints(story, safe)
+                # Persist the NEW safe boundary immediately, not only after
+                # another model batch happens to pass. Even if Cloudflare
+                # fails next, the uploaded checkpoint cannot retain shots
+                # already disproved by the current factual policy.
+                _write_checkpoint(path, story, safe, size, token)
+            else:
+                # Delete only after full HMAC/story validation established
+                # that no previously saved scene remains reusable.
+                Path(path).unlink()
             return safe, size
         return checked, size
     except (OSError, UnicodeError, TypeError, KeyError, json.JSONDecodeError,
@@ -540,6 +549,29 @@ def build_plan(story, request, account, token, checkpoint_path=None):
                      _write_checkpoint(checkpoint_path, story, shots,
                                        batch_size, token))
         if checkpoint_path else None)
+
+
+def _story_visual_constraints(story):
+    """Return a grounded positive visual brief, never a topic template."""
+    full = " ".join(x["narration"] for x in _scene_list(story)).lower()
+    gas = bool(re.search(
+        r"(?:mundo gaseoso|planeta[^.]{0,100}(?:gas|gaseoso)|gaseous planet|gas giant)",
+        full))
+    no_ground = bool(re.search(
+        r"(?:no hay (?:un )?suelo|sin superficie s[oó]lida|no solid (?:surface|ground)|without solid ground)",
+        full))
+    if gas and no_ground:
+        return (
+            "SCIENCE CONSTRAINT FROM FULL STORY: depict the narrated gas "
+            "planet with atmospheric gas layers only. Any temperature or "
+            "hydrogen process must take place in gas, not on a physical "
+            "landscape or material surface. Use the star only when narrated. "
+        )
+    return (
+        "SCENE CONSTRAINT: Treat negated or absent elements as exclusions, "
+        "not objects to illustrate. Depict only positively supported "
+        "subjects and processes in the corresponding narration. "
+    )
 
 
 def _build_plan_chunks(story, request, account, token, chunk_size=2,
@@ -595,6 +627,8 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 "a concrete physical action or relationship, no charts or captions. "
                 "Only show facts supported by EACH batch narration below; do not "
                 "invent materials, terrain, galaxies, locations or physical surfaces. "
+                "NEGATIVE STATEMENTS in narration prohibit, rather than request, "
+                "the depicted objects. "+_story_visual_constraints(story)+
                 "Avoid repeated composition, viewpoint or actions from earlier shots. "
                 "Each scale/angle/role triple must be UNIQUE across all batches. "
                 "The following triples are FORBIDDEN and must not be selected: "+
