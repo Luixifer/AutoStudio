@@ -93,7 +93,10 @@ def assess(path, expected, *, transcription=None, speech_segments=None,
     if not spans: warnings.append("No speech detected by independent VAD")
     if leading>.8: warnings.append("Excessive leading silence")
     if trailing>1.0: warnings.append("Excessive trailing silence")
-    if accuracy<.83: warnings.append("Transcription differs from reference")
+    # A missed opening word is a real editing problem even when most of
+    # the script is correct. Any appreciable discrepancy requires review;
+    # do not silently change the approved narration from ASR output.
+    if accuracy<.98: warnings.append("Transcription differs from reference")
     if not words and transcription is None:
         warnings.append("No word-level timestamps from Whisper")
     return {
