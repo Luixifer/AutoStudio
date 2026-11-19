@@ -8,6 +8,10 @@ approval remains separate. Generic: no per-topic or KELT shot templates.
 from __future__ import annotations
 import json
 import re
+import hashlib
+import hmac
+import os
+import tempfile
 from pathlib import Path
 
 SCALES = ("extreme_wide","wide","medium","close","extreme_close")
@@ -392,17 +396,126 @@ def _retry_timed_out_text_request(request):
     return guarded
 
 
-def build_plan(story, request, account, token):
+CHECKPOINT_VERSION = 1
+
+
+def _canonical_json(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False,
+                      separators=(",", ":")).encode("utf-8")
+
+
+def _story_digest(story):
+    return hashlib.sha256(_canonical_json(story)).hexdigest()
+
+
+def _checkpoint_signature(payload, token):
+    # A persisted prefix must be authenticated: otherwise arbitrary edited
+    # JSON could masquerade as shots that passed the model consistency review.
+    if not isinstance(token, str) or not token:
+        raise ValueError("Cannot authenticate a shot checkpoint without credentials")
+    return hmac.new(token.encode("utf-8"), _canonical_json(payload),
+                    hashlib.sha256).hexdigest()
+
+
+def _write_checkpoint(path, story, accepted, chunk_size, token):
+    """Atomically save only text-reviewed accepted shots, never a partial approval."""
+    if not path:
+        return
+    if not isinstance(chunk_size, int) or chunk_size not in (1, 2):
+        raise ValueError("Invalid checkpoint batch size")
+    if not accepted or len(accepted) > len(_scene_list(story)):
+        raise ValueError("Cannot checkpoint an empty or oversized shot prefix")
+    shots = validate_plan({"shots":accepted},
+                          {"scenes":_scene_list(story)[:len(accepted)]})
+    check_explicit_story_constraints(story, shots)
+    payload = {"version": CHECKPOINT_VERSION,
+               "story_sha256": _story_digest(story),
+               "batch_size": chunk_size,
+               "accepted_shots": shots,
+               "ready_to_publish": False,
+               "scientific_facts_verified": False}
+    signed = {**payload, "signature": _checkpoint_signature(payload, token)}
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temp_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=target.parent,
+            prefix=".autostudio-checkpoint-", suffix=".tmp", delete=False
+        ) as tmp:
+            temp_name = tmp.name
+            json.dump(signed, tmp, ensure_ascii=False, indent=2)
+            tmp.write("\n")
+            tmp.flush()
+            os.fsync(tmp.fileno())
+        os.replace(temp_name, target)
+    finally:
+        if temp_name and os.path.exists(temp_name):
+            os.unlink(temp_name)
+
+
+def _read_checkpoint(path, story, token):
+    """Verify the exact story, integrity and visual rules before resuming."""
+    if not path or not Path(path).exists():
+        return [], 2
+    try:
+        target = Path(path)
+        if target.stat().st_size > 150_000:
+            raise ValueError("Shot checkpoint too large")
+        data = json.loads(target.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            raise ValueError("Invalid shot checkpoint schema")
+        signature = data.get("signature")
+        payload = {k: v for k, v in data.items() if k != "signature"}
+        if (set(payload) != {"version", "story_sha256", "batch_size",
+                             "accepted_shots", "ready_to_publish",
+                             "scientific_facts_verified"} or
+            data["version"] != CHECKPOINT_VERSION or
+            payload["story_sha256"] != _story_digest(story) or
+            payload["ready_to_publish"] is not False or
+            payload["scientific_facts_verified"] is not False or
+            not isinstance(signature, str) or
+            not hmac.compare_digest(signature,
+                                    _checkpoint_signature(payload, token))):
+            raise ValueError("Checkpoint identity or authentication mismatch")
+        size = data["batch_size"]
+        if type(size) is not int or size not in (1, 2):
+            raise ValueError("Invalid checkpoint batch size")
+        shots = data["accepted_shots"]
+        if not isinstance(shots, list) or not 1 <= len(shots) <= len(_scene_list(story)):
+            raise ValueError("Invalid checkpoint scene count")
+        checked = validate_plan(
+            {"shots":shots}, {"scenes":_scene_list(story)[:len(shots)]})
+        check_explicit_story_constraints(story, checked)
+        if len(shots) != len(_scene_list(story)) and len(shots) % size:
+            raise ValueError("Checkpoint does not end on a complete batch")
+        return checked, size
+    except (OSError, UnicodeError, TypeError, KeyError, json.JSONDecodeError,
+            ValueError) as exc:
+        raise ValueError("Untrusted or incompatible shot checkpoint: "+
+                         str(exc)) from None
+
+
+def build_plan(story, request, account, token, checkpoint_path=None):
     """Use short, sequential requests for long stories, preserving all guards."""
     scenes = _scene_list(story)
     guarded_request = _retry_timed_out_text_request(request)
     if len(scenes) <= 4:
         return _build_plan_whole(story, guarded_request, account, token)
-    return _build_plan_chunks(story, guarded_request, account, token)
+    accepted, size = _read_checkpoint(checkpoint_path, story, token)
+    if len(accepted) == len(scenes):
+        return validate_plan({"shots":accepted}, story)
+    return _build_plan_chunks(
+        story, guarded_request, account, token, chunk_size=size,
+        initial_accepted=accepted, start_at=len(accepted),
+        on_accepted=(lambda shots, batch_size:
+                     _write_checkpoint(checkpoint_path, story, shots,
+                                       batch_size, token))
+        if checkpoint_path else None)
 
 
 def _build_plan_chunks(story, request, account, token, chunk_size=2,
-                       initial_accepted=None, start_at=0):
+                       initial_accepted=None, start_at=0, on_accepted=None):
     """Plan in <=2-scene batches; no FLUX or publication can be called here.
 
     Every completed prefix is structurally revalidated, including visual
@@ -531,6 +644,8 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 validate_plan({"shots":candidate},prefix_story)
                 check_explicit_story_constraints(story,candidate)
                 review_story_consistency(chunk_story,local,request,account,token)
+                if on_accepted is not None:
+                    on_accepted(candidate, chunk_size)
                 accepted = candidate
                 break
             except ValueError as exc:
@@ -574,7 +689,8 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
             if chunk_size == 2 and "invalid JSON" in str(reason):
                 return _build_plan_chunks(
                     story, request, account, token, chunk_size=1,
-                    initial_accepted=accepted, start_at=start)
+                    initial_accepted=accepted, start_at=start,
+                    on_accepted=on_accepted)
             raise ValueError(
                 f"Shot batch {start//chunk_size+1} failed twice; no image generation: "+
                 str(reason))
@@ -589,9 +705,9 @@ def shot_context(shot):
             f"visible event {shot['visible_action']}. "
             "Do not replace this with an abstract or generic spiral.")
 
-def plan_file(story_path,out,request,account,token):
+def plan_file(story_path,out,request,account,token,checkpoint_path=None):
     story=json.loads(Path(story_path).read_text(encoding="utf-8"))
-    shots=build_plan(story,request,account,token)
+    shots=build_plan(story,request,account,token,checkpoint_path=checkpoint_path)
     target=Path(out)
     target.parent.mkdir(parents=True,exist_ok=True)
     artifact={"schema":1,"mode":"real-text-only","title":story.get("title","Documentary"),
@@ -606,12 +722,13 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--story",required=True)
     p.add_argument("--out",required=True)
+    p.add_argument("--checkpoint",default=None)
     a=p.parse_args()
     account=os.environ.get("CLOUDFLARE_ACCOUNT_ID","")
     token=os.environ.get("CLOUDFLARE_API_TOKEN","")
     if not account or not token:
         raise ValueError("Cloudflare secrets missing")
-    result=plan_file(a.story,a.out,_request,account,token)
+    result=plan_file(a.story,a.out,_request,account,token,checkpoint_path=a.checkpoint)
     print(json.dumps({"scenes":len(result["shots"]),"new_images":0,
                       "plan_valid":True,"visual_signatures":[
                           "-".join((s["scale"],s["angle"],s["role"])) for s in result["shots"]]},
