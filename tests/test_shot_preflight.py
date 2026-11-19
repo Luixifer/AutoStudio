@@ -1115,6 +1115,48 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("\nPREVIOUS SHOT: ",repair_prompt)
         self.assertNotIn(r"\\nERROR:",repair_prompt)
 
+    def test_grounding_fail_uses_strict_gemma_on_final_repair(self):
+        story={"title":"Ocean changes","scenes":[
+            {"narration":"Ocean waves move along a coast."},
+            {"narration":"Rainwater falls over the open sea."},
+            {"narration":"Wind pushes long lines of seawater toward the coast."},
+            {"narration":"The moon rises above the night ocean."},
+            {"narration":"Foam forms at the edge of a breaking ocean wave."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Coastal waves",
+                 "Ocean waves move along a distant coastal shoreline."),
+            shot(2,"close","frontal","detail","Rainwater",
+                 "Rainwater falls from thick clouds over the open sea.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Rocky land not narrated",
+                 "Rocky mountains tower over a coast with a distant lighthouse."),
+            shot(2,"extreme_wide","overhead","contrast","Moonlit ocean",
+                 "The moon rises above the dark ocean surface at night.")]}
+        review={"decision":"FAIL","issues":[{"scene":1,
+                 "issue":"Narration describes wind-driven water rather than invented mountains."}]}
+        same={"subject":"Rocky mountains",
+              "visible_action":"Rocky mountains tower over a coast with a distant lighthouse."}
+        repaired={"subject":"Wind moved ocean surface",
+                  "visible_action":"Wind pushes the long water ridges diagonally toward the distant coast."}
+        final={"shots":[shot(1,"extreme_close","low","consequence","Wave foam",
+                            "White foam forms around the crest of a breaking ocean wave.")]}
+        answers=[first,{"decision":"PASS","issues":[]},second,
+                 review,same,review,
+                 {"response":repaired},{"decision":"PASS","issues":[]},
+                 final,{"decision":"PASS","issues":[]}]
+        calls=[]
+        def fake(model,payload,*_args):
+            calls.append((model,payload))
+            value=answers.pop(0)
+            return value if "response" in value else {"response":json.dumps(value)}
+        output=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(output),5)
+        self.assertEqual(output[2]["visible_action"],repaired["visible_action"])
+        self.assertEqual(calls[6][0],planner.CRITIC_MODEL)
+        self.assertEqual(calls[6][1]["response_format"]["json_schema"],
+                         planner.SHOT_PATCH_SCHEMA)
+        self.assertEqual(len(calls),10)
+
     def test_grounding_critic_repeat_fail_never_approves_shot(self):
         story={"title":"Gas world","scenes":[
             {"narration":"A gaseous planet orbits a nearby bright star."},
@@ -1137,6 +1179,9 @@ class ShotPlanTests(unittest.TestCase):
         replies=[first,{"decision":"PASS","issues":[]},wrong,verdict,
                  {"subject":"Rocky surface","visible_action":
                   "A rocky surface appears beneath the bright planetary sky."},
+                 verdict,
+                 {"response":{"subject":"Rocky surface","visible_action":
+                  "A rocky surface appears beneath the bright planetary sky."}},
                  verdict]
         def fake(*_args):
             return {"response":json.dumps(replies.pop(0))}
