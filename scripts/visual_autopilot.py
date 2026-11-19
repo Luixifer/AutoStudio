@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import difflib
 import json
 import os
 from pathlib import Path
@@ -86,10 +87,13 @@ def plan_scene(narration, title, previous_style, account, token):
         "If the subject is a gas planet, depict gas only, not rocky land. "
         "Show the actual subject, clear shot composition, lighting and visual hierarchy. "
         "Photorealistic premium cinematic scientific reconstruction, no text/labels/watermark. "
-        "Avoid making a different object from the last scenes. "
+        "Keep the same main subject's identity, but vary camera scale, viewpoint and visual storytelling. "
+        "Never repeat the framing or composition of the previous scene. "
+        "Do not turn planets or stars into generic spiral tunnels or black-hole accretion disks. "
+        "When the narration describes an orbit or scale, show the spatial relation, not abstract swirling gas. "
         "Return ONLY the image prompt as plain text, no explanation.\n"
         + "Video title: "+title[:180]+"\nNarration: "+narration+"\n"
-        + "Visual identity from preceding scene: "+previous_style[:250]
+        + "Previous composition that MUST NOT be repeated: "+previous_style[:350]
     )
     response=_request(DIRECTOR_MODEL,{"messages":[{"role":"user","content":user}],
         "max_tokens":320,"temperature":0.2},account,token)
@@ -215,8 +219,18 @@ def run(story_path, out_path, live=False, max_attempts=1, request_budget=10,
                 entry["status"]="planned"
                 continue
             prompt=director(narration,title,identity,account,token)
+            if identity and difflib.SequenceMatcher(None, prompt.lower(), identity.lower()).ratio()>0.70:
+                # Re-plan composition once without spending any image-generation quota.
+                # Never bypass this with a deterministic manual per-topic shot list.
+                alternate=director(narration,title,
+                    "Avoid repeating this previous shot. Instead depict the NEW event in the current "
+                    "narration using a different camera scale, angle and spatial relationship. "
+                    +identity[:310],account,token)
+                if difflib.SequenceMatcher(None, alternate.lower(), identity.lower()).ratio()<difflib.SequenceMatcher(None,prompt.lower(),identity.lower()).ratio():
+                    prompt=alternate
+                    entry["replanned_for_visual_variety"]=True
             entry["image_prompt"]=prompt
-            identity=prompt[:240]
+            identity=prompt[:350]
             for attempt in range(1,max_attempts+1):
                 refined=prompt
                 if attempt>1:
