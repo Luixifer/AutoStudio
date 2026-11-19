@@ -824,11 +824,24 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 # already reviewed scenes. The final request is still
                 # constrained to EXACTLY the current narration and shot
                 # schema, with all original validation unchanged.
-                request_text += (
-                    "\nReturn ONE FULL SHOT JSON object directly, not a "
-                    "shots list. Fields: scene=1, scale, angle, role, "
-                    "subject and visible_action. No commentary. "
-                    "Use ONLY the narrated facts and unused camera grammar.")
+                request_text = (
+                    "Return ONE complete JSON object with exactly six fields: "
+                    "scene (integer 1), scale, angle, role, subject, visible_action. "
+                    "Do NOT return a shots list, prose, markdown, diagrams or "
+                    "scientific facts not positively supported by the narration. "
+                    "visible_action: 6-22 English words describing a drawable "
+                    "physical relationship or event; choose a central subject "
+                    "different from earlier shots. "
+                    "scale must be one of "+",".join(SCALES)+". "
+                    "angle must be one of "+",".join(ANGLES)+". "
+                    "role must be one of "+",".join(ROLES)+". "
+                    "Do not use previous camera tuples: "+
+                    json.dumps(forbidden,ensure_ascii=False)+". "+
+                    _story_visual_constraints(story)+
+                    "NARRATION: "+batch[0]["narration"]+"\n"+
+                    "PREVIOUS APPROVED SHOTS (avoid reproducing): "+
+                    json.dumps(prior,ensure_ascii=False))
+
                 response = request(CRITIC_MODEL,{
                     "messages":[{"role":"user","content":request_text}],
                     "max_completion_tokens":500, "temperature":0.0,
