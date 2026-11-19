@@ -239,6 +239,9 @@ class ShotPlanTests(unittest.TestCase):
               f"The {events[i-1]} appears above the ocean during a different visible process.")
               for i in range(1,11)]}
         original["shots"][0]["visible_action"]="The tidal crest appears above the ocean in a remote galaxy."
+        planner.validate_plan(original,story)
+        with self.assertRaisesRegex(ValueError,"unsupported galaxy"):
+            planner.check_explicit_story_constraints(story,original["shots"])
         repaired={"subject":"Ocean waves and crest",
                   "visible_action":"A tidal crest rises above the ocean near foaming water."}
         answers=[{"response":json.dumps(original)},{"response":json.dumps(repaired)},
