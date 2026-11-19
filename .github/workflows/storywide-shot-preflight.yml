@@ -1,10 +1,6 @@
 name: AutoStudio · Preproduccion global 10 planos sin FLUX
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'triggers/storywide-grounding-check-2026-11-19.txt'
   pull_request:
     paths:
       - 'scripts/shot_preflight.py'
