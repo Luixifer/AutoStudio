@@ -1,0 +1,82 @@
+name: AutoStudio - Gemma 4 structured shot repair live one-shot
+on:
+  push:
+    branches:
+      - test/gemma-constrained-live-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Offline regression checks
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore seven verified shots
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44536179316 --repo "$REPO" --name AutoStudio-Current-Approved-Shots --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Generate remaining shot plan with existing Cloudflare secrets (TEXT ONLY)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/complete-shot-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Archive approved checkpoint even on failure
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Gemma-Structured-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Archive complete plan if validated
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Gemma-Complete-Plan
+          path: /tmp/complete-shot-plan.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Technical report, no publishing
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          from pathlib import Path
+          import os,json
+          print("### AutoStudio · prueba real del rescate estructurado con Gemma 4")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Estado:",os.environ["STATUS"])
+          print("- Nuevas imágenes: 0; publicación: desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas validadas y guardadas:",len(d["accepted_shots"]))
+          p=Path("/tmp/complete-shot-plan.json")
+          if p.exists():
+              d=json.loads(p.read_text())
+              print("- Preproducción textual completa:",len(d["shots"]))
+              print("- Verificación científica externa:",d["scientific_facts_verified"])
+              print("- Listo para publicar:",d["ready_to_publish"])
+          else:
+              print("- El plan no superó todavía todas las barreras")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
