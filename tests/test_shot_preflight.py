@@ -1083,6 +1083,76 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"failed twice"):
             planner.build_plan(story,fake,"account","token")
 
+
+    def test_third_bounded_duplicate_patch_preserves_approved_prefix(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along a coastal sea surface."},
+            {"narration":"Rain droplets fall from thick clouds over the ocean."},
+            {"narration":"The sea surface bends under strong wind near the shore."},
+            {"narration":"Nightfall dims the water under a moving moon."},
+            {"narration":"A long wave breaks into white foam near the coastline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along a coastal sea surface."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall from thick clouds over the ocean.")]}
+        repetitive={"shots":[
+            shot(1,"medium","high","process","Coastal ocean",
+                 "Ocean waves move along a coastal sea surface."),
+            shot(2,"extreme_wide","overhead","contrast","Water at night",
+                 "Moonlight grows dimmer across the ocean at night.")]}
+        still_same={"subject":"Coastal ocean moving",
+                    "visible_action":"Ocean waves move along a coastal sea surface."}
+        different={"subject":"Wind pushing seawater",
+                   "visible_action":"Wind pushes the nearshore seawater into long diagonal ridges."}
+        last={"shots":[shot(1,"extreme_close","low","consequence",
+                 "Breaking wave foam",
+                 "A long breaking wave bursts into white foam near the coast.")]}
+        answers=[first,{"decision":"PASS","issues":[]},
+                 repetitive,still_same,different,
+                 {"decision":"PASS","issues":[]},last,
+                 {"decision":"PASS","issues":[]}]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(answers.pop(0))}
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(result),5)
+        self.assertEqual(result[0]["visible_action"],first["shots"][0]["visible_action"])
+        self.assertEqual(result[2]["visible_action"],different["visible_action"])
+        self.assertEqual(result[3]["visible_action"],repetitive["shots"][1]["visible_action"])
+        self.assertEqual(len(calls),8)
+        self.assertIn("DUPLICATED EARLIER SHOT",calls[4])
+
+    def test_third_bounded_duplicate_patch_still_fails_closed(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves move along a coastal sea surface."},
+            {"narration":"Rain droplets fall from thick clouds over the ocean."},
+            {"narration":"The sea surface bends under strong wind near the shore."},
+            {"narration":"Nightfall dims the water under a moving moon."},
+            {"narration":"A long wave breaks into white foam near the coastline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Ocean waves",
+                 "Ocean waves move along a coastal sea surface."),
+            shot(2,"close","frontal","detail","Rain droplets",
+                 "Rain droplets fall from thick clouds over the ocean.")]}
+        repetitive={"shots":[
+            shot(1,"medium","high","process","Coastal ocean",
+                 "Ocean waves move along a coastal sea surface."),
+            shot(2,"extreme_wide","overhead","contrast","Water at night",
+                 "Moonlight grows dimmer across the ocean at night.")]}
+        patch={"subject":"Ocean waves",
+               "visible_action":"Ocean waves move along a coastal sea surface."}
+        answers=[first,{"decision":"PASS","issues":[]},
+                 repetitive,patch,patch]
+        calls=[]
+        def fake(_model,payload,*_args):
+            calls.append(payload)
+            return {"response":json.dumps(answers.pop(0))}
+        with self.assertRaisesRegex(ValueError,"failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(calls),5)
+
     def test_cross_batch_duplicate_repair_still_rejects_same_action(self):
         story={"title":"Ocean","scenes":[
             {"narration":"Ocean waves move across a coastal sea surface."},
