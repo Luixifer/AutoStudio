@@ -1,0 +1,84 @@
+name: AutoStudio - real schema fallback final scene one-shot
+on:
+  push:
+    branches:
+      - test/full-shot-schema-last-real-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  text-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Full offline checks
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore nine real signed scientific shots
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44543145280 --repo "$REPO" --name AutoStudio-Scientific-Final-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Resume final scene with real Cloudflare text only
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/complete-scientific-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Preserve signed plans even on failure
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Full-Schema-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Preserve completed text plan only if validated
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Full-Schema-Complete-Plan
+          path: /tmp/complete-scientific-plan.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Report outcome without publishing
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          from pathlib import Path
+          import os,json
+          print("### AutoStudio · prueba real de rescate estructurado de última escena")
+          print("- Ejecución:",os.environ["RUN_URL"])
+          print("- Resultado:",os.environ["STATUS"])
+          print("- FLUX: 0 imágenes; YouTube: publicación desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas aprobadas preservadas:",len(d["accepted_shots"]))
+          p=Path("/tmp/complete-scientific-plan.json")
+          if p.exists():
+              d=json.loads(p.read_text())
+              print("- Escenas del plan completo:",len(d["shots"]))
+              for shot in d["shots"]:
+                  print("- Escena",shot["scene"],shot["subject"],"|",shot["visible_action"])
+              print("- Ciencia verificada externamente:",d["scientific_facts_verified"])
+              print("- Publicación autorizada:",d["ready_to_publish"])
+          else:
+              print("- Plan aún sin aprobación completa; no se envía a FLUX")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
