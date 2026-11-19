@@ -298,6 +298,41 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn('"scene": 2',calls[2])
         self.assertEqual(len(batches),0)
 
+
+    def test_later_chunk_prompt_forbids_previous_camera_triples(self):
+        story={"title":"Ocean","scenes":[
+            {"narration":"Ocean waves rise above the shoreline during the tide."},
+            {"narration":"Cloud droplets form above the coastal ocean water."},
+            {"narration":"Mist rises from the deep ocean into the air."},
+            {"narration":"Rain falls from dark clouds onto the sea surface."},
+            {"narration":"Sea foam gathers along the moving ocean shoreline."}]}
+        first={"shots":[
+            shot(1,"wide","side","establish","Coastal waves",
+                 "Ocean waves roll up against the curved coastline."),
+            shot(2,"close","frontal","detail","Cloud droplets",
+                 "Small droplets cluster inside thick clouds over the ocean.")]}
+        second={"shots":[
+            shot(1,"medium","high","process","Rising mist",
+                 "Thin mist rises from warm ocean water toward the sky."),
+            shot(2,"extreme_wide","overhead","contrast","Rain at sea",
+                 "Rain descends from dark clouds onto the open sea.")]}
+        last={"shots":[shot(1,"extreme_close","low","consequence","Sea foam",
+                "Small patches of sea foam gather along a breaking wave.")]}
+        answers=[{"response":json.dumps(x)} for x in (
+            first,{"decision":"PASS","issues":[]},
+            second,{"decision":"PASS","issues":[]},
+            last,{"decision":"PASS","issues":[]})]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return answers.pop(0)
+        result=planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(result),5)
+        self.assertIn("wide / side / establish",prompts[2])
+        self.assertIn("close / frontal / detail",prompts[2])
+        self.assertIn("medium / high / process",prompts[4])
+        self.assertIn("FORBIDDEN",prompts[2])
+
     def test_bad_long_story_batch_retries_only_that_batch_then_blocks(self):
         lines=[
             "Tidal waves form along the distant ocean shore.",
