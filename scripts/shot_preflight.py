@@ -53,7 +53,7 @@ def validate_plan(plan, story):
         # FLUX cannot turn abstract nouns like "orbital period" into a clear
         # shot. Demand an observable relationship/action before any generation.
         if not isinstance(action,str) or not 16<=len(action)<=200 or not 6<=len(action.split())<=MAX_WORDS:
-            raise ValueError("Shot visible_action must describe a concrete observable scene in 6-22 words")
+            raise ValueError(f"Scene {i}: Shot visible_action must describe a concrete observable scene in 6-22 words")
         if re.search(r"\b(?:map|chart|diagram|infographic|graphic|caption|subtitle|label)\b", action, re.I):
             raise ValueError("Abstract visual shorthand is not an image-generation shot")
         if re.search(r"https?://|\b(?:watermark|subtitle|logo)\b",subject+" "+action,re.I):
@@ -359,6 +359,8 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
         batch = scenes[start:start+chunk_size]
         chunk_story = {"title":story.get("title", "Documentary"),"scenes":batch}
         reason = None
+        repair_local = None
+        previous_batch = None
         for attempt in range(2):
             prior = [{"scene":x["scene"],"scale":x["scale"],
                       "angle":x["angle"],"role":x["role"],
@@ -398,11 +400,33 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                     "\nRegenerate ONLY this batch with corrected, distinct "
                     "and narration-grounded visible actions. Return valid JSON."
                 )
+            if repair_local is not None and previous_batch is not None:
+                request_text = (
+                    "Fix ONLY the subject and visible_action of ONE documentary "
+                    "shot. Return JSON object with exactly subject and "
+                    "visible_action string keys. visible_action MUST contain "
+                    "6-22 English words showing concrete visible subjects and "
+                    "their physical relationship. Do not add unsupported "
+                    "locations, materials or terrain. Do not output a shot list.\\n"
+                    "ERROR: "+str(reason)[:350]+"\\n"
+                    "NARRATION: "+batch[repair_local-1]["narration"]+"\\n"
+                    "PREVIOUS SHOT: "+
+                    json.dumps(previous_batch["shots"][repair_local-1],
+                               ensure_ascii=False)
+                )
             response = request(MODEL, {"messages":[{"role":"user",
-                "content":request_text}], "max_tokens":max(500,len(batch)*250),
+                "content":request_text}], "max_tokens":350 if repair_local else max(500,len(batch)*250),
                 "temperature":0.1}, account, token)
             try:
                 parsed = parse_reply(_extract_text(response))
+                if repair_local is not None:
+                    if (not isinstance(parsed,dict) or
+                        set(parsed)!={"subject","visible_action"} or
+                        not all(isinstance(parsed[k],str) for k in parsed)):
+                        raise ValueError("Single-shot batch repair returned invalid fields")
+                    repaired = {"shots":[dict(item) for item in previous_batch["shots"]]}
+                    repaired["shots"][repair_local-1].update(parsed)
+                    parsed = repaired
                 if isinstance(parsed,dict) and isinstance(parsed.get("shots"),list):
                     if len(parsed["shots"]) != len(batch):
                         raise ValueError("Shot count mismatch: expected "+
@@ -419,6 +443,19 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2):
                 break
             except ValueError as exc:
                 reason = exc
+                # Only a well-formed, correctly numbered batch can undergo
+                # a surgical content repair; malformed plans stay rejected.
+                repair_local = None
+                previous_batch = None
+                match = re.search(
+                    r"^Scene (\d+): Shot visible_action",str(exc))
+                if (match and isinstance(parsed,dict) and
+                    isinstance(parsed.get("shots"),list) and
+                    len(parsed["shots"])==len(batch) and
+                    all(isinstance(item,dict) and item.get("scene")==j
+                        for j,item in enumerate(parsed["shots"],1))):
+                    repair_local=int(match.group(1))
+                    previous_batch=parsed
         else:
             raise ValueError(
                 f"Shot batch {start//chunk_size+1} failed twice; no image generation: "+
