@@ -1,0 +1,74 @@
+name: AutoStudio - real grounding repair checkpoint once
+on:
+  push:
+    branches:
+      - test/grounding-repair-live-resume-20261119
+permissions:
+  contents: read
+  actions: read
+  issues: write
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Check offline tests
+        run: python -m unittest tests.test_shot_preflight tests.test_visual_distinctness -q
+      - name: Restore actual 5 approved Cloudflare scenes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .autostudio
+          gh run download 44523754580 --repo "$REPO" --name AutoStudio-Compact-Critic-Checkpoint --dir .autostudio
+          test -s .autostudio/shot-checkpoint.json
+      - name: Resume Cloudflare text planning without FLUX
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python -m scripts.shot_preflight \
+            --story requests/51cc3cfcdfef933be83eb3d4bb739472/storyboard.json \
+            --out /tmp/complete-plan.json \
+            --checkpoint .autostudio/shot-checkpoint.json
+      - name: Preserve signed scenes on any outcome
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AutoStudio-Grounding-Repair-Checkpoint
+          path: .autostudio/shot-checkpoint.json
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Report technical result
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/report.md
+          import json,os
+          from pathlib import Path
+          print("### AutoStudio: corrección narrativa por escena, ensayo Cloudflare real")
+          print("- Ejecución:",os.environ["RUN"])
+          print("- Resultado:",os.environ["STATUS"])
+          print("- FLUX: 0 imágenes; YouTube: publicación desactivada")
+          cp=Path(".autostudio/shot-checkpoint.json")
+          if cp.exists():
+              d=json.loads(cp.read_text())
+              print("- Escenas preservadas:",len(d["accepted_shots"]))
+          out=Path("/tmp/complete-plan.json")
+          if out.exists():
+              d=json.loads(out.read_text())
+              print("- Plan textual validado:",len(d["shots"]))
+              for item in d["shots"]:
+                  print("- Escena",item["scene"],"|",item["visible_action"])
+          else:
+              print("- Plan no completado, ningún flujo de imágenes autorizado")
+          PY
+          gh issue comment 20 --repo "$REPO" --body-file /tmp/report.md
