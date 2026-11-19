@@ -48,6 +48,19 @@ SHOT_PATCH_SCHEMA = {
     "required": ["subject", "visible_action"],
     "additionalProperties": False
 }
+SHOT_FULL_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "scene": {"type": "integer"},
+        "scale": {"type": "string", "enum": list(SCALES)},
+        "angle": {"type": "string", "enum": list(ANGLES)},
+        "role": {"type": "string", "enum": list(ROLES)},
+        "subject": {"type": "string"},
+        "visible_action": {"type": "string"}
+    },
+    "required": ["scene","scale","angle","role","subject","visible_action"],
+    "additionalProperties": False
+}
 MAX_SCENES = 24
 MAX_WORDS = 22
 ACTION_FILLER = frozenset("a an the and or of to from in on with without over under above below is are as at by into through seen visible camera view shows showing appears image picture scene shot close distant bright glowing illuminated light dramatic cinematic".split())
@@ -803,7 +816,27 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
             # resulting fields still undergo every structural and factual
             # gate; model JSON mode does NOT itself guarantee validity.
             constrained_patch = attempt == 3 and repair_local is not None
-            if constrained_patch:
+            constrained_full = (attempt == 3 and len(batch) == 1 and
+                                repair_local is None and reason is not None and
+                                "invalid JSON" in str(reason))
+            if constrained_full:
+                # A single malformed shot must not force restarting nine
+                # already reviewed scenes. The final request is still
+                # constrained to EXACTLY the current narration and shot
+                # schema, with all original validation unchanged.
+                request_text += (
+                    "\nReturn ONE FULL SHOT JSON object directly, not a "
+                    "shots list. Fields: scene=1, scale, angle, role, "
+                    "subject and visible_action. No commentary. "
+                    "Use ONLY the narrated facts and unused camera grammar.")
+                response = request(CRITIC_MODEL,{
+                    "messages":[{"role":"user","content":request_text}],
+                    "max_completion_tokens":500, "temperature":0.0,
+                    "chat_template_kwargs":{"enable_thinking":False},
+                    "response_format":{"type":"json_schema",
+                                       "json_schema":SHOT_FULL_SCHEMA}
+                },account,token)
+            elif constrained_patch:
                 payload = {
                     "messages":[{"role":"user","content":request_text}],
                     "max_completion_tokens":400, "temperature":0.0,
@@ -830,6 +863,15 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 elif (constrained_patch and isinstance(response,dict) and
                       {"subject","visible_action"}.issubset(response)):
                     parsed = response
+                elif constrained_full:
+                    if isinstance(response,dict) and isinstance(response.get("response"),dict):
+                        parsed=response["response"]
+                    elif isinstance(response,dict) and set(SHOT_FULL_SCHEMA["required"]).issubset(response):
+                        parsed=response
+                    else:
+                        parsed=parse_reply(_extract_text(response))
+                    if isinstance(parsed,dict) and set(SHOT_FULL_SCHEMA["required"]).issubset(parsed):
+                        parsed={"shots":[parsed]}
                 else:
                     parsed = parse_reply(_extract_text(response))
                 if repair_local is not None:
@@ -911,6 +953,13 @@ def _build_plan_chunks(story, request, account, token, chunk_size=2,
                 break
             except ValueError as exc:
                 reason = exc
+                if (attempt == 2 and chunk_size == 1 and
+                    repair_local is None and
+                    str(exc) == "Shot planner returned invalid JSON"):
+                    # One final schema-constrained full-shot request, never
+                    # recursive, and never on a two-shot batch.
+                    attempts = 3
+                    continue
                 # A well-formed but wrongly shaped patch is not approval.
                 # Keep the same frozen source shot for ONE strict correction.
                 if (attempt == 2 and
