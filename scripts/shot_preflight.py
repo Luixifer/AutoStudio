@@ -16,6 +16,13 @@ ROLES = ("establish","relationship","detail","process","contrast","consequence",
 MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8"
 MAX_SCENES = 24
 MAX_WORDS = 22
+ACTION_FILLER = frozenset("a an the and or of to from in on with without over under above below is are as at by into through seen visible camera view shows showing appears image picture scene shot close distant bright glowing illuminated light dramatic cinematic".split())
+
+def _action_fingerprint(text):
+    """Conservative structural overlap: no fixed subject or documentary templates."""
+    words=re.findall(r"[a-z]{3,}",text.lower())
+    return frozenset(w[:-3]+"y" if w.endswith("ies") and len(w)>5 else w[:-1] if w.endswith("s") and len(w)>5 and not w.endswith("ss") else w for w in words if w not in ACTION_FILLER)
+
 
 def _scene_list(story):
     scenes=story.get("scenes")
@@ -31,6 +38,7 @@ def validate_plan(plan, story):
     if not isinstance(plan,dict) or not isinstance(plan.get("shots"),list) or len(plan["shots"])!=len(scenes):
         raise ValueError("Missing or wrong number of scene shot descriptions")
     known=set()
+    prior_actions=[]
     result=[]
     for i,item in enumerate(plan["shots"],1):
         if not isinstance(item,dict) or item.get("scene")!=i:
@@ -55,6 +63,17 @@ def validate_plan(plan, story):
         fingerprint=(scale,angle,role)
         if fingerprint in known:
             raise ValueError("Repeated shot grammar; rebuild plan before FLUX")
+        # Different metadata cannot disguise two near-identical physical
+        # compositions. This is deliberately conservative to allow the same
+        # subject in genuinely different shots.
+        current=_action_fingerprint(action)
+        for previous_scene, previous in prior_actions:
+            shared=current & previous
+            if len(shared)>=5 and len(shared)/max(1,min(len(current),len(previous)))>=0.80:
+                raise ValueError(
+                    f"Near-duplicate visible action in scenes {previous_scene} and {i}; "
+                    "change actual objects, spatial relationship or visible process")
+        prior_actions.append((i,current))
         known.add(fingerprint)
         result.append({"scene":i,"scale":scale,"angle":angle,"role":role,
                        "subject":subject.strip(),"visible_action":action.strip()})
@@ -189,6 +208,9 @@ def build_plan(story,request,account,token):
         "Select fields from these fixed vocabularies, but write subject/action in English. "
         "scale: "+",".join(SCALES)+". angle: "+",".join(ANGLES)+". role: "+",".join(ROLES)+". "
         "Do NOT reuse the same (scale, angle, role) combination in this video. "
+        "Different camera metadata is not enough: the visible_action descriptions must also "
+        "show different physical events, subject relationships or framing. "
+        "Never merely paraphrase the same central gas swirl or stellar glow in multiple scenes. "
         "If the narration describes an abstract fact, illustrate it using the physical "
         "subjects and relationship actually mentioned instead of adding an unsupported object. "
         "Return ONLY JSON object {\"shots\":[{\"scene\":1,\"scale\":\"wide\","
@@ -208,7 +230,7 @@ def build_plan(story,request,account,token):
         if attempt:
             user_prompt += (
                 "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:240]+
-                "\\nCorrect the invalid plan below, keeping its ten scene numbers "
+                "\\nCorrect the invalid plan below, keeping the exact scene numbers "
                 "and the narration-grounded physical subjects. "
                 "Return the COMPLETE JSON object, not a patch.\\n"+
                 last_reply[:3600])
