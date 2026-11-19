@@ -75,7 +75,7 @@ class ShotPlanTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,"Repeated"):
                     auto.run(path,Path(t)/"out",live=True,max_attempts=1,request_budget=3,
                         shot_planner=lambda *args:planner.validate_plan(
-                            {"shots":[VALID["shots"][0]]*3},STORY),
+                            {"shots":[dict(item,scale="wide",angle="overhead",role="establish") for item in VALID["shots"]]},STORY),
                         director=lambda *a:"A scientifically plausible image of the Earth and ocean.",
                         generator=lambda *a:flux.append(1))
             self.assertEqual(flux,[])
