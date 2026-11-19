@@ -158,7 +158,7 @@ class ShotPlanTests(unittest.TestCase):
 
     def test_critic_accepts_known_nested_cloudflare_envelopes(self):
         for response in (
-            {"response":'\`\`\`json\\n{"decision":"PASS","issues":[]}\\n\`\`\`'},
+            {"response":'```json\n{"decision":"PASS","issues":[]}\n```'},
             {"result":{"choices":[{"message":{"content":'{"decision":"PASS","issues":[]}'}}]}},
             {"output":[{"text":'{"decision":"PASS","issues":[]}'}]},
             {"response":'{"decision":" pass ","issues":[]}'},
