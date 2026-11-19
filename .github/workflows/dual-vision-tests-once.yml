@@ -1,0 +1,20 @@
+name: AutoStudio dual vision and 9B offline tests ONLY
+on:
+  push:
+    branches:
+      - feat/second-vision-and-flux9-comparison-20261119
+permissions:
+  contents: read
+jobs:
+  offline-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Run offline image model integration tests (NO API CALLS)
+        run: |
+          python -m py_compile scripts/vision_scout.py scripts/flux2_klein_9b.py scripts/compare_visual_models.py scripts/cinematic_pilot.py
+          python -m unittest tests.test_vision_scout_flux9 tests.test_compare_visual_models tests.test_cinematic_pilot tests.test_vision_gemma tests.test_flux2_klein -v
