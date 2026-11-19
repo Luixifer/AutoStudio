@@ -16,13 +16,16 @@ SCOUT_MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct"
 _ALLOWED = frozenset(("PASS", "FAIL", "UNSURE"))
 
 
-def parse_scout(answer):
+def parse_scout(answer, scene_kind="orbit"):
     if not isinstance(answer, str):
         answer = ""
+    if scene_kind not in ("orbit", "hydrogen"):
+        raise ValueError("Unsupported Scout review kind")
+    requirements = ("STAR", "GAS_PLANET") if scene_kind == "orbit" else ("HYDROGEN", "NO_TERRAIN")
     patterns = {
         key: re.findall(r"(?im)^\s*" + key +
                         r":\s*(PASS|FAIL|UNSURE|YES|NO)\s*$", answer)
-        for key in ("DECISION", "STAR", "GAS_PLANET")
+        for key in ("DECISION", *requirements)
     }
     evidence = re.findall(r"(?im)^\s*EVIDENCE:\s*(.{12,350})\s*$", answer)
     if (len(patterns["DECISION"]) != 1 or not evidence or
@@ -32,24 +35,41 @@ def parse_scout(answer):
     decision = patterns["DECISION"][0]
     # If a requested astronomical comparison omits the two object checks,
     # do not silently trust a one-line PASS.
-    if any(len(patterns[key]) != 1 for key in ("STAR", "GAS_PLANET")):
+    if any(len(patterns[key]) != 1 for key in requirements):
         decision = "UNSURE"
-    elif "NO" in (patterns["STAR"][0], patterns["GAS_PLANET"][0]):
+    elif "NO" in (patterns[requirements[0]][0], patterns[requirements[1]][0]):
         decision = "FAIL"
-    elif any(patterns[key][0] == "UNSURE" for key in ("STAR", "GAS_PLANET")):
+    elif any(patterns[key][0] == "UNSURE" for key in requirements):
         decision = "UNSURE" if decision == "PASS" else decision
     return {"decision": decision, "evidence": evidence[0].strip(),
-            "star_visible": patterns["STAR"][0] if len(patterns["STAR"]) == 1 else "UNSURE",
-            "gas_planet_visible": patterns["GAS_PLANET"][0] if len(patterns["GAS_PLANET"]) == 1 else "UNSURE",
+            "requirements": {key: patterns[key][0] if len(patterns[key]) == 1 else "UNSURE"
+                             for key in requirements},
             "method": "llama4_scout_multimodal"}
 
 
-def evaluate_scout(image_bytes, narration, expected_visual, account, token):
+def evaluate_scout(image_bytes, narration, expected_visual, account, token, *, scene_kind="orbit"):
     """Inspect the actual pixels; compare star and planet explicitly."""
     _, _, ext = image_dimensions(image_bytes)
     uri = ("data:image/png;base64," if ext == ".png" else "data:image/jpeg;base64,") + (
         base64.b64encode(image_bytes).decode("ascii"))
-    instruction = (
+    if scene_kind not in ("orbit", "hydrogen"):
+        raise ValueError("Unsupported Scout review kind")
+    if scene_kind == "hydrogen":
+        instruction = (
+            "Inspect the ATTACHED image, not the intended image. "
+            "This scene MUST illustrate disassociation of one H2 molecule into "
+            "two distinct neutral hydrogen atoms, not planets, lava, electricity, "
+            "solid ground or electrons being stripped. If atoms are not clearly "
+            "distinguishable, mark UNSURE or FAIL; do not infer them from the prompt. "
+            "Answer EXACTLY four lines:\n"
+            "HYDROGEN: YES or NO or UNSURE\n"
+            "NO_TERRAIN: YES or NO or UNSURE\n"
+            "DECISION: PASS or FAIL or UNSURE\n"
+            "EVIDENCE: concrete visible details, not an inference.\n"
+            "Narration: " + narration[:520] + "\n"
+            "Desired visual (NOT evidence): " + expected_visual[:700])
+    else:
+        instruction = (
         "Inspect the ATTACHED image, not the desired image. Be skeptical. "
         "This is an orbital astronomy scene that MUST contain TWO distinct "
         "celestial objects: (1) a genuinely star-like, luminous host STAR "
@@ -74,7 +94,7 @@ def evaluate_scout(image_bytes, narration, expected_visual, account, token):
         ]}],
         "temperature": 0, "max_tokens": 360, "stream": False
     }, account, token)
-    result = parse_scout(_final_answer(response))
+    result = parse_scout(_final_answer(response), scene_kind=scene_kind)
     result["model"] = SCOUT_MODEL
     return result
 
