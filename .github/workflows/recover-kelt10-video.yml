@@ -38,6 +38,7 @@ jobs:
           python -m unittest tests.test_recover_supervised_images tests.test_stage_supervised tests.test_vision_gemma -v
           python -m py_compile scripts/recover_supervised_images.py
       - name: Recuperar paquete original del 19-11-2026 desde GitHub Actions
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -49,6 +50,7 @@ jobs:
           test "$(find original-data -name visual-supervision-manifest.json | wc -l)" -eq 1
           echo "SOURCE_MANIFEST=$(find original-data -name visual-supervision-manifest.json)" >> "$GITHUB_ENV"
       - name: Revisar SOLO las escenas 1 y 10 (cero peticiones FLUX)
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: development
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -57,6 +59,7 @@ jobs:
           python -m scripts.recover_supervised_images \
             --manifest "../$SOURCE_MANIFEST" --out ../recovered-art --scenes 10
       - name: Preparar storyboard solo si las diez imágenes estan aprobadas
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: development
         run: |
           python -m scripts.stage_supervised \
@@ -64,6 +67,7 @@ jobs:
             --manifest ../recovered-art/visual-supervision-manifest.json \
             --out ../reviewed-storyboard
       - name: Instalar motor de voz y FFmpeg para montar MP4
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: engine
         run: |
           sudo apt-get update -qq
@@ -71,6 +75,7 @@ jobs:
           python -m pip install --disable-pip-version-check -r requirements-neural.txt
           python scripts/fetch_voice.py
       - name: Montar documental y comprobar QA técnico
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: engine
         run: |
           python -m scripts.personal_prepare ../reviewed-storyboard/storyboard.json --out ../prepared
@@ -84,7 +89,7 @@ jobs:
           print("SUPERVISED_KELT10_MP4_OK",q["sha256"])
           PY
       - name: Conservar todas las imágenes, evaluaciones y vídeo sin publicar
-        if: ${{ always() }}
+        if: ${{ always() && github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: AutoStudio-KELT9b-Recuperacion-Supervisada
