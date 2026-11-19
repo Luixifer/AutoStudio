@@ -266,25 +266,47 @@ def build_plan(story,request,account,token):
         "Title: "+str(story.get("title","Documentary"))[:180]+"\nNarration scenes:\n"+numbered
     )
     max_tokens=min(4600,max(900,len(scenes)*190))
-    # One bounded repair request is permitted; never regenerate images while
-    # fixing an unusable whole-story shot outline.
+    # A bounded, targeted repair is allowed before any FLUX call.
+    # Preserve the COMPLETE valid plan for a semantic repair. In particular,
+    # truncating the plan at 3600 characters discarded later scenes and made
+    # the model reconstruct them from memory rather than fixing the error.
     from scripts.visual_autopilot import _extract_text
     last_error=None
     last_reply=""
+    last_shots=None
     for attempt in range(2):
         user_prompt=prompt
         if attempt:
             user_prompt += (
-                "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:240]+
-                "\\nCorrect the invalid plan below, keeping the exact scene numbers "
-                "and the narration-grounded physical subjects. "
-                "Return the COMPLETE JSON object, not a patch.\\n"+
-                last_reply[:3600])
+                "\\nPREVIOUS PLAN REJECTED: "+str(last_error)[:950]+
+                "\\nThe preceding plan was NOT authorized. Fix the named defect "
+                "without introducing new unsupported objects or settings. "
+                "When the defect cites scene N, change ONLY that scene's subject "
+                "and visible_action unless structural uniqueness requires another "
+                "change. Keep all other scenes and their order unchanged. "
+                "Use only the actual narrated subjects; remove unsupported "
+                "galaxies, dust, terrain or any other invented material. "
+                "Do not bypass the validator. Return the COMPLETE JSON object "
+                "with exactly "+str(len(scenes))+" shots, not a patch.\\n"
+            )
+            if last_shots is not None:
+                user_prompt += (
+                    "FULL PREVIOUS PLAN (preserve non-failing scenes):\\n"+
+                    json.dumps({"shots":last_shots},ensure_ascii=False)
+                )
+            else:
+                user_prompt += (
+                    "Previous output could not be structurally validated; "
+                    "reconstruct from the complete narration. "
+                    "Malformed output excerpt (not authoritative):\\n"+
+                    last_reply[:1200]
+                )
         response=request(MODEL,{"messages":[{"role":"user","content":user_prompt}],
                                 "max_tokens":max_tokens,"temperature":0.15},account,token)
         last_reply=_extract_text(response)
         try:
             shots=validate_plan(parse_reply(last_reply),story)
+            last_shots=shots
             check_explicit_story_constraints(story, shots)
             review_story_consistency(story, shots, request, account, token)
             return shots

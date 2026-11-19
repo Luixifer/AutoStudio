@@ -224,6 +224,46 @@ class ShotPlanTests(unittest.TestCase):
             planner.build_plan(STORY,model,"a"*32,"test")
         self.assertEqual(len(calls),4)
 
+
+    def test_semantic_repair_keeps_complete_plan_including_last_scene(self):
+        long_story={"title":"General science film","scenes":[
+            {"narration":f"Observable effect {i} happens in the ocean and the atmosphere."}
+            for i in range(1,11)]}
+        events=["tidal crest","evaporating droplets","condensing mist","wind currents",
+                "rolling wavefronts","breaking foam","rising vapor","gathering clouds",
+                "falling rainfall","reflected moonlight"]
+        original={"shots":[shot(i,["wide","medium","close","extreme_wide","extreme_close"][((i-1)%5)],
+              ["side","frontal","low","overhead","high","three_quarter"][((i-1)%6)],
+              ["establish","process","detail","contrast","consequence","relationship","transition"][((i-1)%7)],
+              f"Ocean atmosphere unique subject number {i}",
+              f"The {events[i-1]} appears above the ocean within a distant galaxy.")
+              for i in range(1,11)]}
+        self.assertGreater(len(json.dumps(original)),1200)
+        corrected=json.loads(json.dumps(original))
+        for item in corrected["shots"]:
+            item["visible_action"]=item["visible_action"].replace("distant galaxy","ocean atmosphere")
+        answers=[{"response":json.dumps(original)},{"response":json.dumps(corrected)},
+                 {"response":json.dumps({"decision":"PASS","issues":[]})}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return answers.pop(0)
+        result=planner.build_plan(long_story,fake,"account","token")
+        self.assertEqual(len(result),10)
+        self.assertEqual(len(prompts),3)
+        self.assertIn('"scene": 10',prompts[1])
+        self.assertIn("unsupported galaxy",prompts[1])
+        self.assertIn("FULL PREVIOUS PLAN",prompts[1])
+
+    def test_semantic_repair_remains_fail_closed(self):
+        bad=json.loads(json.dumps(VALID))
+        bad["shots"][0]["visible_action"]="The whole planet lies inside an unsupported distant galaxy."
+        responses=[{"response":json.dumps(bad)},{"response":json.dumps(bad)}]
+        def fake(*_args):
+            return responses.pop(0)
+        with self.assertRaisesRegex(ValueError,"failed preflight twice"):
+            planner.build_plan(STORY,fake,"account","token")
+
     def test_invalid_plan_issues_no_flux_requests(self):
         with tempfile.TemporaryDirectory() as t:
             path=Path(t)/"story.json"
