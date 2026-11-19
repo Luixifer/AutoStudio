@@ -745,6 +745,28 @@ class ShotPlanTests(unittest.TestCase):
         self.assertIn("Rocky surface contradicts",prompts[4])
         self.assertEqual(len(prompts),8)
 
+    def test_grounding_repair_does_not_treat_critic_complaint_as_fact(self):
+        story={"title":"Atmosphere","scenes":[
+            {"narration":"The heat makes hydrogen molecules split into atoms."}
+        ]}
+        bad={"shots":[shot(1,"close","side","detail","Hydrogen on rocky ground",
+                           "Hydrogen molecules split over a rocky surface under heat.")]}
+        answer={"subject":"Hydrogen gas molecules",
+                "visible_action":"Hydrogen molecules split into separate atoms in the intensely hot gas."}
+        replies=[bad,{"decision":"FAIL","issues":[{"scene":1,
+                 "issue":"Rocky surface is invented and unsupported by narration."}]},
+                 answer,{"decision":"PASS","issues":[]}]
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":json.dumps(replies.pop(0))}
+        # The long-story chunk route shares this exact repair instruction.
+        import inspect
+        source=inspect.getsource(planner._build_plan_chunks)
+        self.assertIn("ONLY positive factual source",source)
+        self.assertIn("to REMOVE, NEVER facts to illustrate",source)
+        self.assertIn("NARRATION:",source)
+
     def test_grounding_critic_repeat_fail_never_approves_shot(self):
         story={"title":"Gas world","scenes":[
             {"narration":"A gaseous planet orbits a nearby bright star."},
