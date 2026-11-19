@@ -75,6 +75,34 @@ class ShotPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"invalid JSON"):
             planner.parse_reply("Certainly, here are ten shots.")
 
+    def test_json_extractor_reads_single_wrapped_complete_object(self):
+        raw=json.dumps(VALID)
+        for response in (raw,"Here is the result:\n"+raw,
+                         raw+"\nDone.","JSON follows:\n"+raw+"\nEnd."):
+            self.assertEqual(planner.parse_reply(response),VALID)
+
+    def test_json_extractor_rejects_ambiguous_or_truncated_output(self):
+        raw=json.dumps(VALID)
+        for value in (raw[:-1],raw+"\n"+raw,"[]","No JSON here",
+                      '{"shots":[}', '{"shots":[]}\n{"shots":[]}'):
+            with self.subTest(value=value[:30]):
+                with self.assertRaisesRegex(ValueError,"invalid JSON"):
+                    planner.parse_reply(value)
+
+    def test_chunk_invalid_json_retry_is_bounded_and_fail_closed(self):
+        story={"scenes":[
+            {"narration":f"Wave action {i} moves across the surface of the ocean."}
+            for i in range(5)]}
+        prompts=[]
+        def fake(_model,payload,*_args):
+            prompts.append(payload["messages"][0]["content"])
+            return {"response":'{"shots":['}
+        with self.assertRaisesRegex(ValueError,"Shot batch 1 failed twice"):
+            planner.build_plan(story,fake,"account","token")
+        self.assertEqual(len(prompts),2)
+        self.assertIn("final bounded retry",prompts[1])
+        self.assertIn("exactly 2 shots",prompts[1])
+
     def test_abstract_two_word_actions_rejected(self):
         bad=json.loads(json.dumps(VALID))
         bad["shots"][0]["visible_action"]="Orbital period"
