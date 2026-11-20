@@ -42,6 +42,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
           python -m pip install -r requirements-director.txt
           mkdir -p reports/director
+      - name: Recuperar registros del primer intento
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.previous_logs 44793568260 --out reports/director/previous-run.log
       - name: Regresiones, compilación y firma reales
         run: |
           python -m unittest discover -s tests -v > reports/director/tests.txt 2>&1

@@ -135,13 +135,13 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
     m=scene['media'];source=Path(root)/m['path'];args=[];graph=[]
     if m['kind']=='image':
         big=(width*2,height*2);still=work/'canvas.png';canvas(source,still,big,m.get('fit','contain'))
-        args+=['-loop','1','-framerate',str(fps),'-i',str(still)];previous='0:v'
+        args+=['-framerate',str(fps),'-i',str(still)];graph.append(f'[0:v]loop=loop=-1:size=1:start=0,setpts=N/({fps}*TB)[base]');previous='base'
         for i,layer in enumerate(m.get('layers',[]),1):
             pic=work/f'layer-{i}.png';canvas(Path(root)/layer['path'],pic,big,layer=True)
-            args+=['-loop','1','-framerate',str(fps),'-i',str(pic)]
+            args+=['-framerate',str(fps),'-i',str(pic)];graph.append(f'[{i}:v]loop=loop=-1:size=1:start=0,setpts=N/({fps}*TB)[layer{i}]')
             a=layer.get('from',[0,0]);b=layer.get('to',[0,0]);phase=f'(.5-.5*cos(PI*min(t/{visual_seconds},1)))'
             x=f'{big[0]}*({a[0]}+({b[0]}-{a[0]})*{phase})';y=f'{big[1]}*({a[1]}+({b[1]}-{a[1]})*{phase})'
-            graph.append(f'[{previous}][{i}:v]overlay=x=\'{x}\':y=\'{y}\':eval=frame:shortest=1[p{i}]');previous=f'p{i}'
+            graph.append(f'[{previous}][layer{i}]overlay=x=\'{x}\':y=\'{y}\':eval=frame:shortest=1[p{i}]');previous=f'p{i}'
         graph.append(f'[{previous}]'+camera_filter(scene,frames,size,fps)+'[v]')
     else:
         details=probe(source);v=next((s for s in details['streams'] if s['codec_type']=='video'),None)

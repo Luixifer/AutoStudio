@@ -21,4 +21,12 @@ def main():
  paths=[*(p for p in out.iterdir() if p.is_file()),*(p for p in [apk,Path('build/android/apk-info.json'),Path('build/android/SHA256SUMS')] if p.is_file())]
  for path in paths:upload(release,path)
  print('REAL_EVALUATION_RELEASE',release['html_url'])
-if __name__=='__main__':main()
+if __name__=='__main__':
+ try:main()
+ except Exception as error:
+  from scripts.director.publish_check_fallback import publish
+  publish(error)
+  raise
+ else:
+  from scripts.director.publish_check_fallback import publish
+  publish()
