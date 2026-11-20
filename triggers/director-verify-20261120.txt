@@ -1,2 +1,3 @@
 Verify actual long MP4 already uploaded, recover exact optional-log error, and test numeric TTS/MP3 alignment with actual CPU models.
 Bounded base/small CPU retry with saved acoustic diagnostics; independent MP4 verdict published even if optional numeric probe fails.
+Fix observed real Whisper numeric segmentation (3 + ,5), preserving exact matching and measured spans.

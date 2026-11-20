@@ -14,3 +14,11 @@ class SpanishNarrationTests(unittest.TestCase):
  def test_punctuation_without_phonemes_is_attached(self):
   text,_=expand('Hola — mundo.');self.assertEqual(text,'Hola— mundo.');mapped=align('Hola — mundo.',[{'word':'Hola','start':0,'end':.3},{'word':'mundo.','start':.4,'end':.8}]);self.assertEqual(mapped[0]['word'],'Hola —')
  def test_mismatched_words_are_not_forced(self):self.assertRaises(ValueError,align,'Sesenta minutos',[{'word':'treinta','start':0,'end':.4},{'word':'minutos','start':.5,'end':1}])
+
+ def test_whisper_split_decimal_uses_whole_measured_span(self):
+  words=[{'word':'3','start':3.28,'end':3.5},{'word':',5','start':3.5,'end':4.24}]
+  self.assertEqual(align('3,5',words),[{'word':'3,5','start':3.28,'end':4.24}])
+  words[1]['start']=3.8
+  self.assertRaises(ValueError,align,'3,5',words)
+ def test_split_decimal_does_not_change_wrong_number(self):
+  self.assertRaises(ValueError,align,'3,6',[{'word':'3','start':0.,'end':.2},{'word':',5','start':.2,'end':.5}])

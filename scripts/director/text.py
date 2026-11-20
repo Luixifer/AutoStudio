@@ -44,8 +44,17 @@ def align(original,observed):
  spoken,groups=expand(original);expected=[];ranges=[]
  for group in groups:
   values=normalized_words(group['spoken']);ranges.append((len(expected),len(expected)+len(values),group['original']));expected.extend(values)
- actual=[];owners=[]
+ # Whisper may split one decimal into adjacent acoustic tokens: "3", ",5".
+ # Join only that numeric syntax, retaining the full measured span. The final
+ # comparison remains exact; this never substitutes an unrecognized word.
+ acoustic=[]
  for word in observed:
+  word=dict(word)
+  if acoustic and re.fullmatch(r'[+\-−]?[0-9]+',acoustic[-1]['word']) and re.fullmatch(r'[.,][0-9]+%?[).,;:!?]*',word['word']) and 0<=word['start']-acoustic[-1]['end']<=.08:
+   acoustic[-1]['word']+=word['word'];acoustic[-1]['end']=word['end']
+  else:acoustic.append(word)
+ actual=[];owners=[]
+ for word in acoustic:
   values=normalized_words(expand_token(word['word']));actual.extend(values);owners.extend([word]*len(values))
  if expected!=actual:raise ValueError('La transcripción no coincide con el guion; revisa el audio y la pronunciación de nombres o cifras')
  result=[]
