@@ -88,3 +88,11 @@ La ejecución de render **44804915434** produjo y publicó correctamente vídeo 
 La ejecución adicional **44810268234** aprobó 320 regresiones y volvió a verificar el MP4 largo. Falló al alinear exactamente un MP3 con «1981, 3,5 y 60 minutos». El motor rechazó la discrepancia, sin inventar subtítulos. La revisión actual permite un único reintento CPU con Whisper `small` después de `base`, manteniendo la misma comparación exacta, y conserva texto detectado e intervalos en `alignment-diagnostic.json`.
 
 Las cifras del guion se expanden antes de la síntesis, pero el texto original de los subtítulos se conserva mediante intervalos acústicos medidos. Una discrepancia sin resolver sigue siendo un error accionable. No se promete que un reconocedor automático transcriba correctamente cualquier nombre o cifra. La verificación adicional de esta revisión se registra separada del estado válido del MP4 ya entregado.
+
+
+La ejecución **44836508982** también aprobó **321 pruebas en 48,203 s** y la verificación independiente del MP4. El diagnóstico acústico de ambos modelos reveló la causa concreta del rechazo de cifras: Whisper separa `3,5` en dos tokens consecutivos `3` y `,5`. No faltaba la palabra en la locución; fallaba la normalización de ese límite. [Transcripción real e intervalos](evidence/cloud-44836508982-alignment-diagnostic-0.json).
+
+La corrección une únicamente esa sintaxis decimal cuando los tokens son acústicamente contiguos (máximo 80 ms), conserva el intervalo completo medido y sigue rechazando una cifra diferente o una separación temporal excesiva. Las pruebas correspondientes no aceptan `3,5` como `3,6` ni inventan tiempos. La comprobación real posterior se registra separadamente.
+
+
+Tras corregir esa segmentación, la batería completa local aprobó **323 pruebas en 49,648 s** ([registro](evidence/regressions-323.txt)). Se volvió a aplicar el alineador a las transcripciones reales guardadas de `base` y `small`: ambas conservan las cifras y sus intervalos completos. Esta reproducción de diagnóstico no se confunde con una nueva inferencia: la inferencia y render nuevos se comprueban en la ejecución posterior de Actions.
