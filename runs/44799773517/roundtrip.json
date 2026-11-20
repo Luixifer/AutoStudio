@@ -1,0 +1,5 @@
+{
+  "passed": false,
+  "error": "java.lang.Exception: Actual UI error: open() got an unexpected keyword argument 'metadata_errors'",
+  "physical_samsung_tested": false
+}

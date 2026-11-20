@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: stream=DIRECTOR_TEST_FAILED: java.lang.Exception: Actual UI error: open() got an unexpected keyword argument 'metadata_errors'
+INSTRUMENTATION_CODE: 0

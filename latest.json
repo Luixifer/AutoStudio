@@ -1,8 +1,8 @@
 {
   "managed_by": "autostudio-director-evaluation",
-  "run_id": "44798100121",
-  "source_commit": "5124fee019a74a9b903c6273b3d088fdfd9e9a25",
-  "status": "cancelled",
-  "release_delivery_error": "HTTP Error 403: Forbidden",
+  "run_id": "44799773517",
+  "source_commit": "e617266c36ac041116c450c422e2ee2d658aa68a",
+  "status": "failure",
+  "release_delivery_error": null,
   "physical_samsung_tested": false
 }

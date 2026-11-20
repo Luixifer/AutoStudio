@@ -1,0 +1,34 @@
+{
+  "run_id": "44799773517",
+  "source_commit": "e617266c36ac041116c450c422e2ee2d658aa68a",
+  "job_status": "failure",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "android_emulator": {
+    "passed": false,
+    "error": "java.lang.Exception: Actual UI error: open() got an unexpected keyword argument 'metadata_errors'",
+    "physical_samsung_tested": false
+  },
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab",
+    "version_name": "director-0.1.0-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-0.1.0-lab.apk",
+    "bytes": 119331,
+    "sha256": "5af3f65cbd066e84c17af54156864eeba0920cbfef728068059f6111b43fb83b",
+    "source_commit": "e617266c36ac041116c450c422e2ee2d658aa68a",
+    "github_run_id": "44799773517",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}
