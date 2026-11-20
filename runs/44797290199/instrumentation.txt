@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: stream=DIRECTOR_TEST_FAILED: java.lang.Exception: Transport failed: Unable to resolve host "api.github.com": No address associated with hostname
+INSTRUMENTATION_CODE: 0
