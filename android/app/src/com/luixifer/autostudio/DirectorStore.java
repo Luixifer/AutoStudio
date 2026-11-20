@@ -25,10 +25,9 @@ public final class DirectorStore {
     public List<String> projects(){File[] files=root.listFiles();List<String> result=new ArrayList<>();if(files!=null)for(File f:files)if(f.isDirectory()&&f.getName().matches("[a-f0-9]{32}")&&new File(f,"project.json").isFile())result.add(f.getName());Collections.sort(result);return result;}
     public static JSONObject ownRights()throws Exception{return new JSONObject().put("license","original_user").put("credit","Material aportado por el usuario; titularidad declarada, no verificada por AutoStudio");}
     public String importFile(String id,Uri uri,String role)throws Exception{
-        String type=context.getContentResolver().getType(uri);String ext=null;
-        if("image/jpeg".equals(type))ext="jpg";if("image/png".equals(type))ext="png";if("image/webp".equals(type))ext="webp";
-        if("video/mp4".equals(type))ext="mp4";if("audio/mpeg".equals(type))ext="mp3";if("audio/wav".equals(type)||"audio/x-wav".equals(type)||"audio/wave".equals(type))ext="wav";
-        if(ext==null)throw new IOException("Formato no admitido. Usa JPG, PNG, WebP, MP4, WAV o MP3.");
+        String ext;
+        try(InputStream stream=context.getContentResolver().openInputStream(uri)){if(stream==null)throw new IOException("Recurso no accesible");byte[] h=new byte[32];int n=0,k;while(n<h.length&&(k=stream.read(h,n,h.length-n))>0)n+=k;ext=DirectorMediaFormat.detect(h,n);}
+        if(ext==null)throw new IOException("Formato real no admitido. Usa JPG, PNG, WebP, MP4, WAV o MP3.");
         if(role.equals("visual")&&(ext.equals("wav")||ext.equals("mp3"))||!role.equals("visual")&&!(ext.equals("wav")||ext.equals("mp3")))throw new IOException("Tipo de recurso incorrecto");
         File media=new File(folder(id),"media");media.mkdirs();File target=new File(media,id()+"."+ext),temp=new File(media,target.getName()+".part");
         try(InputStream in=context.getContentResolver().openInputStream(uri);OutputStream out=new FileOutputStream(temp)){if(in==null)throw new IOException("No se puede abrir el recurso");byte[] b=new byte[65536];int n;long total=0;while((n=in.read(b))!=-1){total+=n;if(total>MAX)throw new IOException("El recurso supera 200 MiB");out.write(b,0,n);}if(total==0)throw new IOException("Recurso vacío");}catch(Exception e){temp.delete();throw e;}

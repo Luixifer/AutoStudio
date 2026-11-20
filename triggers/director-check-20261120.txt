@@ -1,2 +1,3 @@
 Real Director APK, import, cloud transport, FFmpeg and playback check. No Hessdalen material yet.
 Retry 2: preserve exact previous logs and always publish small diagnostic evidence.
+Retry 3: fix confirmed nullable MIME import and failed-report JSON handling; real signatures plus backup.

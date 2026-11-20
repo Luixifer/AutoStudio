@@ -9,7 +9,10 @@ def main():
  run=os.environ['GITHUB_RUN_ID'];status=os.environ['DIRECTOR_CHECK_STATUS'];out=Path('reports/director');out.mkdir(parents=True,exist_ok=True)
  check={'run_id':run,'source_commit':os.environ['GITHUB_SHA'],'job_status':status,'physical_samsung_tested':False,'hessdalen_produced':False,'youtube_enabled':False}
  qa=out/'roundtrip.json'
- if qa.is_file():check['android_emulator']=json.loads(qa.read_text())
+ if qa.is_file() and qa.stat().st_size:
+  try:check['android_emulator']=json.loads(qa.read_text())
+  except json.JSONDecodeError:check['qa_error']='Invalid emulator JSON; not treated as success'
+ if status=='success' and not check.get('android_emulator',{}).get('passed'):raise RuntimeError('Success without real emulator evidence')
  apk=Path('build/android/AutoStudio-Director-0.1.0-lab.apk')
  if apk.is_file():
   info=json.loads(Path('build/android/apk-info.json').read_text())
