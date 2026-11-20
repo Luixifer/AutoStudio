@@ -1,0 +1,100 @@
+{
+  "source_commit": "e722cf94007e326fd6a4537ad57ebbc60b43faa9",
+  "files": [
+    {
+      "path": "scripts/personal_camera.py",
+      "sha256": "3d9811afe978fea3c535679d7ce2b0349d2eba644147b4d9c41b16ec2bafc41b"
+    },
+    {
+      "path": "scripts/personal_catalog.py",
+      "sha256": "066a1c28acf7a53f4d9c5b0b5d7e0938f0e1f8de0ef8f948311df5a2929ba5bb"
+    },
+    {
+      "path": "scripts/personal_cinematic.py",
+      "sha256": "9985f581edb132c523b8c085562f9a87592704318c6b74da33f51bf5ecf2ad77"
+    },
+    {
+      "path": "scripts/personal_custom_request.py",
+      "sha256": "615533e97cc2c851c930f7f2d98eef83ad5c6e9b71793c412ed58b3fd3242773"
+    },
+    {
+      "path": "scripts/personal_custom_smoke.py",
+      "sha256": "c324e874d39526583649e0b939ddc6e01b4781cb0a1b93ae9dff7f535ef5be3f"
+    },
+    {
+      "path": "scripts/personal_demo.py",
+      "sha256": "10cc020e310b242ec318c0b9ccde3e14ae81394a8948522470ab5e9cddc3cf4e"
+    },
+    {
+      "path": "scripts/personal_editor.py",
+      "sha256": "568c8cd8c92bcd6b29a203c63d894d59717e66c505560f9272e887525a57c011"
+    },
+    {
+      "path": "scripts/personal_prepare.py",
+      "sha256": "753d56d21fcaa992654ef03c68ef783623925251ab3d37bb8dede77ccc797659"
+    },
+    {
+      "path": "scripts/personal_quality.py",
+      "sha256": "b546ab3b419d31ff5b7e0b700063c7d976f48bdecb65a47fb73a8ab862f7bc53"
+    },
+    {
+      "path": "scripts/personal_studio.py",
+      "sha256": "e0c050682db195bc2b1b72ee217e07979bb49c34b8eb55b34120e4f952fa9ca5"
+    },
+    {
+      "path": "scripts/personal_visual_audit.py",
+      "sha256": "e7bfa0ffc65d67ae4e2baf9a7d6e23414e9cfbfe2d72fccb858a83d36d671eca"
+    },
+    {
+      "path": "scripts/personal_visual_briefs.py",
+      "sha256": "3b974ec39a378eb24c6d67ba8bd68aca4628e0c961f889b62a298cb17ba8d062"
+    },
+    {
+      "path": "scripts/personal_youtube_pack.py",
+      "sha256": "3770f6834260a247bb60983f564484f70769d49ab40700cddc96135a79026a09"
+    },
+    {
+      "path": "tests/test_personal_camera.py",
+      "sha256": "97dbc153d0ea5236be19bc3027df8dc081a3d915a44f6e3715f2877c0291cd4d"
+    },
+    {
+      "path": "tests/test_personal_catalog.py",
+      "sha256": "7afc2073c8f9e4a12da6ba875340bd4498b9e411a080241445939f6fc48a11f9"
+    },
+    {
+      "path": "tests/test_personal_custom_request.py",
+      "sha256": "7a5e3275b976a3dea48db8916a88d80dbdb150347edccd50fb4daef6048c67b1"
+    },
+    {
+      "path": "tests/test_personal_prepare.py",
+      "sha256": "42bc2ce46419ec65cd0ede35a38838c8965d3b81534bfb2447c834b22c47ad08"
+    },
+    {
+      "path": "tests/test_personal_studio.py",
+      "sha256": "ca74d056df9eb356fea276b5c5fb6e4420191414f1621b41f8368202fef14470"
+    },
+    {
+      "path": "tests/test_personal_video_real.py",
+      "sha256": "b8a7d629f8ebde76310facfe15705ebb2cebd719d1d62e51b0792ad09465bcb8"
+    },
+    {
+      "path": "tests/test_personal_visual_audit.py",
+      "sha256": "55b2369f94cb53c97b46c8c4db6c48434c972c27dcd71c10dc83ecd49cd0e516"
+    },
+    {
+      "path": "tests/test_personal_visual_briefs.py",
+      "sha256": "e7546b66faa3f30a90da68bce5efbe69e6f695a1b9c5d59d87d2b60a2f428fc0"
+    },
+    {
+      "path": "tests/test_personal_youtube_pack.py",
+      "sha256": "8c9a066aede697b145fa524ebd9face11c99a8fa69f33a0ee7ff9b49599e32da"
+    }
+  ],
+  "integration_changes": [
+    {
+      "path": "scripts/personal_editor.py",
+      "reason": "FFmpeg 7 writes full-range JPEG input as yuvj420p unless explicitly converted; preserve strict H264/yuv420p QA and convert to TV range before ASS",
+      "current_sha256": "b329d06e070005bf494d548632e0ef0b1f1a8fe5ecf570f252a5d00851b80275"
+    }
+  ]
+}

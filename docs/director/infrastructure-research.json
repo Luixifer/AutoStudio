@@ -1,0 +1,26 @@
+[
+  {
+    "document": "limits",
+    "retrieved_date": "2026-11-20",
+    "sha256": "46084b06ba6090116e09b1826197b313f4f999989724e3e1ffafce7dfaf5530a",
+    "via": "raw.githubusercontent.com/github/docs/main; official documentation source"
+  },
+  {
+    "document": "billing",
+    "retrieved_date": "2026-11-20",
+    "sha256": "1eb412764f4d7f100d3cfe923ef85d447c06c7b6dd9df78966dfe6b9b4fbd9db",
+    "via": "raw.githubusercontent.com/github/docs/main; official documentation source"
+  },
+  {
+    "document": "release",
+    "retrieved_date": "2026-11-20",
+    "sha256": "4feedd93b6247e24cc148937348910ff5f3a0506d165821ae187557b5d11904c",
+    "via": "raw.githubusercontent.com/github/docs/main; official documentation source"
+  },
+  {
+    "document": "compute",
+    "retrieved_date": "2026-11-20",
+    "sha256": "8314300cdafa2f13c9749e3f1fbba7bbc8b42f3a77f103fc7e2625cda31ea5ee",
+    "via": "raw.githubusercontent.com/github/docs/main; official documentation source"
+  }
+]

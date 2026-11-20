@@ -1,0 +1,18 @@
+{
+  "schema": "autostudio-director/1",
+  "title": "Las luces de Hessdalen",
+  "format": "horizontal",
+  "fps": 30,
+  "youtube_enabled": false,
+  "voice": {"mode": "kokoro", "voice": "em_alex"},
+  "chapters": [{
+    "id": "hessdalen-01", "title": "Introducción",
+    "scenes": [{
+      "id": "hessdalen-001",
+      "narration": "SUSTITUIR POR TU GUION. Esta plantilla no es un documental producido ni contiene hechos verificados.",
+      "media": {"kind": "image", "path": "media/TU_IMAGEN.jpg", "fit": "contain", "rights": {"license": "original_user", "credit": "SUSTITUIR POR LA PROCEDENCIA REAL"}},
+      "camera": {"keyframes": [{"at": 0, "x": 0.5, "y": 0.5, "zoom": 1}, {"at": 1, "x": 0.5, "y": 0.5, "zoom": 1.08}]},
+      "transition": {"type": "dissolve", "seconds": 0.4}
+    }]
+  }]
+}

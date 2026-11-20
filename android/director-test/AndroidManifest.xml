@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.luixifer.autostudio.director.test" android:versionCode="1" android:versionName="director-test">
+ <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35"/>
+ <application android:debuggable="true" android:label="Director Instrumentation"/>
+ <instrumentation android:name="com.luixifer.autostudio.test.DirectorInstrumentation" android:targetPackage="com.luixifer.autostudio.director.lab"/>
+</manifest>

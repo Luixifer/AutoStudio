@@ -10,11 +10,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: autostudio-custom-${{ github.event.sender.login }}
+  group: autostudio-custom-${{ github.ref == 'refs/heads/codex/autostudio-director' && inputs.request_id || github.event.sender.login }}
   cancel-in-progress: false
 jobs:
   render-personal:
-    if: ${{ github.event.repository.private == false }}
+    if: ${{ github.event.repository.private == false && github.ref != 'refs/heads/codex/autostudio-director' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -90,3 +90,26 @@ jobs:
             /tmp/autostudio-custom/briefs/prompts-imagenes.md
           if-no-files-found: error
           retention-days: 7
+
+  director:
+    if: ${{ github.event.repository.private == false && github.ref == 'refs/heads/codex/autostudio-director' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      DIRECTOR_REQUEST_ID: ${{ inputs.request_id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas de montaje y alineación CPU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          python scripts/fetch_voice.py
+      - name: Descargar material, producir capítulos y validar documental
+        run: python -m scripts.director.cloud --request-id "$DIRECTOR_REQUEST_ID" --work "$RUNNER_TEMP/director"

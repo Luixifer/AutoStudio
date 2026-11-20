@@ -23,6 +23,7 @@ public final class MainActivity extends Activity implements JobController.Listen
         scenes=Ui.button(progress,"Ver escenas de este vídeo",Ui.SCENES,false);scenes.setOnClickListener(v->startActivity(new Intent(this,ScenesActivity.class).putExtra("request_id",jobs.snapshot().optString("request_id"))));
         logs=Ui.button(progress,"Ver ejecución en GitHub",1011,false);logs.setOnClickListener(v->Ui.browser(this,jobs.snapshot().optString("run_url","https://github.com/"+GitHubClient.REPO+"/actions")));
         Ui.para(progress,"Puedes cerrar la aplicación: la generación continúa en GitHub. Al volver, se consulta la misma solicitud. El móvil no renderiza el vídeo.");
+        Ui.button(body,"AutoStudio Director · documentales",2115,false).setOnClickListener(v->startActivity(new Intent(this,DirectorActivity.class)));
         Ui.button(body,"Biblioteca y vídeos anteriores",1012,false).setOnClickListener(v->startActivity(new Intent(this,LibraryActivity.class)));
         Ui.para(body,"Sin publicación en YouTube. Documentales, producción por lotes y edición de escenas están pendientes de validar tras este primer recorrido.");
     }
