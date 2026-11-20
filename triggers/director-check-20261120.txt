@@ -4,3 +4,4 @@ Retry 3: fix confirmed nullable MIME import and failed-report JSON handling; rea
 Retry 4: click actual confirmation dialog without inaccessible root cache; verify rendered VideoView frame and ZIP restoration.
 Retry 5: reuse proven Android DNS bootstrap GET probes; no automatic POST retries. Persist failed QA.
 Retry 6: fix target-parent disk-space check and validate imported MP3 + real CPU Whisper alignment. Supersede obsolete evaluation only.
+Retry 7: reuse existing tested FFmpeg PCM16 -> Whisper ndarray path, avoiding removed PyAV metadata_errors API.

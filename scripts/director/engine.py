@@ -51,10 +51,11 @@ def narrate(scene,config,root,out,narrators):
         seconds=pcm_seconds(raw);words=voice.get('timed_words')
         if words is None:
             # Optional free CPU alignment; fail on transcription discrepancy.
-            from faster_whisper import WhisperModel
-            from scripts.audio_ai_qa import normalized_words
-            if 'whisper' not in narrators:narrators['whisper']=WhisperModel('base',device='cpu',compute_type='int8',cpu_threads=2)
-            pieces,_=narrators['whisper'].transcribe(str(raw),language='es',word_timestamps=True,condition_on_previous_text=False)
+            from scripts.audio_ai_qa import normalized_words,pcm16
+            if 'whisper' not in narrators:
+                from faster_whisper import WhisperModel
+                narrators['whisper']=WhisperModel('base',device='cpu',compute_type='int8',cpu_threads=2)
+            pieces,_=narrators['whisper'].transcribe(pcm16(raw),language='es',word_timestamps=True,condition_on_previous_text=False)
             detected=[w for p in pieces for w in (p.words or [])]
             actual=' '.join(w.word.strip() for w in detected)
             if normalized_words(actual)!=normalized_words(scene['narration']):
@@ -62,7 +63,7 @@ def narrate(scene,config,root,out,narrators):
             tokens=scene['narration'].split()
             if len(tokens)!=len(detected):raise ValueError('No es posible alinear exactamente este audio; aporta tiempos confirmados')
             words=[{'word':t,'start':float(w.start),'end':float(w.end)} for t,w in zip(tokens,detected)]
-        info={'engine':'user-provided audio','alignment':'provided timed_words' if voice.get('timed_words') else 'local CPU Whisper exact text match','voice_quality_approved':False}
+        info={'engine':'user-provided audio','decoder':'FFmpeg PCM; no PyAV file-open dependency','alignment':'provided timed_words' if voice.get('timed_words') else 'local CPU Whisper exact text match','voice_quality_approved':False}
     else:
         name=voice.get('voice','em_alex')
         if name not in narrators:
