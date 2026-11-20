@@ -1,0 +1,14 @@
+INSTRUMENTATION_RESULT: stream={
+  "passed": true,
+  "request_id": "4a35f4cfd8c94499ad75613f3a2f961f",
+  "github_run_id": "44803832152",
+  "sha256": "35a06b9b272afbbcb4f149141540de6dae3c027903abf8e8a28faddc88f27997",
+  "duration": 25.2,
+  "native_playback_position_ms": 2638,
+  "actual_video_frame_rendered": true,
+  "project_zip_backup_restored": true,
+  "native_network_probes": 2,
+  "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+  "physical_samsung_tested": false
+}
+INSTRUMENTATION_CODE: -1
