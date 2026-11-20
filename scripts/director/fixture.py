@@ -5,7 +5,7 @@ from PIL import Image,ImageDraw
 from scripts.director.project import SCHEMA
 ROOT=Path(__file__).resolve().parents[2]
 
-def create(out,format='horizontal'):
+def create(out,format='horizontal',with_audio=False):
  out=Path(out);out.mkdir(parents=True,exist_ok=True)
  for i in (1,2):shutil.copy2(ROOT/f'assets/science_v04/auroras/auroras_0{i}.jpg',out/f'image{i}.jpg')
  subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=640x360:rate=24:duration=3','-c:v','libx264','-pix_fmt','yuv420p',str(out/'clip.mp4')],check=True)
@@ -30,6 +30,12 @@ def create(out,format='horizontal'):
   elif isinstance(obj,list):
    for v in obj:relocate(v)
  relocate(p)
+ if with_audio:
+  from scripts.neural_narration import NeuralNarrator
+  raw=out/'media/imported-voice.wav';NeuralNarrator(voice='em_alex').synthesize(scenes[0]['narration'],raw)
+  target=out/'media/imported-voice.mp3'
+  subprocess.run(['ffmpeg','-v','error','-y','-i',str(raw),'-af','adelay=300:all=1','-c:a','libmp3lame','-b:a','128k',str(target)],check=True)
+  scenes[0]['voice']={'mode':'file','path':'media/imported-voice.mp3'}
  (out/'project.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');return out/'project.json'
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--format',default='horizontal',choices=['horizontal','vertical']);a=p.parse_args();print(create(a.out,a.format))
+ p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--with-imported-audio',action='store_true');p.add_argument('--format',default='horizontal',choices=['horizontal','vertical']);a=p.parse_args();print(create(a.out,a.format,a.with_imported_audio))

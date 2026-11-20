@@ -12,9 +12,9 @@ import java.util.*;
 
 /** Mobile-first project editor. Long operations share the existing IO executor. */
 public class DirectorActivity extends Activity {
- private DirectorStore store;private String projectId;private JSONObject project;private LinearLayout body;private TextView status;private EditText title;private AlertDialog generationConfirmation;private boolean busy=false;private final Handler handler=new Handler();
+ private DirectorStore store;private String projectId;private JSONObject project;private LinearLayout body;private TextView status;private EditText title;private AlertDialog generationConfirmation;private volatile String lastOperationError=null;private boolean busy=false;private final Handler handler=new Handler();
  private final Runnable poll=new Runnable(){public void run(){try{if(!busy&&projectId!=null){File f=new File(store.folder(projectId),"job.json");if(f.isFile()){JSONObject state=DirectorStore.read(f);if(!state.optBoolean("terminal")&&state.optString("stage").equals("RUNNING"))refresh();}}}catch(Exception e){status.setText(e.getMessage());}handler.postDelayed(this,20000);}};
- private void task(Work work,Runnable done){busy=true;status.setText("Trabajando… Mantén abierta la aplicación durante la subida o descarga.");AutoStudioApp.IO.execute(()->{try{work.run();runOnUiThread(()->{busy=false;done.run();});}catch(Exception e){runOnUiThread(()->{busy=false;status.setText(e.getMessage());Ui.error(this,e.getMessage());});}});}
+ private void task(Work work,Runnable done){lastOperationError=null;busy=true;status.setText("Trabajando… Mantén abierta la aplicación durante la subida o descarga.");AutoStudioApp.IO.execute(()->{try{work.run();runOnUiThread(()->{busy=false;done.run();});}catch(Exception e){runOnUiThread(()->{busy=false;lastOperationError=e.getMessage();status.setText(e.getMessage());Ui.error(this,e.getMessage());});}});}
  interface Work{void run()throws Exception;}
  @Override public void onCreate(Bundle saved){super.onCreate(saved);store=new DirectorStore(this);projectId=getIntent().getStringExtra("project_id");show();}
  private void show(){try{body=Ui.scroll(this,Ui.root(this,projectId==null?"AutoStudio Director":"Tu documental"));status=Ui.para(body,"LAB · Montaje en la nube. Sin publicación en YouTube.");

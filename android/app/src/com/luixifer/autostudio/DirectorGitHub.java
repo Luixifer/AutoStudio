@@ -37,7 +37,7 @@ public final class DirectorGitHub {
   if(!result.getString("status").equals("completed"))throw new IOException("El documental no se ha completado");JSONArray assets=r.getJSONArray("assets");JSONObject asset=null;for(int i=0;i<assets.length();i++){JSONObject a=assets.getJSONObject(i);if(a.getLong("id")==result.getLong("asset_id")&&a.getString("name").equals("documental-REVISION.mp4"))asset=a;}
   if(asset==null||asset.getLong("size")!=result.getLong("bytes")||asset.getLong("size")>=2L*1024*1024*1024)throw new IOException("Resultado no verificable");
   if(target.isFile()&&target.length()==asset.getLong("size")&&DirectorStore.sha(target).equals(result.getString("sha256")))return;
-  if(target.getUsableSpace()<asset.getLong("size")+100L*1024*1024)throw new IOException("No hay espacio libre suficiente en el móvil");
+  if(target.getParentFile().getUsableSpace()<asset.getLong("size")+100L*1024*1024)throw new IOException("No hay espacio libre suficiente en el móvil");
   File temp=new File(target.getParentFile(),target.getName()+".part");long total=0;
   try(InputStream in=assetStream(asset.getLong("id"));OutputStream out=new FileOutputStream(temp)){byte[] b=new byte[65536];int n;while((n=in.read(b))!=-1){total+=n;if(total>asset.getLong("size"))throw new IOException("Descarga demasiado grande");out.write(b,0,n);}}
   catch(Exception e){temp.delete();throw e;}

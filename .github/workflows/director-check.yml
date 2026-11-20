@@ -9,7 +9,7 @@ permissions:
   contents: read
 concurrency:
   group: autostudio-director-evaluation
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   android-and-render:
     if: ${{ github.event.repository.private == false }}
@@ -51,7 +51,9 @@ jobs:
           python -m unittest discover -s tests -v > reports/director/tests.txt 2>&1
           python android/build.py > reports/director/build.txt 2>&1
       - name: Crear material técnico identificado, sin APIs de imágenes
-        run: python -m scripts.director.fixture --out "$RUNNER_TEMP/director-fixture"
+        run: |
+          python scripts/fetch_voice.py
+          python -m scripts.director.fixture --with-imported-audio --out "$RUNNER_TEMP/director-fixture"
       - name: Android 15 real y prueba APK → Actions → MP4
         env:
           ANDROID_TEST_GITHUB_TOKEN: ${{ github.token }}
