@@ -12,7 +12,11 @@ def main():
  if qa.is_file() and qa.stat().st_size:
   try:check['android_emulator']=json.loads(qa.read_text())
   except json.JSONDecodeError:check['qa_error']='Invalid emulator JSON; not treated as success'
- if status=='success' and not check.get('android_emulator',{}).get('passed'):raise RuntimeError('Success without real emulator evidence')
+ recovery=out/'recovery.json'
+ if recovery.is_file() and recovery.stat().st_size:
+  try:check['android_recovery']=json.loads(recovery.read_text())
+  except json.JSONDecodeError:check['recovery_error']='Invalid recovery report'
+ if status=='success' and not (check.get('android_emulator',{}).get('passed') and check.get('android_recovery',{}).get('passed')):raise RuntimeError('Success without real emulator and recovery evidence')
  apk=Path('build/android/AutoStudio-Director-0.1.0-lab.apk')
  if apk.is_file():
   info=json.loads(Path('build/android/apk-info.json').read_text())

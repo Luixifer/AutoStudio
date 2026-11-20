@@ -68,6 +68,12 @@ jobs:
           adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-qa/preview.png > reports/director/preview.png
           adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
           python -c 'import json; assert json.load(open("reports/director/roundtrip.json"))["passed"]'
+      - name: Cerrar proceso, recuperar proyecto y exportar en Descargas
+        run: |
+          adb shell am force-stop com.luixifer.autostudio.director.lab
+          adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/recovery-instrumentation.txt
+          adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-qa/recovery.json > reports/director/recovery.json
+          python -c 'import json; assert json.load(open("reports/director/recovery.json"))["passed"]'
       - name: Entregar APK y evidencia real fuera de Git
         if: ${{ always() }}
         env:
