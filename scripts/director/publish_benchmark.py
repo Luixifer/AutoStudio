@@ -26,7 +26,7 @@ def main():
    source=render/name;target=root/name;shutil.copy2(source,target);files.append(target)
  for name in ['resources.json','benchmark.log','setup.log']:
   path=root/name
-  if path.is_file():files.append(path)
+  if path.is_file() and path.stat().st_size:files.append(path)
  summary=root/'benchmark-check.json';summary.write_text(json.dumps(check,ensure_ascii=False,indent=2)+'\n');files.append(summary)
  release=target_release()
  for path in files:

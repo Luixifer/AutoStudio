@@ -1,0 +1,53 @@
+name: AutoStudio Director · verificar entrega y narración científica
+on:
+  push:
+    branches: ['codex/autostudio-director']
+    paths: ['triggers/director-verify-20261120.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas y modelos CPU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          python scripts/fetch_voice.py
+          mkdir -p reports/director-verify
+      - name: Regresiones completas
+        run: python -m unittest discover -s tests -v > reports/director-verify/tests.txt 2>&1
+      - name: Leer causa real del último error de entrega
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.previous_logs 44804915434 --out reports/director-verify/previous-upload.log
+      - name: Verificar MP4 ya renderizado y probar cifras en audio real
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.verify_delivery --out reports/director-verify > reports/director-verify/verification.log 2>&1
+      - name: Conservar diagnóstico incluso si falla
+        if: ${{ always() }}
+        env:
+          DIRECTOR_CHECK_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY'
+          import shutil
+          from pathlib import Path
+          from scripts.director import publish_check_fallback as publisher
+          out=Path('reports/director');out.mkdir(exist_ok=True)
+          for p in Path('reports/director-verify').glob('*'):
+              if p.is_file() and p.suffix in ('.json','.txt','.log'):shutil.copy2(p,out/p.name)
+          publisher.BRANCH='director-quality-evidence'
+          publisher.publish()
+          PY

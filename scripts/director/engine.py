@@ -56,20 +56,18 @@ def narrate(scene,config,root,out,narrators):
                 from faster_whisper import WhisperModel
                 narrators['whisper']=WhisperModel('base',device='cpu',compute_type='int8',cpu_threads=2)
             pieces,_=narrators['whisper'].transcribe(pcm16(raw),language='es',word_timestamps=True,condition_on_previous_text=False)
-            detected=[w for p in pieces for w in (p.words or [])]
-            actual=' '.join(w.word.strip() for w in detected)
-            if normalized_words(actual)!=normalized_words(scene['narration']):
-                raise ValueError('La transcripción no coincide con el guion: revisa el audio o aporta tiempos confirmados')
-            tokens=scene['narration'].split()
-            if len(tokens)!=len(detected):raise ValueError('No es posible alinear exactamente este audio; aporta tiempos confirmados')
-            words=[{'word':t,'start':float(w.start),'end':float(w.end)} for t,w in zip(tokens,detected)]
+            detected=[{'word':w.word.strip(),'start':float(w.start),'end':float(w.end)} for p in pieces for w in (p.words or [])]
+            from scripts.director.text import align
+            words=align(scene['narration'],detected)
         info={'engine':'user-provided audio','decoder':'FFmpeg PCM; no PyAV file-open dependency','alignment':'provided timed_words' if voice.get('timed_words') else 'local CPU Whisper exact text match','voice_quality_approved':False}
     else:
         name=voice.get('voice','em_alex')
         if name not in narrators:
             from scripts.neural_narration import NeuralNarrator
             narrators[name]=NeuralNarrator(voice=name)
-        info=narrators[name].synthesize(scene['narration'],raw);words=info['words'];seconds=pcm_seconds(raw)
+        from scripts.director.text import expand,align
+        spoken,_=expand(scene['narration']);info=narrators[name].synthesize(spoken,raw);words=align(scene['narration'],info['words']);seconds=pcm_seconds(raw)
+        info['spoken_text']=spoken;info['words']=words;info['script_text_preserved']=True;info['timing_method']+='; original text mapped to measured expansion/phrase spans'
     if not .3<=seconds<=180:raise ValueError('Cada escena debe contener entre 0,3 y 180 segundos reales de voz')
     validate_words(words,scene['narration'],seconds)
     return raw,words,info
@@ -113,7 +111,7 @@ def scene_cache_key(scene,config,root):
         elif isinstance(obj,list):
             for value in obj:collect(value)
     collect(scene);collect(config.get('voice',{}))
-    code=[Path(__file__).parent/'project.py',ROOT/'scripts/neural_narration.py',ROOT/'assets/voice-models.json']
+    code=[Path(__file__).parent/'project.py',Path(__file__).parent/'text.py',ROOT/'scripts/neural_narration.py',ROOT/'assets/voice-models.json']
     import inspect,hashlib
     functions={fn.__name__:hashlib.sha256(inspect.getsource(fn).encode()).hexdigest() for fn in (render_scene,narrate,canvas,camera_filter,ease_keys,pcm_seconds,run,zoom_filter)}
     value={'cache_schema':2,'functions':functions,'size':FORMATS[config['format']],'scene':scene,'format':config['format'],'fps':config.get('fps',30),'voice':config.get('voice'), 'inputs':inputs,'code':{str(p.relative_to(ROOT)):digest(p) for p in code},'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]}

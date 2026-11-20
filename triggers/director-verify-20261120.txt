@@ -1,0 +1,1 @@
+Verify actual long MP4 already uploaded, recover exact optional-log error, and test numeric TTS/MP3 alignment with actual CPU models.
