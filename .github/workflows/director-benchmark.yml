@@ -1,0 +1,47 @@
+name: AutoStudio Director · benchmark real de cinco minutos
+run-name: Director · ensayo de 5 minutos · NO Hessdalen
+on:
+  push:
+    branches: ['codex/autostudio-director']
+    paths: ['triggers/director-benchmark-20261120.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-director-benchmark
+  cancel-in-progress: false
+jobs:
+  render:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas y pesos verificados
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-neural.txt
+          python scripts/fetch_voice.py
+          mkdir -p reports/director-benchmark
+      - name: Preparar locución medida y material identificado de ensayo
+        run: |
+          python -m scripts.director.fixture --out "$RUNNER_TEMP/director-baseline"
+          python -m scripts.director.engine "$RUNNER_TEMP/director-baseline/project.json" --out "$RUNNER_TEMP/director-baseline-render" > reports/director-benchmark/setup.log 2>&1
+      - name: Montar realmente unos cinco minutos y decodificar el MP4 completo
+        run: |
+          python -m scripts.director.measure --report reports/director-benchmark/resources.json -- \
+            python -m scripts.director.benchmark "$RUNNER_TEMP/director-baseline/project.json" \
+            --short-render "$RUNNER_TEMP/director-baseline-render" --out reports/director-benchmark/long \
+            > reports/director-benchmark/benchmark.log 2>&1
+      - name: Entregar MP4 real e informes fuera de Git
+        if: ${{ always() }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_BENCHMARK_STATUS: ${{ job.status }}
+        run: python -m scripts.director.publish_benchmark
