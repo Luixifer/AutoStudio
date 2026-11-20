@@ -50,7 +50,7 @@ def language(out):
 
 def publish(out):
  run=os.environ['GITHUB_RUN_ID'];out=Path(out);release=target_release()
- for p in [out/'delivery-verification.json',out/'language/language-verification.json',out/'previous-upload.log']:
+ for p in [out/'delivery-verification.json',out/'language/language-verification.json',out/'previous-upload.log',*out.glob('alignment-diagnostic-*.json')]:
   if p.is_file() and p.stat().st_size:
    safe=out/('director-quality-'+run+'-'+p.name);shutil.copy2(p,safe);upload(release,safe)
  print('REAL_VERIFICATION_RUN',run)
@@ -58,4 +58,15 @@ def publish(out):
 if __name__=='__main__':
  import argparse
  p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);a=p.parse_args()
- verify(a.out);language(a.out/'language');publish(a.out)
+ verify(a.out)
+ try:
+  language(a.out/'language')
+ except Exception as error:
+  (a.out/'language').mkdir(exist_ok=True)
+  (a.out/'language/language-verification.json').write_text(json.dumps({'passed':False,'error':str(error),'no_estimated_word_times':True},indent=2)+'\n')
+  # Keep actual ASR diagnostics separately from the independent MP4 verdict.
+  for index,source in enumerate((a.out/'language').rglob('alignment-diagnostic.json')):
+   shutil.copy2(source,a.out/('alignment-diagnostic-'+str(index)+'.json'))
+  raise
+ finally:
+  publish(a.out)

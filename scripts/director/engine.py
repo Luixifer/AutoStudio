@@ -50,15 +50,28 @@ def narrate(scene,config,root,out,narrators):
         run('-i',source,'-vn','-c:a','pcm_s16le','-ar','24000','-ac','1',raw)
         seconds=pcm_seconds(raw);words=voice.get('timed_words')
         if words is None:
-            # Optional free CPU alignment; fail on transcription discrepancy.
-            from scripts.audio_ai_qa import normalized_words,pcm16
-            if 'whisper' not in narrators:
-                from faster_whisper import WhisperModel
-                narrators['whisper']=WhisperModel('base',device='cpu',compute_type='int8',cpu_threads=2)
-            pieces,_=narrators['whisper'].transcribe(pcm16(raw),language='es',word_timestamps=True,condition_on_previous_text=False)
-            detected=[{'word':w.word.strip(),'start':float(w.start),'end':float(w.end)} for p in pieces for w in (p.words or [])]
-            from scripts.director.text import align
-            words=align(scene['narration'],detected)
+            # Bounded CPU retry; never relax exact text matching or invent times.
+            from scripts.audio_ai_qa import pcm16
+            from scripts.director.text import align,expand
+            samples=pcm16(raw);attempts=[]
+            for model_name in ('base','small'):
+                key='whisper' if model_name=='base' else 'whisper-small'
+                if key not in narrators:
+                    from faster_whisper import WhisperModel
+                    narrators[key]=WhisperModel(model_name,device='cpu',compute_type='int8',cpu_threads=2)
+                pieces,_=narrators[key].transcribe(samples,language='es',word_timestamps=True,condition_on_previous_text=False)
+                detected=[{'word':w.word.strip(),'start':float(w.start),'end':float(w.end)} for p in pieces for w in (p.words or [])]
+                attempt={'model':model_name,'expected_script':scene['narration'],'expected_spoken':expand(scene['narration'])[0],'detected_words':detected}
+                try:
+                    words=align(scene['narration'],detected)
+                    attempt['passed']=True
+                except ValueError as error:
+                    attempt.update(passed=False,error=str(error))
+                attempts.append(attempt)
+                atomic_json(out/'alignment-diagnostic.json',{'attempts':attempts,'matching':'exact after numeric normalization; no estimated word times'})
+                if attempt['passed']:break
+            else:
+                raise ValueError('La locución no coincide con el guion tras dos modelos CPU; consulta alignment-diagnostic.json y corrige el audio o el texto')
         info={'engine':'user-provided audio','decoder':'FFmpeg PCM; no PyAV file-open dependency','alignment':'provided timed_words' if voice.get('timed_words') else 'local CPU Whisper exact text match','voice_quality_approved':False}
     else:
         name=voice.get('voice','em_alex')
