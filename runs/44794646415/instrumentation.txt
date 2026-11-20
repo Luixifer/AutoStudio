@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: stream=DIRECTOR_TEST_FAILED: java.io.IOException: Formato no admitido. Usa JPG, PNG, WebP, MP4, WAV o MP3.
+INSTRUMENTATION_CODE: 0

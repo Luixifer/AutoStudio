@@ -1,0 +1,8 @@
+{
+  "managed_by": "autostudio-director-evaluation",
+  "run_id": "44794646415",
+  "source_commit": "d65ebdecf7ad6c518cdac2520a84ef65f1240f68",
+  "status": "failure",
+  "release_delivery_error": "Expecting value: line 1 column 1 (char 0)",
+  "physical_samsung_tested": false
+}

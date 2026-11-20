@@ -1,0 +1,40 @@
+Credential format JVM regressions passed: 12
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 10,000 days
+	for: CN=Android Debug, O=AutoStudio Lab, C=ES
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
+Signer #1 certificate SHA-256 digest: a135594161d75973cc5116844ba438f05762de346411e0efa65e6d021fc0ee8c
+Signer #1 certificate SHA-1 digest: 18178fa01b7999cc2bde09969d7394dea86b914f
+Signer #1 certificate MD5 digest: e805ced0dbb3b678db71f555c4241e77
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 9147db4dfcaa7ab6f647093b8031bed4fe7c5f66da0956501a7e001a8190d49e
+Signer #1 public key SHA-1 digest: d8658d8a765de6f575b50e3002d6ce7b500ec1c9
+Signer #1 public key MD5 digest: eab5ba579db1b1acccd4a476847cbd11
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Android Debug, O=AutoStudio Lab, C=ES
+Signer #1 certificate SHA-256 digest: a135594161d75973cc5116844ba438f05762de346411e0efa65e6d021fc0ee8c
+Signer #1 certificate SHA-1 digest: 18178fa01b7999cc2bde09969d7394dea86b914f
+Signer #1 certificate MD5 digest: e805ced0dbb3b678db71f555c4241e77
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 9147db4dfcaa7ab6f647093b8031bed4fe7c5f66da0956501a7e001a8190d49e
+Signer #1 public key SHA-1 digest: d8658d8a765de6f575b50e3002d6ce7b500ec1c9
+Signer #1 public key MD5 digest: eab5ba579db1b1acccd4a476847cbd11
+REAL_APK /home/runner/work/AutoStudio/AutoStudio/build/android/AutoStudio-Director-0.1.0-lab.apk
