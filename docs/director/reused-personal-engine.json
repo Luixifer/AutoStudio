@@ -94,7 +94,11 @@
     {
       "path": "scripts/personal_editor.py",
       "reason": "FFmpeg 7 writes full-range JPEG input as yuvj420p unless explicitly converted; preserve strict H264/yuv420p QA and convert to TV range before ASS",
-      "current_sha256": "b329d06e070005bf494d548632e0ef0b1f1a8fe5ecf570f252a5d00851b80275"
+      "current_sha256": "bb54127359cde51f0712337a0273c8021e92707f3cbc9674dccef61f8c1e34a9",
+      "additional_fixes": [
+        "Clamp ASS cue holds to the next cue and film end; no stacked captions",
+        "Round centiseconds with minute/hour carry"
+      ]
     }
   ]
 }

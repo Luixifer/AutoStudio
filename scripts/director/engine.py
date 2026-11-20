@@ -112,8 +112,10 @@ def scene_cache_key(scene,config,root):
         elif isinstance(obj,list):
             for value in obj:collect(value)
     collect(scene);collect(config.get('voice',{}))
-    code=[Path(__file__),Path(__file__).parent/'project.py',ROOT/'scripts/neural_narration.py',ROOT/'scripts/personal_editor.py',ROOT/'assets/voice-models.json']
-    value={'scene':scene,'format':config['format'],'fps':config.get('fps',30),'voice':config.get('voice'), 'inputs':inputs,'code':{str(p.relative_to(ROOT)):digest(p) for p in code},'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]}
+    code=[Path(__file__).parent/'project.py',ROOT/'scripts/neural_narration.py',ROOT/'assets/voice-models.json']
+    import inspect,hashlib
+    functions={fn.__name__:hashlib.sha256(inspect.getsource(fn).encode()).hexdigest() for fn in (render_scene,narrate,canvas,camera_filter,ease_keys,pcm_seconds,run,zoom_filter)}
+    value={'cache_schema':2,'functions':functions,'size':FORMATS[config['format']],'scene':scene,'format':config['format'],'fps':config.get('fps',30),'voice':config.get('voice'), 'inputs':inputs,'code':{str(p.relative_to(ROOT)):digest(p) for p in code},'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]}
     import hashlib
     return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
 
@@ -146,14 +148,15 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
     else:
         details=probe(source);v=next((s for s in details['streams'] if s['codec_type']=='video'),None)
         if not v:raise ValueError('MP4 sin vídeo')
-        available=float(details['format']['duration'])-float(m.get('trim_start',0))
+        available=float(v.get('duration',details['format']['duration']))-float(m.get('trim_start',0))
         if available<=0 or available+1/fps<visual_seconds and not m.get('loop',False):
             raise ValueError('Clip insuficiente para la locución; recórtala, aporta otro clip o activa bucle explícitamente')
         if m.get('loop',False):args+=['-stream_loop','-1']
         args+=['-ss',str(m.get('trim_start',0)),'-i',str(source)]
         fit=f'scale={width}:{height}:force_original_aspect_ratio=decrease,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=0x0d141f'
         if m.get('fit','contain')=='cover':fit=f'scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height}'
-        graph.append(f'[0:v]scale=ceil(iw*sar/2)*2:ih,setsar=1,fps={fps},{fit},setsar=1,setpts=PTS-STARTPTS,format=yuv420p[v]')
+        tone='zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,' if v.get('color_transfer') in ('smpte2084','arib-std-b67') else ''
+        graph.append(f'[0:v]{tone}scale=ceil(iw*sar/2)*2:ih,setsar=1,fps={fps},{fit},setsar=1,setpts=PTS-STARTPTS,format=yuv420p[v]')
     temp=work/'visual.tmp.mp4'
     run(*args,'-filter_complex_threads','1','-filter_complex',';'.join(graph),'-map','[v]','-an','-frames:v',frames,'-c:v','libx264','-preset','veryfast','-crf','20','-pix_fmt','yuv420p','-r',fps,'-movflags','+faststart',temp)
     os.replace(temp,video)
@@ -162,6 +165,8 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
 
 def produce(project_path,out,chapter_id=None):
     path=Path(project_path).resolve();config=load(path);root=path.parent;out=Path(out).resolve();out.mkdir(parents=True,exist_ok=True)
+    from scripts.director.audit import audit
+    atomic_json(out/'input-audit.json',audit(path))
     size=FORMATS[config['format']];fps=config.get('fps',30);cache=out/'scene-cache';cache.mkdir(exist_ok=True);narrators={}
     chapters=config['chapters']
     if chapter_id:
@@ -171,6 +176,8 @@ def produce(project_path,out,chapter_id=None):
     for chapter in chapters:
         parts=[];cues=[];offset=0
         for index,scene in enumerate(chapter['scenes']):
+            if shutil.disk_usage(out).free<1024**3:raise RuntimeError('Menos de 1 GiB libre para renderizar. Divide el proyecto y conserva sus capítulos.')
+            if sum(p.stat().st_size for p in out.rglob('*') if p.is_file())>8*1024**3:raise RuntimeError('Presupuesto de trabajo de 8 GiB superado; entrega por capítulos.')
             work,meta=render_scene(scene,config,root,cache,narrators,index<len(chapter['scenes'])-1)
             meta={**meta,'start':global_offset+offset,'chapter':chapter['id']};parts.append((work,meta))
             cues.extend({**c,'start':c['start']+offset,'end':c['end']+offset} for c in caption_groups(meta['words']))

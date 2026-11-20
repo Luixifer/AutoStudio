@@ -36,7 +36,7 @@ public final class DirectorStore {
     public static JSONArray parseScript(String text)throws Exception{
         if(text.length()>100000)throw new IOException("Guion demasiado grande; divide el documental");
         JSONArray chapters=new JSONArray(),scenes=new JSONArray();JSONObject chapter=new JSONObject().put("id","c-"+id()).put("title","Capítulo 1").put("scenes",scenes);chapters.put(chapter);
-        for(String part:text.replace("\r","").split("\\n\\s*\\n")){
+        for(String part:text.replace("\r","").replaceAll("(?m)^(#+[^\\n]*)$","\n\n$1\n\n").split("\\n\\s*\\n")){
             String line=part.trim();if(line.isEmpty())continue;
             if(line.startsWith("#")){String title=line.replaceFirst("^#+\\s*","");if(scenes.length()==0){chapter.put("title",title);}else{scenes=new JSONArray();chapter=new JSONObject().put("id","c-"+id()).put("title",title).put("scenes",scenes);chapters.put(chapter);}continue;}
             if(line.length()>6000)throw new IOException("Párrafo demasiado largo. Separa las escenas con líneas en blanco.");

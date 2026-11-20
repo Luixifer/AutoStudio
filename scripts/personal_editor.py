@@ -44,8 +44,8 @@ def subtitle_text(text):
     return str(text).replace("\\","\\\\").replace("{","").replace("}","").replace("\n"," ")
 
 def ass_time(t):
-    h=int(t//3600);m=int((t%3600)//60);s=t%60
-    return f"{h}:{m:02}:{s:05.2f}"
+    ticks=round(max(0,t)*100);h,ticks=divmod(ticks,360000);m,ticks=divmod(ticks,6000);sec,cs=divmod(ticks,100)
+    return f"{h}:{m:02}:{sec:02}.{cs:02}"
 
 def srt_time(t):
     ms=round(t*1000);h,ms=divmod(ms,3600000);m,ms=divmod(ms,60000);s,ms=divmod(ms,1000)
@@ -78,8 +78,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Heading,,0,0,0,,{clean_title}\n",
         f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Disclosure,,0,0,0,,{notice}\n",
     ]
-    for cue in cues:
-        events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(cue['end']+.08)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
+    for index,cue in enumerate(cues):
+        end=min(cue["end"]+.08,cues[index+1]["start"] if index+1<len(cues) else duration,duration)
+        events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(end)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
     result=header+"".join(events)
     if result.count("\nDialogue:") != len(cues)+2:
         raise ValueError("Malformed ASS event separators; refusing visual corruption.")

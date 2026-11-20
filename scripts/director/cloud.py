@@ -58,7 +58,15 @@ def upload(release,path):
 def execute(request_id,work):
  if not re.fullmatch('[a-f0-9]{32}',request_id):raise ValueError('Solicitud no válida')
  if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!=REPO:raise RuntimeError('Este transporte solo se ejecuta en el repositorio autorizado de Actions')
- release=get_json('/releases/tags/director-'+request_id)
+ try:release=get_json('/releases/tags/director-'+request_id)
+ except urllib.error.HTTPError as error:
+  if error.code!=404:raise
+  release=None
+  for page in range(1,4):
+   items=get_json('/releases?per_page=100&page='+str(page))
+   release=next((r for r in items if r.get('tag_name')=='director-'+request_id and r.get('draft')),None)
+   if release or len(items)<100:break
+  if release is None:raise ValueError('No se encuentra el borrador de esta solicitud')
  if not release.get('draft') or release['tag_name']!='director-'+request_id:raise ValueError('Se requiere una entrega de revisión, no una publicación')
  intent=json.loads(release.get('body','{}'))
  if intent.get('autostudio_director')!=1 or intent.get('request_id')!=request_id or not re.fullmatch('[a-f0-9]{64}',intent.get('bundle_sha256','')):raise ValueError('La solicitud no tiene integridad verificable')
@@ -71,7 +79,7 @@ def execute(request_id,work):
   bundle=work/'project.zip';download(bundles[0],bundle,intent['bundle_sha256']);extract_bundle(bundle,work/'input')
   from scripts.director.engine import produce
   report=produce(work/'input/project.json',work/'render')
-  for name in ('documental-REVISION.mp4','captions.srt','validation.json','timeline.json','SHA256SUMS'):
+  for name in ('documental-REVISION.mp4','captions.srt','validation.json','timeline.json','input-audit.json','SHA256SUMS'):
    asset=upload(release,work/'render'/name)
    if name.endswith('.mp4'):result.update({'asset_id':asset['id'],'bytes':asset['size'],'sha256':report['sha256'],'duration':report['duration'],'width':report['width'],'height':report['height']})
   result['status']='completed'

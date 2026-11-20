@@ -1,3 +1,5 @@
+> **AutoStudio Director LAB** se desarrolla en la rama independiente `codex/autostudio-director`. [Auditoría, motor documental y guía Android](docs/director/README.md). Conserva las versiones anteriores. No se ha producido todavía el documental de Hessdalen con materiales del usuario.
+
 # AutoStudio 0.2 — escenas y voz neuronal
 
 Fábrica experimental de vídeos científicos con programas libres y **sin APIs de pago ni publicación en YouTube**. Montaje reproducible en GitHub Actions, administrable desde el móvil. No es un generador cinematográfico autónomo terminado.

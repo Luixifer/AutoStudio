@@ -6,6 +6,7 @@ import java.net.*;
 /** Official GitHub APIs only. Tokens never follow asset redirects. */
 public final class DirectorGitHub {
  public static final String REF="codex/autostudio-director",REPO="Luixifer/AutoStudio";
+ public static final class ApiFailure extends IOException {public final int status;ApiFailure(int value){super("GitHub HTTP "+value+". Revisa permisos, conexión y diagnóstico de Actions.");status=value;}}
  private final String token;
  public DirectorGitHub(String token)throws IOException{if(!TokenFormat.acceptable(token))throw new IOException("Conecta GitHub en Ajustes. Director requiere Actions: lectura/escritura y Contents: lectura/escritura.");this.token=token;}
  private HttpURLConnection open(String url,boolean auth)throws Exception{
@@ -15,9 +16,9 @@ public final class DirectorGitHub {
   HttpURLConnection c=(HttpURLConnection)u.openConnection();c.setConnectTimeout(30000);c.setReadTimeout(120000);c.setInstanceFollowRedirects(false);c.setRequestProperty("User-Agent","AutoStudio-Director/0.1");c.setRequestProperty("Accept","application/vnd.github+json");c.setRequestProperty("X-GitHub-Api-Version","2022-11-28");if(auth)c.setRequestProperty("Authorization","Bearer "+token);return c;
  }
  private JSONObject api(String path,String method,JSONObject body)throws Exception{
-  HttpURLConnection c=open("https://api.github.com/repos/"+REPO+path,true);try{c.setRequestMethod(method);if(body!=null){c.setDoOutput(true);c.setRequestProperty("Content-Type","application/json");try(OutputStream out=c.getOutputStream()){out.write(body.toString().getBytes("UTF-8"));}}int code=c.getResponseCode();if(code==204)return new JSONObject();if(code!=200&&code!=201)throw new IOException("GitHub HTTP "+code+". Revisa permisos, conexión y diagnóstico de Actions.");try(InputStream in=c.getInputStream()){return new JSONObject(DirectorStore.text(in,2_000_000));}}finally{c.disconnect();}
+  HttpURLConnection c=open("https://api.github.com/repos/"+REPO+path,true);try{c.setRequestMethod(method);if(body!=null){c.setDoOutput(true);c.setRequestProperty("Content-Type","application/json");try(OutputStream out=c.getOutputStream()){out.write(body.toString().getBytes("UTF-8"));}}int code=c.getResponseCode();if(code==204)return new JSONObject();if(code!=200&&code!=201)throw new ApiFailure(code);try(InputStream in=c.getInputStream()){String value=DirectorStore.text(in,2_000_000);return value.trim().startsWith("[")?new JSONObject().put("items",new JSONArray(value)):new JSONObject(value);}}finally{c.disconnect();}
  }
- public JSONObject release(String id)throws Exception{if(!GitHubClient.validId(id))throw new IOException("Solicitud inválida");return api("/releases/tags/director-"+id,"GET",null);}
+ public JSONObject release(String id)throws Exception{if(!GitHubClient.validId(id))throw new IOException("Solicitud inválida");try{return api("/releases/tags/director-"+id,"GET",null);}catch(ApiFailure e){if(e.status!=404)throw e;}for(int page=1;page<=3;page++){JSONArray items=api("/releases?per_page=100&page="+page,"GET",null).getJSONArray("items");for(int i=0;i<items.length();i++){JSONObject r=items.getJSONObject(i);if(r.optString("tag_name").equals("director-"+id)&&r.optBoolean("draft"))return r;}if(items.length()<100)break;}throw new IOException("No se encuentra el borrador de esta solicitud. Revisa subida y permisos.");}
  public JSONObject start(File bundle,String id)throws Exception{
   String sha=DirectorStore.sha(bundle);JSONObject intent=new JSONObject().put("autostudio_director",1).put("request_id",id).put("bundle_sha256",sha).put("source_ref",REF);
   JSONObject r=api("/releases","POST",new JSONObject().put("tag_name","director-"+id).put("target_commitish",REF).put("name","Director · revisión "+id.substring(0,8)).put("draft",true).put("prerelease",true).put("body",intent.toString()));

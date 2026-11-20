@@ -25,6 +25,17 @@ class DirectorRealFFmpegTests(unittest.TestCase):
   cache=out/'scene-cache';m=next(cache.glob('*/complete.json'));data=json.loads(m.read_text());video=m.parent/'visual.mp4';before=video.stat().st_mtime_ns
   with patch.dict(FORMATS,{'horizontal':(320,180)}):work,info=render_scene(self.scene,self.p,self.root,cache,{})
   self.assertEqual(before,video.stat().st_mtime_ns);self.assertTrue(info['files'])
+ def test_actual_hdr_tagged_clip_is_normalized_to_sdr(self):
+  import subprocess
+  from scripts.director.project import probe
+  from scripts.director.audit import audit
+  subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=s=320x180:r=24:d=2','-vf','setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc','-c:v','libx264','-pix_fmt','yuv420p10le','-color_primaries','bt2020','-color_trc','smpte2084','-colorspace','bt2020nc',str(self.root/'hdr.mp4')],check=True)
+  self.scene['media']={'kind':'video','path':'hdr.mp4','rights':{'license':'own_creation'}}
+  self.p['chapters']=[{'id':'c1','scenes':[self.scene]}];p=self.root/'project.json';p.write_text(json.dumps(self.p))
+  with patch.dict(FORMATS,{'horizontal':(320,180)}):
+   self.assertTrue(audit(p)['scenes'][0]['hdr_to_sdr']);work,report=render_scene(self.scene,self.p,self.root,self.root/'cache',{},False)
+  stream=next(s for s in probe(work/'visual.mp4')['streams'] if s['codec_type']=='video')
+  self.assertEqual(stream['pix_fmt'],'yuv420p');self.assertEqual(stream.get('color_transfer'),'bt709')
  def test_clip_requires_explicit_loop_if_short(self):
   import subprocess
   subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=s=320x180:r=24:d=0.5','-c:v','libx264',str(self.root/'clip.mp4')],check=True)
