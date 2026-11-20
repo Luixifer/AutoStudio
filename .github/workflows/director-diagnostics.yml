@@ -1,0 +1,39 @@
+name: AutoStudio Director · registros de una ejecución
+on:
+  push:
+    branches: ['codex/autostudio-director']
+    paths: ['triggers/director-diagnostics-20261120.txt']
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: ID numérico de la ejecución que hay que revisar
+        default: '44801864837'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  logs:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Leer registros oficiales y guardar diagnóstico saneado
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_LOG_RUN: ${{ inputs.run_id || '44801864837' }}
+        run: python -m scripts.director.previous_logs "$DIRECTOR_LOG_RUN" --out reports/director/previous-run.log
+      - name: Entregar diagnóstico fuera del código
+        if: ${{ always() }}
+        env:
+          DIRECTOR_CHECK_STATUS: diagnostic
+        run: |
+          python - <<'PY'
+          from scripts.director import publish_check_fallback as publisher
+          publisher.BRANCH='director-diagnostics'
+          publisher.publish()
+          PY
