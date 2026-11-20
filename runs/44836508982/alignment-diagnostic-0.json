@@ -1,0 +1,113 @@
+{
+  "attempts": [
+    {
+      "model": "base",
+      "expected_script": "Esta prueba usa 1981, 3,5 y 60 minutos.",
+      "expected_spoken": "Esta prueba usa mil novecientos ochenta y uno, tres coma cinco y sesenta minutos.",
+      "detected_words": [
+        {
+          "word": "Esta",
+          "start": 0.0,
+          "end": 0.52
+        },
+        {
+          "word": "prueba",
+          "start": 0.52,
+          "end": 0.78
+        },
+        {
+          "word": "usa",
+          "start": 0.78,
+          "end": 1.12
+        },
+        {
+          "word": "1981,",
+          "start": 1.12,
+          "end": 2.28
+        },
+        {
+          "word": "3",
+          "start": 3.28,
+          "end": 3.5
+        },
+        {
+          "word": ",5",
+          "start": 3.5,
+          "end": 4.24
+        },
+        {
+          "word": "y",
+          "start": 4.24,
+          "end": 4.44
+        },
+        {
+          "word": "60",
+          "start": 4.44,
+          "end": 4.9
+        },
+        {
+          "word": "minutos.",
+          "start": 4.9,
+          "end": 5.26
+        }
+      ],
+      "passed": false,
+      "error": "La transcripción no coincide con el guion; revisa el audio y la pronunciación de nombres o cifras"
+    },
+    {
+      "model": "small",
+      "expected_script": "Esta prueba usa 1981, 3,5 y 60 minutos.",
+      "expected_spoken": "Esta prueba usa mil novecientos ochenta y uno, tres coma cinco y sesenta minutos.",
+      "detected_words": [
+        {
+          "word": "Esta",
+          "start": 0.0,
+          "end": 0.5
+        },
+        {
+          "word": "prueba",
+          "start": 0.5,
+          "end": 0.82
+        },
+        {
+          "word": "usa",
+          "start": 0.82,
+          "end": 1.14
+        },
+        {
+          "word": "1981,",
+          "start": 1.14,
+          "end": 2.52
+        },
+        {
+          "word": "3",
+          "start": 3.22,
+          "end": 3.46
+        },
+        {
+          "word": ",5",
+          "start": 3.46,
+          "end": 4.22
+        },
+        {
+          "word": "y",
+          "start": 4.22,
+          "end": 4.46
+        },
+        {
+          "word": "60",
+          "start": 4.46,
+          "end": 4.82
+        },
+        {
+          "word": "minutos.",
+          "start": 4.82,
+          "end": 5.32
+        }
+      ],
+      "passed": false,
+      "error": "La transcripción no coincide con el guion; revisa el audio y la pronunciación de nombres o cifras"
+    }
+  ],
+  "matching": "exact after numeric normalization; no estimated word times"
+}

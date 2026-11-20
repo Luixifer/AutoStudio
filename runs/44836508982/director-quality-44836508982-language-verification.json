@@ -1,0 +1,5 @@
+{
+  "passed": false,
+  "error": "La locuci\u00f3n no coincide con el guion tras dos modelos CPU; consulta alignment-diagnostic.json y corrige el audio o el texto",
+  "no_estimated_word_times": true
+}
