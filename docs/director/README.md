@@ -1,6 +1,8 @@
 # AutoStudio Director LAB 0.1
 
-Ampliación de AutoStudio, no sustitución de la APK estable. Revisión completa: [auditoría](AUDIT.md), [guía Samsung](PHONE_GUIDE.md), [infraestructura y límites](INFRASTRUCTURE.md).
+Ampliación de AutoStudio, no sustitución de la APK estable. Primera aceptación Android: [APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-0.1.0-lab.apk). [Pruebas y límites reales](VALIDATION.md).
+
+Revisión completa: [auditoría](AUDIT.md), [guía Samsung](PHONE_GUIDE.md), [infraestructura y límites](INFRASTRUCTURE.md).
 
 ## Ejecutar el motor existente y la ampliación
 

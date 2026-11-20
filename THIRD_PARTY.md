@@ -29,3 +29,14 @@ Aplicación nativa original en Java, sin bibliotecas Android externas. Se compil
 ## Contenido científico 0.4
 
 24 ilustraciones 3D y tres maestros Blender originales, sin fotografías, texturas ni modelos externos. Procedencia y derechos en `assets/science_v04/LICENSE_ART.md` y manifiestos por tema. Animación ligera original siguiendo trayectorias del maestro, sin simulación física a escala. No hay nuevas dependencias de pago. Las páginas NASA/NOAA/NHGRI/USGS se consultan como referencias científicas, no se descargan sus imágenes; el informe de recuperación conserva URLs, títulos, hashes y extractos limitados para revisión editorial.
+
+
+## AutoStudio Director LAB
+
+- **faster-whisper 1.2.1** y **CTranslate2**, MIT: reconocimiento/alineación local CPU, sin API de inferencia. [Código y licencia](https://github.com/SYSTRAN/faster-whisper). Modelo Whisper multilingüe `base`, procedente de la conversión pública de SYSTRAN de los pesos OpenAI Whisper, bajo su licencia MIT. La descarga de pesos no equivale a utilizar la API comercial de OpenAI. No se instalan modelos GPU de pago.
+- **PyAV** es una dependencia de faster-whisper (BSD-3-Clause; FFmpeg subyacente tiene sus propias condiciones). El lector de archivos de PyAV cambió su API `metadata_errors`; Director reutiliza la decodificación **FFmpeg → PCM16** ya existente y entrega muestras a Whisper. No depende de ese lector incompatible ni afirma que un modelo ASR sustituya la revisión humana.
+- **imageio-ffmpeg 0.6.0**, BSD-2-Clause para el envoltorio Python; el binario FFmpeg incluido por su distribución tiene las condiciones de su compilación. Se declara la dependencia que ya utilizaban los motores procedurales/pruebas del repositorio. No se añade al APK.
+- Director utiliza las voces locales `em_alex`, `em_santa` y opcionalmente `ef_dora` del paquete Kokoro ya documentado. No se afirma naturalidad, edad percibida, acento ni aprobación artística sin escucha humana.
+- Los ensayos Director usan recursos originales del repositorio y patrones/sonido generados localmente, etiquetados como ensayos. **No son imágenes ni documental de Hessdalen**.
+- En producciones personales, las imágenes, vídeos, voz y música proceden del usuario. Su licencia, autor y URL cuando correspondan deben declararse en el contrato; aceptar un archivo no certifica sus derechos ni hechos científicos. No se descarga música comercial ni se llama a proveedores de pago.
+- Los motores Python/FFmpeg/Whisper/Kokoro se ejecutan en GitHub Actions, **no dentro de la APK**. La aplicación nativa sigue usando las API Android sin bibliotecas móviles externas ni credenciales incrustadas.

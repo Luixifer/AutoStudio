@@ -18,3 +18,10 @@ No pulses repetidamente Generar tras un corte de red. Primero consulta la solici
 Para evaluar Hessdalen, revisa a velocidad normal toda la narración, los movimientos, la exactitud del guion y los permisos del material. Las luces deben identificarse como grabación real o recreación según su procedencia. No se afirmará haber producido tu documental hasta procesar esos recursos.
 
 Tras descargar y comprobar una producción, puedes eliminar **su borrador de Release** desde GitHub para retirar los adjuntos temporales. No elimines el proyecto del teléfono si quieres volver a montarlo.
+
+
+## Primera revisión verificada
+
+[Descargar APK Director LAB 0.1](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-0.1.0-lab.apk) · [Ejemplo técnico de 25,2 segundos](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/ensayo-tecnico-NO-HESSDALEN.mp4).
+
+Se han verificado en Android emulado la generación, la recuperación tras force-stop y Guardar en Descargas, comprobando hashes. Falta probar físicamente esta revisión en tu Samsung. Para incidencias, indica título del proyecto, UUID mostrado, fase donde se detuvo y ejecución de GitHub; nunca incluyas tu token.
