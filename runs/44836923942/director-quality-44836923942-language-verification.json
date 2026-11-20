@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "original_script_preserved": true,
+  "actual_cpu_whisper_imported_mp3": true,
+  "actual_cpu_kokoro_numeric_expansion": true,
+  "no_estimated_word_times": true,
+  "video_sha256": "5b03d806f832aedb6fcbe75ffe957a9c9d15d1a12020b19c39e3db7a38047d74",
+  "human_listening_approved": false,
+  "youtube_enabled": false
+}
