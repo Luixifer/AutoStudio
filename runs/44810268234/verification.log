@@ -1,0 +1,24 @@
+[0;93m2026-11-20 20:20:52.715142169 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/verify_delivery.py", line 61, in <module>
+    verify(a.out);language(a.out/'language');publish(a.out)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/verify_delivery.py", line 47, in language
+    p.write_text(json.dumps(project,ensure_ascii=False,indent=2)+'\n');report=produce(p,out/'render');timeline=json.loads((out/'render/timeline.json').read_text())
+                                                                              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/engine.py", line 180, in produce
+    work,meta=render_scene(scene,config,root,cache,narrators,index<len(chapter['scenes'])-1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/engine.py", line 127, in render_scene
+    raw,words,voice=narrate(scene,config,root,work,narrators)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/engine.py", line 61, in narrate
+    words=align(scene['narration'],detected)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/AutoStudio/AutoStudio/scripts/director/text.py", line 50, in align
+    if expected!=actual:raise ValueError('La transcripción no coincide con el guion; revisa el audio y la pronunciación de nombres o cifras')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: La transcripción no coincide con el guion; revisa el audio y la pronunciación de nombres o cifras
