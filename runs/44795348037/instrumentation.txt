@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: stream=DIRECTOR_TEST_FAILED: java.lang.Exception: No confirmation window
+INSTRUMENTATION_CODE: 0

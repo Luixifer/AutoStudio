@@ -1,0 +1,30 @@
+{
+  "run_id": "44795348037",
+  "source_commit": "162ec59553b86a365f987f4b82d6426c3fd0aafe",
+  "job_status": "failure",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "qa_error": "Invalid emulator JSON; not treated as success",
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab",
+    "version_name": "director-0.1.0-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-0.1.0-lab.apk",
+    "bytes": 115235,
+    "sha256": "54cc19ff7fccabf55bce82b1735162b2cb0e7c9b3b4da77a330d4beab251552f",
+    "source_commit": "162ec59553b86a365f987f4b82d6426c3fd0aafe",
+    "github_run_id": "44795348037",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}
