@@ -22,6 +22,13 @@ Tras descargar y comprobar una producción, puedes eliminar **su borrador de Rel
 
 ## Primera revisión verificada
 
-[Descargar APK Director LAB 0.1](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-0.1.0-lab.apk) · [Ejemplo técnico de 25,2 segundos](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/ensayo-tecnico-NO-HESSDALEN.mp4).
+[Descargar APK Director LAB 0.1.1](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44807042861/AutoStudio-Director-0.1.1-lab.apk) · [Ejemplo técnico de 25,2 segundos](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/ensayo-tecnico-NO-HESSDALEN.mp4).
 
 Se han verificado en Android emulado la generación, la recuperación tras force-stop y Guardar en Descargas, comprobando hashes. Falta probar físicamente esta revisión en tu Samsung. Para incidencias, indica título del proyecto, UUID mostrado, fase donde se detuvo y ejecución de GitHub; nunca incluyas tu token.
+
+
+## Compatibilidad entre laboratorios
+
+Esta entrega es **LAB2**, paquete `com.luixifer.autostudio.director.lab02`, independiente de LAB1 y de Control 0.3. No actualiza ni borra sus datos. Si ya creaste proyectos en LAB1, expórtalos como ZIP y restáuralos en LAB2; conserva la aplicación anterior hasta comprobar la copia. Las firmas son únicamente de depuración; no existe todavía una clave de publicación estable.
+
+[Descargar ensayo técnico real de 4 min 59,4 s](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-ensayo-5min-NO-HESSDALEN-44804915434.mp4). Este vídeo repetitivo prueba duración, voz, montaje y exportación; **no es Hessdalen ni una muestra editorial aprobada**.

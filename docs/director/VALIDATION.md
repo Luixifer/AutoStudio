@@ -64,3 +64,27 @@ En el primer intento **44801864837**, el render y su validación acabaron correc
 La prueba adicional con MP3 descubrió una incompatibilidad real de la versión actual de PyAV con faster-whisper (`metadata_errors`). Se corrigió reutilizando la decodificación PCM16 existente, no atribuyendo una transcripción inyectada a un modelo real. Las ejecuciones Android aceptadas **44801247644** y **44803232978** volvieron a ejecutar el modelo CPU y completaron ese caso correctamente.
 
 La dependencia `imageio-ffmpeg` que faltaba en la declaración común neuronal se añadió también allí: conserva la ejecución de las pruebas procedurales ya presentes en main. El conjunto de dependencias de Director no cambia por este traslado; no se modifica main ni se sustituye el renderer de Shorts.
+
+
+## Entrega actual: LAB2 0.1.1
+
+La ejecución **[44807042861](https://github.com/Luixifer/AutoStudio/actions/runs/44807042861)** está aprobada y conserva main intacta. Fuente APK `f4e7c07b543e9b692860f64d8e48477c0747af0e`. El cambio de configuración exige correctamente Contents lectura/escritura además de Actions; el paquete **`com.luixifer.autostudio.director.lab02`** coexiste con LAB1 y Control 0.3.
+
+- [APK pública 0.1.1](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44807042861/AutoStudio-Director-0.1.1-lab.apk): **119.331 bytes**, SHA-256 **`94e0e9194675ff7aa0b687d4ae429ed8c13fc0caed5432a822911233a9c71318`**. Descargada y contrastada de nuevo. Firma debug v2/v3 comprobada con apksigner.
+- Producción real iniciada por esta APK: [44807596572](https://github.com/Luixifer/AutoStudio/actions/runs/44807596572), 25,2 segundos. VideoView mostró un fotograma real y avanzó 2.790 ms. [Informe](evidence/lab02-roundtrip.json).
+- Force-stop → arranque nuevo → misma solicitud y conexión cifrada → reproducción → exportación MediaStore: SHA **`3897fbe295b5a50b23dca93c3c7c6086867cc8621c6fb24bf0686b05013e1367`**, idéntico al original. [Recuperación](evidence/lab02-recovery.json), [firma](evidence/lab02-signature.txt), [captura](evidence/lab02-preview.png).
+- Última ejecución local: **321 pruebas Python aprobadas, 49,719 s**. [Registro completo](evidence/regressions-321.txt). Incluye la prueba nueva de reintento ASR acotado y rechazo de discrepancias; no se presenta ese backend simulado como escucha física. La prueba Android anterior mantiene 22 comprobaciones JVM reales.
+
+### Vídeo de cinco minutos realmente generado en GitHub
+
+[Descargar MP4 técnico de 299,4 segundos](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-ensayo-5min-NO-HESSDALEN-44804915434.mp4).
+
+**51.599.735 bytes**, SHA-256 **`2706ff5e9dfb46ed1445c7e6d5326bec04ac8093ac740b254e2ce70490f01813`**; 1920×1080, 30 FPS, H264/AAC, 264 cues. El archivo público se descargó y decodificó de principio a fin, sin errores ni intervalos negros detectados. [Verificación independiente](evidence/cloud-five-minute-delivery-verification.json).
+
+La ejecución de render **44804915434** produjo y publicó correctamente vídeo e informes, pero su estado global es **fallido**: el último adjunto opcional `benchmark.log` estaba vacío y GitHub lo rechazó con HTTP 422. El fallo está identificado en registros oficiales; el publicador ahora omite adjuntos vacíos. No se atribuye estado verde a esa ejecución. Los contadores reales de ese runner fueron **456,378 s**, máximo de hijos **639.024 KiB**; no mediciones de Android.
+
+### Cifras y audio importado: límite y diagnóstico
+
+La ejecución adicional **44810268234** aprobó 320 regresiones y volvió a verificar el MP4 largo. Falló al alinear exactamente un MP3 con «1981, 3,5 y 60 minutos». El motor rechazó la discrepancia, sin inventar subtítulos. La revisión actual permite un único reintento CPU con Whisper `small` después de `base`, manteniendo la misma comparación exacta, y conserva texto detectado e intervalos en `alignment-diagnostic.json`.
+
+Las cifras del guion se expanden antes de la síntesis, pero el texto original de los subtítulos se conserva mediante intervalos acústicos medidos. Una discrepancia sin resolver sigue siendo un error accionable. No se promete que un reconocedor automático transcriba correctamente cualquier nombre o cifra. La verificación adicional de esta revisión se registra separada del estado válido del MP4 ya entregado.

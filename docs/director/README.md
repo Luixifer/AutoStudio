@@ -1,6 +1,6 @@
-# AutoStudio Director LAB 0.1
+# AutoStudio Director LAB 0.1.1
 
-Ampliación de AutoStudio, no sustitución de la APK estable. Primera aceptación Android: [APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-0.1.0-lab.apk). [Pruebas y límites reales](VALIDATION.md).
+Ampliación de AutoStudio, no sustitución de la APK estable. Primera aceptación Android: [APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44807042861/AutoStudio-Director-0.1.1-lab.apk). [Pruebas y límites reales](VALIDATION.md).
 
 Revisión completa: [auditoría](AUDIT.md), [guía Samsung](PHONE_GUIDE.md), [infraestructura y límites](INFRASTRUCTURE.md).
 
@@ -26,7 +26,7 @@ El JSON versionado agrupa `chapters[].scenes[]`: `id`, `narration`, `media` con 
 AUTOSTUDIO_DIRECTOR_BUILD=1 python android/build.py
 ```
 
-Salida `build/android/AutoStudio-Director-0.1.0-lab.apk`; firma de depuración comprobada por apksigner. El build predeterminado anterior sigue disponible sin esa variable. No se incluyen credenciales ni claves de publicación.
+Salida `build/android/AutoStudio-Director-0.1.1-lab.apk`; firma de depuración comprobada por apksigner. El build predeterminado anterior sigue disponible sin esa variable. No se incluyen credenciales ni claves de publicación.
 
 El workflow `personal-custom.yml` conserva el editor personal original fuera de la rama Director. En `codex/autostudio-director`, recibe el mismo UUID ya soportado por GitHub y procesa el ZIP desde su borrador de Release. No hace falta sustituir ni fusionar main para probarlo.
 
@@ -51,3 +51,10 @@ python -m scripts.director.chapters assemble partes/assembly.json --bundles part
 El ensamblaje valida proyecto, orden, hashes, formato, duración PCM, vídeo y subtítulos de cada parte. No requiere volver a sintetizar voz ni disponer de todas las imágenes durante el ensamblaje. Se ha probado un recorrido real de dos capítulos con FFmpeg. El reparto automático de ZIPs desde la APK y entre jobs todavía falta; los efectos puntuales por escena se admiten en el montaje completo, pero se rechazan expresamente en este primer formato portátil.
 
 La APK permite exportar una copia ZIP e importarla como otro proyecto, sin tocar el original. Estas copias evitan depender de una firma de laboratorio entre revisiones: **no desinstales una revisión con proyectos sin exportarlos primero**. Todavía no hay un almacén de firma de publicación ni se ha activado uno.
+
+
+## Entrega LAB2
+
+La APK 0.1.1 usa el identificador separado `com.luixifer.autostudio.director.lab02` y corrige la configuración de permisos GitHub a **Contents y Actions de lectura/escritura**. [Prueba Android aceptada](https://github.com/Luixifer/AutoStudio/actions/runs/44807042861). Firma y SHA verificados tras descargar la APK pública. Conserva las aplicaciones anteriores y exporta los proyectos antes de trasladarlos.
+
+[Vídeo real de 299,4 segundos generado en Actions](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-ensayo-5min-NO-HESSDALEN-44804915434.mp4). Ensayo técnico repetitivo; no contiene el guion ni el material de Hessdalen. [Verificación independiente del archivo](evidence/cloud-five-minute-delivery-verification.json).

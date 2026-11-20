@@ -1,0 +1,53 @@
+{
+  "run_id": "44807042861",
+  "source_commit": "f4e7c07b543e9b692860f64d8e48477c0747af0e",
+  "job_status": "success",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "android_emulator": {
+    "passed": true,
+    "request_id": "47184ad552844b33b9b0ec6b76c99a8f",
+    "github_run_id": "44807596572",
+    "sha256": "3897fbe295b5a50b23dca93c3c7c6086867cc8621c6fb24bf0686b05013e1367",
+    "duration": 25.2,
+    "native_playback_position_ms": 2790,
+    "actual_video_frame_rendered": true,
+    "project_zip_backup_restored": true,
+    "settings_contents_write_instructions_verified": true,
+    "native_network_probes": 3,
+    "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+    "physical_samsung_tested": false
+  },
+  "android_recovery": {
+    "passed": true,
+    "process_restart_preserved_project": true,
+    "encrypted_connection_restored": true,
+    "actual_video_frame_rendered": true,
+    "native_playback_position_ms": 669,
+    "download_export_sha256": "3897fbe295b5a50b23dca93c3c7c6086867cc8621c6fb24bf0686b05013e1367",
+    "request_id": "47184ad552844b33b9b0ec6b76c99a8f",
+    "physical_samsung_tested": false
+  },
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab02",
+    "version_name": "director-0.1.1-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-0.1.1-lab.apk",
+    "bytes": 119331,
+    "sha256": "94e0e9194675ff7aa0b687d4ae429ed8c13fc0caed5432a822911233a9c71318",
+    "source_commit": "f4e7c07b543e9b692860f64d8e48477c0747af0e",
+    "github_run_id": "44807042861",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}
