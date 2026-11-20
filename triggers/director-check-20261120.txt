@@ -2,3 +2,4 @@ Real Director APK, import, cloud transport, FFmpeg and playback check. No Hessda
 Retry 2: preserve exact previous logs and always publish small diagnostic evidence.
 Retry 3: fix confirmed nullable MIME import and failed-report JSON handling; real signatures plus backup.
 Retry 4: click actual confirmation dialog without inaccessible root cache; verify rendered VideoView frame and ZIP restoration.
+Retry 5: reuse proven Android DNS bootstrap GET probes; no automatic POST retries. Persist failed QA.
