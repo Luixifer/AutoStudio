@@ -58,3 +58,6 @@ La APK permite exportar una copia ZIP e importarla como otro proyecto, sin tocar
 La APK 0.1.1 usa el identificador separado `com.luixifer.autostudio.director.lab02` y corrige la configuración de permisos GitHub a **Contents y Actions de lectura/escritura**. [Prueba Android aceptada](https://github.com/Luixifer/AutoStudio/actions/runs/44807042861). Firma y SHA verificados tras descargar la APK pública. Conserva las aplicaciones anteriores y exporta los proyectos antes de trasladarlos.
 
 [Vídeo real de 299,4 segundos generado en Actions](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44803232978/AutoStudio-Director-ensayo-5min-NO-HESSDALEN-44804915434.mp4). Ensayo técnico repetitivo; no contiene el guion ni el material de Hessdalen. [Verificación independiente del archivo](evidence/cloud-five-minute-delivery-verification.json).
+
+
+[Verificación final en Actions aprobada](https://github.com/Luixifer/AutoStudio/actions/runs/44836923942): 323 regresiones, descarga/decodificación completa del MP4 largo y montaje real de cifras con voz sintética y MP3 importado. La aplicación permite introducir tu material; **Hessdalen aún no se ha producido**.

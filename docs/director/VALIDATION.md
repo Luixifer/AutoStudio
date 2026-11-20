@@ -96,3 +96,15 @@ La corrección une únicamente esa sintaxis decimal cuando los tokens son acúst
 
 
 Tras corregir esa segmentación, la batería completa local aprobó **323 pruebas en 49,648 s** ([registro](evidence/regressions-323.txt)). Se volvió a aplicar el alineador a las transcripciones reales guardadas de `base` y `small`: ambas conservan las cifras y sus intervalos completos. Esta reproducción de diagnóstico no se confunde con una nueva inferencia: la inferencia y render nuevos se comprueban en la ejecución posterior de Actions.
+
+
+## Verificación final en la nube: aprobada
+
+La ejecución **[44836923942](https://github.com/Luixifer/AutoStudio/actions/runs/44836923942)**, código `1cc9fcc0770ce5babdb5bd1166de399e51d895a2`, terminó **correctamente**:
+
+- 323 regresiones completas aprobadas en el runner.
+- Descarga independiente del MP4 público de 299,4 s, verificación SHA y decodificación completa: **aprobado**; 264 cues. [Informe](evidence/cloud-44836923942-delivery-verification.json).
+- Nueva síntesis Kokoro con cifras y nuevo MP3 importado con retardo real, transcrito por Whisper CPU y montado con FFmpeg: **aprobado**, conservando las cifras originales y los intervalos medidos. SHA del vídeo adicional: `5b03d806f832aedb6fcbe75ffe957a9c9d15d1a12020b19c39e3db7a38047d74`. [Informe](evidence/cloud-44836923942-language-verification.json).
+- Los informes también se descargaron de los adjuntos públicos de Release para comprobar que la entrega existe. Este resultado resuelve el rechazo numérico anterior y confirma el MP4 largo existente; no cambia retrospectivamente el estado fallido de las ejecuciones antiguas.
+
+La APK entregada sigue siendo LAB2 0.1.1, ya aceptada en Android emulado. Las correcciones de alineación se ejecutan en el motor de GitHub; no requieren reemplazar el binario del teléfono. La naturalidad de la voz, la revisión editorial de Hessdalen y la validación física de esta revisión continúan pendientes.
