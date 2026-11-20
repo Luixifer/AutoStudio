@@ -22,6 +22,10 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
+      - name: Verificar entrega en la Release ya autorizada antes de renderizar
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.publish_benchmark --preflight
       - name: Herramientas gratuitas y pesos verificados
         run: |
           sudo apt-get update -qq

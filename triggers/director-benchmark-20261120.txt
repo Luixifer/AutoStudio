@@ -1,1 +1,2 @@
 Real five-minute cloud benchmark with explicit test material, no user Hessdalen assets and no YouTube.
+Delivery retry: renderer passed; new-release creation was HTTP 403. Preflight and append to already verified Director release, without permission expansion.

@@ -4,3 +4,4 @@ onnxruntime==1.32.0
 numpy==2.5.5
 phonemizer==3.6.0
 espeakng-loader==0.2.4
+imageio-ffmpeg==0.6.0
