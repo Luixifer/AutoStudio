@@ -6,3 +6,4 @@ Retry 5: reuse proven Android DNS bootstrap GET probes; no automatic POST retrie
 Retry 6: fix target-parent disk-space check and validate imported MP3 + real CPU Whisper alignment. Supersede obsolete evaluation only.
 Retry 7: reuse existing tested FFmpeg PCM16 -> Whisper ndarray path, avoiding removed PyAV metadata_errors API.
 Acceptance 8: keep passed round trip and additionally verify force-stop recovery and MediaStore download export by SHA.
+Acceptance 9: correct inherited PAT setup text/link to Contents write for Director; LAB 2 installs alongside previous app and keeps its projects.

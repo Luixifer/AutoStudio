@@ -20,7 +20,7 @@ jobs:
       actions: write
     env:
       AUTOSTUDIO_DIRECTOR_BUILD: '1'
-      AUTOSTUDIO_EMULATOR_APK: build/android/AutoStudio-Director-0.1.0-lab.apk
+      AUTOSTUDIO_EMULATOR_APK: build/android/AutoStudio-Director-0.1.1-lab.apk
       ANDROID_IMAGE: system-images;android-35;google_apis;x86_64
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -61,18 +61,18 @@ jobs:
           if [ ! -e /dev/kvm ]; then echo 'Sin KVM: no se simula validación Android.'; exit 1; fi
           sudo setfacl -m "u:$USER:rw" /dev/kvm
           python android/start_emulator.py > reports/director/emulator-start.txt 2>&1
-          adb shell run-as com.luixifer.autostudio.director.lab mkdir -p files/director-projects/11111111111111111111111111111111
-          tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab tar -C files/director-projects/11111111111111111111111111111111 -xf -
+          adb shell run-as com.luixifer.autostudio.director.lab02 mkdir -p files/director-projects/11111111111111111111111111111111
+          tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab02 tar -C files/director-projects/11111111111111111111111111111111 -xf -
           adb shell am instrument -w -r -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/instrumentation.txt
-          adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-qa/roundtrip.json > reports/director/roundtrip.json
-          adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-qa/preview.png > reports/director/preview.png
-          adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
+          adb exec-out run-as com.luixifer.autostudio.director.lab02 cat files/director-qa/roundtrip.json > reports/director/roundtrip.json
+          adb exec-out run-as com.luixifer.autostudio.director.lab02 cat files/director-qa/preview.png > reports/director/preview.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab02 cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
           python -c 'import json; assert json.load(open("reports/director/roundtrip.json"))["passed"]'
       - name: Cerrar proceso, recuperar proyecto y exportar en Descargas
         run: |
-          adb shell am force-stop com.luixifer.autostudio.director.lab
+          adb shell am force-stop com.luixifer.autostudio.director.lab02
           adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/recovery-instrumentation.txt
-          adb exec-out run-as com.luixifer.autostudio.director.lab cat files/director-qa/recovery.json > reports/director/recovery.json
+          adb exec-out run-as com.luixifer.autostudio.director.lab02 cat files/director-qa/recovery.json > reports/director/recovery.json
           python -c 'import json; assert json.load(open("reports/director/recovery.json"))["passed"]'
       - name: Entregar APK y evidencia real fuera de Git
         if: ${{ always() }}
