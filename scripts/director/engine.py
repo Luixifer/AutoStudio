@@ -184,7 +184,7 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
         if m.get('fit','contain')=='cover':fit=f'scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height}'
         tone='zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,' if v.get('color_transfer') in ('smpte2084','arib-std-b67') else ''
         if m.get('fit')=='blur':
-            graph.append(f'[0:v]{tone}setsar=1,fps={fps},setpts=PTS-STARTPTS,split=2[fg][bg]')
+            graph.append(f'[0:v]{tone}scale=ceil(iw*sar/2)*2:ih,setsar=1,fps={fps},setpts=PTS-STARTPTS,split=2[fg][bg]')
             graph.append(f'[bg]scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},boxblur=20:2[b]')
             graph.append(f'[fg]scale={width}:{height}:force_original_aspect_ratio=decrease[f]')
             graph.append('[b][f]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]')
@@ -192,7 +192,7 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
     temp=work/'visual.tmp.mp4'
     run(*args,'-filter_complex_threads','1','-filter_complex',';'.join(graph),'-map','[v]','-an','-frames:v',frames,'-c:v','libx264','-preset','veryfast','-crf','20','-pix_fmt','yuv420p','-r',fps,'-movflags','+faststart',temp)
     os.replace(temp,video)
-    info={'id':scene['id'],'key':key,'duration':duration,'voice_seconds':spoken,'visual_seconds':visual_seconds,'transition_seconds':extra,'transition':transition.get('type','cut'),'words':words,'voice':voice,'files':{p.name:digest(p) for p in (video,audio)},'input_media_sha256':digest(source),'original_text':scene['narration'],'media_path':m['path'],'narration_file':str(raw),'incoming_silence':incoming,'pause_after':duration-incoming-spoken,'narration_offset':incoming,'validation_state':'rendered; assembly pending'}
+    info={'id':scene['id'],'key':key,'duration':duration,'voice_seconds':spoken,'visual_seconds':visual_seconds,'transition_seconds':extra,'transition':transition.get('type','cut'),'words':words,'voice':voice,'files':{p.name:digest(p) for p in (video,audio)},'input_media_sha256':digest(source),'original_text':scene['narration'],'media_path':m['path'],'camera':scene.get('camera',{}),'narration_file':str(raw),'incoming_silence':incoming,'pause_after':duration-incoming-spoken,'narration_offset':incoming,'validation_state':'rendered; assembly pending'}
     atomic_json(marker,info);return work,info
 
 def produce(project_path,out,chapter_id=None):
@@ -211,7 +211,11 @@ def produce(project_path,out,chapter_id=None):
             if shutil.disk_usage(out).free<1024**3:raise RuntimeError('Menos de 1 GiB libre para renderizar. Divide el proyecto y conserva sus capítulos.')
             if sum(p.stat().st_size for p in out.rglob('*') if p.is_file())>8*1024**3:raise RuntimeError('Presupuesto de trabajo de 8 GiB superado; entrega por capítulos.')
             incoming=parts[-1][1]['transition_seconds'] if parts and config.get('scene_policy')=='paragraph/1' else 0
-            work,meta=render_scene({**scene,'_incoming_seconds':incoming},config,root,cache,narrators,index<len(chapter['scenes'])-1)
+            if incoming:incoming+=1/fps # Full new-image frame before its first phoneme.
+            try:work,meta=render_scene({**scene,'_incoming_seconds':incoming},config,root,cache,narrators,index<len(chapter['scenes'])-1)
+            except Exception as error:
+                atomic_json(out/'scene-error.json',{'scene_id':scene['id'],'position':len(scene_reports),'state':'failed','error':str(error)})
+                raise ValueError('Escena '+scene['id']+': '+str(error)) from error
             meta={**meta,'start':global_offset+offset,'narration_start':global_offset+offset+meta['narration_offset'],'narration_end':global_offset+offset+meta['narration_offset']+meta['voice_seconds'],'position':len(scene_reports),'chapter':chapter['id']};parts.append((work,meta))
             from scripts.director.captions import phrases
             subtitle_options=config.get('subtitles',{});groups=phrases(meta['words'],subtitle_options.get('style','documentary')) if config.get('scene_policy')=='paragraph/1' else caption_groups(meta['words'])
@@ -278,6 +282,12 @@ def produce(project_path,out,chapter_id=None):
         correspondence=inspect_correspondence(final,scene_reports,cache,fps,global_cues,root)
         atomic_json(out/'correspondence.json',correspondence)
         report['correspondence']=correspondence
+        timeline=json.loads((out/'timeline.json').read_text())
+        verdict={s['id']:s['passed'] for s in correspondence['scenes']}
+        for item in timeline['scenes']:
+            item['validation_state']='passed' if verdict[item['id']] else 'failed'
+            item['subtitles']=[c for c in global_cues if c.get('scene_id')==item['id']]
+        atomic_json(out/'timeline.json',timeline)
         if not correspondence['passed']:report['passed']=False;report['errors'].extend(correspondence['errors'])
     report['github_run_id']=os.environ.get('GITHUB_RUN_ID');report['execution_context']='GitHub Actions' if os.environ.get('GITHUB_ACTIONS')=='true' else 'cloud workspace'
     atomic_json(out/'validation.json',report)

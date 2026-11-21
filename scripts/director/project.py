@@ -70,6 +70,8 @@ def validate(data,root):
             rights(m)
             number(scene.get('pause_after',.35),0,10,'pausa posterior')
             if strict:
+                if len(re.split(r'\n\s*\n',scene['narration'].replace('\r\n','\n').replace('\r','\n').strip()))!=1:raise ValueError('Cada escena debe contener un único párrafo')
+                if type(m.get('allow_reuse',False)) is not bool:raise ValueError('La autorización de reutilización debe ser explícita y booleana')
                 fingerprint=digest(media_file(root,m.get('path'),{'.jpg','.jpeg','.png','.webp','.mp4'}))
                 if fingerprint in media_seen and not m.get('allow_reuse',False):raise ValueError('Recurso repetido entre párrafos sin autorización explícita')
                 media_seen.add(fingerprint)

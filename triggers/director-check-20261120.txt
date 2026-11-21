@@ -13,3 +13,5 @@ Revisión visual: cerrar ANR externo de Pixel Launcher y exigir que la ventana c
 
 Director 2: cada párrafo es una escena; recursos persistentes, transiciones en silencio, control de fotogramas y voz por escena.
 Director 2 final: guardado automático de tarjetas, encuadre elegible, rechazo de recursos faltantes, y pruebas de caché y voz por frases.
+Final Android: selector de cámara reversible; comprobación de todas las tarjetas y guardado. El documental largo está validándose en la ejecución anterior independiente.
+Final de integración: Markdown y JSON conservan capítulos e IDs; selector de cámara reversible y guardado de tarjetas.

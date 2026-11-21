@@ -37,7 +37,7 @@ public final class DirectorStore {
         List<JSONObject> result=new ArrayList<>();JSONArray chapters=p.getJSONArray("chapters");for(int c=0;c<chapters.length();c++){JSONArray scenes=chapters.getJSONObject(c).getJSONArray("scenes");for(int i=0;i<scenes.length();i++)result.add(scenes.getJSONObject(i));}return result;
     }
     public static void prepareParagraphs(JSONObject p,String text)throws Exception{
-        List<String> paragraphs=DirectorQuickPlan.paragraphs(text);buildParagraphs(p,paragraphs,null);
+        DirectorQuickPlan.paragraphs(text);JSONArray chapters=parseScript(text);for(int c=0;c<chapters.length();c++){JSONArray scenes=chapters.getJSONObject(c).getJSONArray("scenes");for(int i=0;i<scenes.length();i++)scenes.getJSONObject(i).put("pause_after",.35).put("camera",new JSONObject().put("movement","zoom_in"));}p.put("chapters",chapters).put("scene_policy","paragraph/1");if(!p.has("subtitles"))p.put("subtitles",new JSONObject().put("enabled",true).put("style","documentary"));syncQuick(p);
     }
     private static void buildParagraphs(JSONObject p,List<String> paragraphs,List<String> ids)throws Exception{JSONArray chapters=new JSONArray(),scenes=null;
         for(int i=0;i<paragraphs.size();i++){
@@ -58,15 +58,17 @@ public final class DirectorStore {
     public static void compileQuick(JSONObject p)throws Exception{
         if(!p.optString("scene_policy").equals("paragraph/1"))throw new IOException("Revisa el guion antiguo: el reparto anterior no se convierte automáticamente.");
         int position=0,missing=0;Set<String> ids=new HashSet<>();
-        for(JSONObject scene:allScenes(p)){position++;if(!ids.add(scene.getString("id")))throw new IOException("Escenas con identificadores repetidos");if(!scene.has("media")||scene.getJSONObject("media").optString("path").isEmpty())missing++;if(scene.optString("narration").trim().isEmpty())throw new IOException("La escena "+position+" no tiene narración");}
+        for(JSONObject scene:allScenes(p)){position++;if(!ids.add(scene.getString("id")))throw new IOException("Escenas con identificadores repetidos");if(!scene.has("media")||scene.getJSONObject("media").optString("path").isEmpty())missing++;if(scene.optString("narration").trim().isEmpty())throw new IOException("La escena "+position+" no tiene narración");if(DirectorQuickPlan.paragraphs(scene.getString("narration")).size()!=1)throw new IOException("La escena "+position+" contiene varios párrafos. Impórtalos como escenas separadas.");}
         if(position==0)throw new IOException("Importa el guion primero");if(missing>0)throw new IOException("Hay "+position+" párrafos y faltan "+missing+" recursos. Cada párrafo necesita su imagen o vídeo.");
     }
     public static void prepareScript(JSONObject p,String input)throws Exception{
         if(!input.trim().startsWith("{")){prepareParagraphs(p,input);return;}
         JSONObject obj=new JSONObject(input);JSONArray chapters=obj.optJSONArray("chapters");if(chapters==null)chapters=new JSONArray().put(new JSONObject().put("scenes",obj.getJSONArray("scenes")));
-        List<String> text=new ArrayList<>(),ids=new ArrayList<>();Set<String> unique=new HashSet<>();
-        for(int c=0;c<chapters.length();c++){JSONArray scenes=chapters.getJSONObject(c).getJSONArray("scenes");for(int i=0;i<scenes.length();i++){JSONObject scene=scenes.getJSONObject(i);String value=scene.optString("narration",scene.optString("text")),id=scene.optString("id","s-"+id());if(value.trim().isEmpty()||value.length()>6000||!id.matches("[a-zA-Z0-9_-]{1,64}")||!unique.add(id))throw new IOException("Texto o ID de escena JSON inválido");text.add(value);ids.add(id);}}
-        if(text.isEmpty()||text.size()>720)throw new IOException("Cantidad de escenas JSON no válida");buildParagraphs(p,text,ids);
+        List<String> text=new ArrayList<>(),ids=new ArrayList<>();Set<String> unique=new HashSet<>();JSONArray parsedChapters=new JSONArray();
+        for(int c=0;c<chapters.length();c++){JSONArray scenes=chapters.getJSONObject(c).getJSONArray("scenes");for(int i=0;i<scenes.length();i++){JSONObject scene=scenes.getJSONObject(i);String value=scene.optString("narration",scene.optString("text")),id=scene.optString("id","s-"+id());if(value.trim().isEmpty()||value.length()>6000||DirectorQuickPlan.paragraphs(value).size()!=1||!id.matches("[a-zA-Z0-9_-]{1,64}")||!unique.add(id))throw new IOException("Texto o ID de escena JSON inválido");text.add(value);ids.add(id);}
+            if(text.isEmpty())throw new IOException("Capítulo JSON vacío");JSONObject temporary=new JSONObject();buildParagraphs(temporary,text,ids);JSONArray group=temporary.getJSONArray("chapters");for(int part=0;part<group.length();part++){JSONObject chapter=group.getJSONObject(part);String chapterId=part==0?chapters.getJSONObject(c).optString("id",chapter.getString("id")):chapter.getString("id");if(!chapterId.matches("[a-zA-Z0-9_-]{1,64}")||!unique.add(chapterId))throw new IOException("ID de capítulo inválido o repetido");chapter.put("id",chapterId);chapter.put("title",chapters.getJSONObject(c).optString("title","Capítulo "+(c+1))+(part>0?" · continuación":""));parsedChapters.put(chapter);}text.clear();ids.clear();}
+        if(parsedChapters.length()==0||parsedChapters.length()>24)throw new IOException("Cantidad de capítulos no válida");
+        if(allScenes(new JSONObject().put("chapters",parsedChapters)).size()>720)throw new IOException("Cantidad de escenas JSON no válida");p.put("chapters",parsedChapters).put("scene_policy","paragraph/1");if(!p.has("subtitles"))p.put("subtitles",new JSONObject().put("enabled",true).put("style","documentary"));syncQuick(p);
     }
     public static String scriptText(String input)throws Exception{
         if(!input.trim().startsWith("{"))return input;
@@ -78,7 +80,7 @@ public final class DirectorStore {
     public static JSONArray parseScript(String text)throws Exception{
         if(text.length()>100000)throw new IOException("Guion demasiado grande; divide el documental");
         JSONArray chapters=new JSONArray(),scenes=new JSONArray();JSONObject chapter=new JSONObject().put("id","c-"+id()).put("title","Capítulo 1").put("scenes",scenes);chapters.put(chapter);
-        for(String part:text.replace("\r","").replaceAll("(?m)^(#+[^\\n]*)$","\n\n$1\n\n").split("\\n\\s*\\n")){
+        for(String part:text.replace("\r\n","\n").replace('\r','\n').replaceAll("(?m)^(#+[^\\n]*)$","\n\n$1\n\n").split("\\n\\s*\\n")){
             String line=part.trim();if(line.isEmpty())continue;
             if(line.startsWith("#")){String title=line.replaceFirst("^#+\\s*","");if(scenes.length()==0){chapter.put("title",title);}else{scenes=new JSONArray();chapter=new JSONObject().put("id","c-"+id()).put("title",title).put("scenes",scenes);chapters.put(chapter);}continue;}
             if(line.length()>6000)throw new IOException("Párrafo demasiado largo. Separa las escenas con líneas en blanco.");

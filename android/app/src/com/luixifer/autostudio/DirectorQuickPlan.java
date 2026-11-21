@@ -6,7 +6,7 @@ public final class DirectorQuickPlan {
   if(text==null||text.trim().isEmpty())throw new IllegalArgumentException("Escribe o importa el guion.");
   if(text.length()>100000)throw new IllegalArgumentException("El guion supera el límite; impórtalo por capítulos.");
   List<String> result=new ArrayList<>();
-  for(String part:text.replace("\r\n","\n").replace('\r','\n').trim().split("\\n[\\t ]*\\n(?:[\\t ]*\\n)*")){
+  for(String part:text.replace("\r\n","\n").replace('\r','\n').replaceAll("(?m)^#{1,6}[\\t ]+[^\\n]*$","\n\n").trim().split("\\n[\\t ]*\\n(?:[\\t ]*\\n)*")){
    String paragraph=part.trim();if(paragraph.isEmpty())continue;
    if(paragraph.matches("(?s)^#{1,6}\\s+[^\\n]+$"))continue; // standalone Markdown chapter heading
    if(paragraph.length()>6000)throw new IllegalArgumentException("Un párrafo supera 6000 caracteres. Divídelo explícitamente.");

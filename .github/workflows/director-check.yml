@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: autostudio-director-evaluation
+  group: autostudio-director2-final-evaluation
   cancel-in-progress: true
 jobs:
   android-and-render:
@@ -88,7 +88,7 @@ jobs:
 
   scene-proof:
     needs: android-and-render
-    if: ${{ github.event.repository.private == false }}
+    if: ${{ github.event.repository.private == false && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[proof]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     permissions:
