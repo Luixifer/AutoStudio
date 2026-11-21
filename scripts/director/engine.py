@@ -47,13 +47,16 @@ def narrate(scene,config,root,out,narrators):
     raw=out/'spoken.wav'
     if voice['mode']=='file':
         source=media_file(root,voice.get('path'),{'.wav','.mp3'})
+        maximum=600 if config.get('scene_policy')=='paragraph/1' else 180
+        if float(probe(source)['format']['duration'])>maximum:raise ValueError('La locución supera el límite por escena; divide el párrafo explícitamente')
         run('-i',source,'-vn','-c:a','pcm_s16le','-ar','24000','-ac','1',raw)
         seconds=pcm_seconds(raw);words=voice.get('timed_words')
         if words is None:
             # Bounded CPU retry; never relax exact text matching or invent times.
             from scripts.audio_ai_qa import pcm16
             from scripts.director.text import align,expand
-            samples=pcm16(raw);attempts=[]
+            from scripts.director.audio import pcm
+            samples=pcm(raw,maximum);attempts=[]
             for model_name in ('base','small'):
                 key='whisper' if model_name=='base' else 'whisper-small'
                 if key not in narrators:

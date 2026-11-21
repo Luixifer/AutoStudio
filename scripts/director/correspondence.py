@@ -19,8 +19,8 @@ def inspect_correspondence(video,scenes,cache,fps,cues,root):
   a,b=scene['narration_start'],scene['narration_end'];span=b-a
   times=[a+min(.04,span/10),a+span*.25,a+span*.5,a+span*.75,b-min(.04,span/10)]
   requested[scene['id']]=sorted(set(math.ceil(t*fps-1e-7) for t in times if t<b))
- from scripts.audio_ai_qa import pcm16
- audio=pcm16(Path(video).parent/'narration.wav')
+ from scripts.director.audio import pcm
+ audio=pcm(Path(video).parent/'narration.wav')
  actual=frames(video,[index for values in requested.values() for index in values])
  for scene in scenes:
   sid=scene['id'];start_frame=round(scene['start']*fps);indices=requested[sid]
@@ -36,7 +36,7 @@ def inspect_correspondence(video,scenes,cache,fps,cues,root):
   text_ok=' '.join(c['text'] for c in own).split()==scene['original_text'].split()
   bounds_ok=all(scene['narration_start']-.002<=c['start']<c['end']<=scene['narration_end']+.03 for c in own)
   source_ok=digest(Path(root)/scene['media_path'])==scene['input_media_sha256']
-  original=pcm16(Path(cache)/scene['key']/'spoken.wav')
+  original=pcm(Path(cache)/scene['key']/'spoken.wav',600)
   trim=min(480,max(1,len(original)//20));expected_audio=original[trim:-trim];start=round(scene['narration_start']*16000)+trim
   correlations=[]
   for lag in range(-2,3):

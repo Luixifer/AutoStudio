@@ -1,0 +1,50 @@
+name: Director 2 · cinco escenas y capítulo real
+on:
+  push:
+    branches: ['codex/director-2-scene-integrity']
+    paths: ['triggers/director2-proof.txt']
+permissions:
+  contents: read
+jobs:
+  five-scenes:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas CPU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          python scripts/fetch_voice.py
+      - name: Crear cinco párrafos y renderizar el capítulo completo
+        run: |
+          python -m scripts.director.scene_proof --out reports/scene-proof/input
+          python -m scripts.director.measure --report reports/scene-proof/resources.json -- python -m scripts.director.engine reports/scene-proof/input/project.json --out reports/scene-proof/render > reports/scene-proof/engine.log 2>&1
+      - name: Entregar MP4 y validación real por escena
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_APK_RUN: '44921580504'
+        run: python -m scripts.director.publish_scene_proof
+      - name: Conservar diagnóstico verdadero
+        if: ${{ always() }}
+        env:
+          DIRECTOR_CHECK_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          from scripts.director import publish_check_fallback as publisher
+          out=Path('reports/director');out.mkdir(parents=True,exist_ok=True)
+          for folder in (Path('reports/scene-proof'),Path('reports/scene-proof/render')):
+              for p in folder.glob('*'):
+                  if p.is_file() and p.suffix in ('.json','.log','.txt'):shutil.copy2(p,out/p.name)
+          publisher.BRANCH='director-2-proof-evidence'
+          publisher.publish()
+          PY

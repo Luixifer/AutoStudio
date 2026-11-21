@@ -44,3 +44,12 @@ class DirectorRealFFmpegTests(unittest.TestCase):
   self.scene['media']['loop']=True
   with patch.dict(FORMATS,{'horizontal':(320,180)}):work,r=render_scene(self.scene,self.p,self.root,self.root/'cache',{})
   self.assertTrue((work/'visual.mp4').is_file());self.assertGreater(r['visual_seconds'],1)
+
+ def test_strict_mixed_anamorphic_clip_and_images(self):
+  import subprocess
+  Image.new('RGB',(320,180),(200,130,30)).save(self.root/'other.png')
+  subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=s=320x180:r=24:d=4','-vf','setsar=8/9','-c:v','libx264',str(self.root/'anamorphic.mp4')],check=True)
+  first={**self.scene,'id':'first'};clip={**self.scene,'id':'clip','media':{'kind':'video','path':'anamorphic.mp4','fit':'blur','rights':{'license':'own_creation'}}};last={**self.scene,'id':'last','media':{'kind':'image','path':'other.png','rights':{'license':'own_creation'}}}
+  self.p.update(scene_policy='paragraph/1',subtitles={'enabled':False},chapters=[{'id':'mixed','scenes':[first,clip,last]}]);path=self.root/'project.json';path.write_text(json.dumps(self.p))
+  with patch.dict(FORMATS,{'horizontal':(320,180)}):report=produce(path,self.root/'mixed')
+  self.assertTrue(report['passed'],report['errors']);self.assertEqual(len(report['correspondence']['scenes']),3)

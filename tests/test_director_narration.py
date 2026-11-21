@@ -25,3 +25,10 @@ class ParagraphVoiceTests(unittest.TestCase):
     return {'words':[{'word':text,'start':0.,'end':.09}]}
   with tempfile.TemporaryDirectory() as td:
    report=synthesize(Model(),'Uno dos tres',Path(td)/'spoken.wav');self.assertEqual(report['inference_fragments'],3);self.assertAlmostEqual(report['words'][2]['start'],.2)
+ def test_long_pcm_decoder_passes_180_seconds_without_weakening_limits(self):
+  from scripts.director.audio import pcm
+  with tempfile.TemporaryDirectory() as td:
+   path=Path(td)/'long.wav'
+   with wave.open(str(path),'wb') as out:out.setnchannels(1);out.setsampwidth(2);out.setframerate(24000);out.writeframes(b'\0\0'*(24000*181))
+   samples=pcm(path,600);self.assertEqual(len(samples),16000*181)
+   self.assertRaises(ValueError,pcm,path,180)

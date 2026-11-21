@@ -1,7 +1,7 @@
 """Five original scientific paragraphs and five distinct owned illustrations.
 A real QA documentary, NOT the user's Hessdalen project or real scientific footage.
 """
-import json,shutil,argparse
+import json,shutil,argparse,re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 PARAGRAPHS=[
@@ -15,6 +15,9 @@ ASSETS=['auroras/auroras_01.jpg','dna/dna_01.jpg','volcanoes/volcanoes_01.jpg','
 def create(out):
  out=Path(out);media=out/'media';media.mkdir(parents=True,exist_ok=True);scenes=[]
  for i,(text,asset) in enumerate(zip(PARAGRAPHS,ASSETS)):
+  sentences=re.split(r'(?<=[.!?])\s+',text)
+  while len(' '.join(sentences).split())>150 and len(sentences)>3:sentences.pop(-2)
+  text=' '.join(sentences)
   target=media/f'paragraph-{i+1}.jpg';shutil.copy2(ROOT/'assets/science_v04'/asset,target)
   scenes.append({'id':f'paragraph-{i+1}','narration':text,'pause_after':.5,'media':{'kind':'image','path':'media/'+target.name,'fit':'blur','rights':{'license':'own_creation','credit':'AutoStudio; original Blender scientific illustration, NOT real footage'}},'camera':{'movement':['zoom_in','pan_left','pan_up','diagonal','zoom_out'][i]},'transition':{'type':'dissolve','seconds':.4}})
  project={'schema':'autostudio-director/1','scene_policy':'paragraph/1','title':'Cinco escenas verificables · ENSAYO, NO HESSDALEN','format':'horizontal','fps':30,'youtube_enabled':False,'voice':{'mode':'kokoro','voice':'em_alex'},'subtitles':{'enabled':True,'style':'documentary'},'chapters':[{'id':'qa-five-paragraphs','scenes':scenes}]}
