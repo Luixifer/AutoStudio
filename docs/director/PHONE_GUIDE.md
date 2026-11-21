@@ -1,5 +1,18 @@
 # Usar AutoStudio Director desde el Samsung
 
+## Modo sencillo de Director Fácil 0.2
+
+[Descargar APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44843101009/AutoStudio-Director-0.2.0-lab.apk). Se instala aparte de LAB2; conserva la anterior y configura la conexión una vez en esta nueva instalación.
+
+Pulsa **Crear un vídeo**, escribe el título, pega el texto completo y selecciona tus imágenes de una vez. Revisa las miniaturas en orden y pulsa **Crear vídeo**. No necesitas dividir el guion ni editar cada escena. La aplicación reparte el texto y prepara la voz, las transiciones y los subtítulos.
+
+El botón principal queda fijo en pantalla. Cuando termina la producción, usa **Ver mi vídeo → Guardar en Descargas**. En **Más opciones** puedes elegir formato vertical u otra voz; los clips, música y ajustes de cada escena permanecen en la edición avanzada.
+
+[Cómo funciona el reparto automático y límites](EASY_MODE.md).
+
+## Configuración y edición avanzada
+
+
 Esta es una APK **LAB**, con paquete separado de las versiones anteriores. No desinstales las aplicaciones anteriores ni borres sus datos.
 
 1. Instala la APK Director. Concede «instalar aplicaciones desconocidas» únicamente al navegador/gestor que utilices y vuelve a desactivarlo después.

@@ -1,6 +1,6 @@
 # AutoStudio Director — laboratorio
 
-Ampliación de AutoStudio, no sustitución de la APK estable. Primera aceptación Android: [APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44807042861/AutoStudio-Director-0.1.1-lab.apk). [Pruebas y límites reales](VALIDATION.md).
+Ampliación de AutoStudio, no sustitución de la APK estable. Primera aceptación Android: [APK verificada](https://github.com/Luixifer/AutoStudio/releases/download/director-check-44843101009/AutoStudio-Director-0.2.0-lab.apk). [Pruebas y límites reales](VALIDATION.md).
 
 Modo nuevo: [Director Fácil: título, texto e imágenes](EASY_MODE.md). Conserva el editor avanzado para los proyectos anteriores.
 
@@ -28,7 +28,7 @@ El JSON versionado agrupa `chapters[].scenes[]`: `id`, `narration`, `media` con 
 AUTOSTUDIO_DIRECTOR_BUILD=1 python android/build.py
 ```
 
-Salida `build/android/AutoStudio-Director-0.1.1-lab.apk`; firma de depuración comprobada por apksigner. El build predeterminado anterior sigue disponible sin esa variable. No se incluyen credenciales ni claves de publicación.
+Salida `build/android/AutoStudio-Director-0.2.0-lab.apk`; firma de depuración comprobada por apksigner. El build predeterminado anterior sigue disponible sin esa variable. No se incluyen credenciales ni claves de publicación.
 
 El workflow `personal-custom.yml` conserva el editor personal original fuera de la rama Director. En `codex/autostudio-director`, recibe el mismo UUID ya soportado por GitHub y procesa el ZIP desde su borrador de Release. No hace falta sustituir ni fusionar main para probarlo.
 
@@ -63,3 +63,6 @@ La APK 0.1.1 usa el identificador separado `com.luixifer.autostudio.director.lab
 
 
 [Verificación final en Actions aprobada](https://github.com/Luixifer/AutoStudio/actions/runs/44836923942): 323 regresiones, descarga/decodificación completa del MP4 largo y montaje real de cifras con voz sintética y MP3 importado. La aplicación permite introducir tu material; **Hessdalen aún no se ha producido**.
+
+
+[Entrega Director Fácil 0.2.0](EASY_MODE.md#entrega-final-verificada): formulario título/texto/imágenes, compilación y firma comprobadas, producción real y captura limpia en Android emulado. Los proyectos antiguos conservan su editor avanzado.
