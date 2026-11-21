@@ -1,0 +1,55 @@
+{
+  "run_id": "44920865721",
+  "source_commit": "62ef42c8c82fc734264e2a7072585342d008d9fc",
+  "job_status": "success",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "android_emulator": {
+    "passed": true,
+    "request_id": "e5615943c7234c44bd653e627524d0c3",
+    "github_run_id": "44921251249",
+    "sha256": "fc0b79243a2a4ad757199de7411978d27dd763fd48f6595e8f30654880ecd2ea",
+    "duration": 10.7,
+    "native_playback_position_ms": 2676,
+    "actual_video_frame_rendered": true,
+    "simple_editor_title_text_multiple_images": true,
+    "automatic_scene_association_preserves_script": true,
+    "project_zip_backup_restored": true,
+    "settings_contents_write_instructions_verified": true,
+    "native_network_probes": 3,
+    "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+    "physical_samsung_tested": false
+  },
+  "android_recovery": {
+    "passed": true,
+    "process_restart_preserved_project": true,
+    "encrypted_connection_restored": true,
+    "actual_video_frame_rendered": true,
+    "native_playback_position_ms": 673,
+    "download_export_sha256": "fc0b79243a2a4ad757199de7411978d27dd763fd48f6595e8f30654880ecd2ea",
+    "request_id": "e5615943c7234c44bd653e627524d0c3",
+    "physical_samsung_tested": false
+  },
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab04",
+    "version_name": "director-2.0.0-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-2.0.0-lab.apk",
+    "bytes": 143907,
+    "sha256": "dfd6d4c2393bf9442d60cf1439d62403d3631d25984591a3506d0739170af4e1",
+    "source_commit": "62ef42c8c82fc734264e2a7072585342d008d9fc",
+    "github_run_id": "44920865721",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}
