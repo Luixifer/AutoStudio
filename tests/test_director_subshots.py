@@ -49,3 +49,21 @@ class AnchoredShotTests(unittest.TestCase):
    shutil.copy2(out/'narration.wav',root/'narration.wav')
    qa=inspect_correspondence(old,current['scenes'],out/'scene-cache',30,current['cues'],root)
    self.assertFalse(qa['passed']);self.assertTrue(qa['scenes'][0]['subshots'][0]['passed']);self.assertFalse(qa['scenes'][0]['subshots'][1]['passed']);self.assertTrue(qa['scenes'][0]['subshots'][2]['passed'])
+
+ def test_real_subshot_video_after_parent_dissolve_uses_shifted_word_times(self):
+  with tempfile.TemporaryDirectory() as td:
+   import subprocess
+   root=Path(td)
+   for i,color in enumerate(('red','green','blue','purple')):Image.new('RGB',(320,180),color).save(root/f'{i}.png')
+   subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=orange:s=320x180:r=30:d=3','-an','-c:v','libx264','-pix_fmt','yuv420p',str(root/'third.mp4')],check=True)
+   with wave.open(str(root/'voice.wav'),'wb') as out:
+    out.setnchannels(1);out.setsampwidth(2);out.setframerate(24000);out.writeframes(b''.join(struct.pack('<h',int(5000*math.sin(2*math.pi*220*i/24000))) for i in range(81600)))
+   s=copy.deepcopy(self.scene);voice={'mode':'file','path':'voice.wav','timed_words':self.words};s['voice']=voice
+   s['subshots'][2]['media']={'kind':'video','path':'third.mp4','rights':{'license':'own_creation'}}
+   previous={'id':'previous','narration':s['narration'],'voice':voice,'media':{'kind':'image','path':'3.png','rights':{'license':'own_creation'}},'transition':{'type':'dissolve','seconds':.2}}
+   p={'schema':'autostudio-director/1','scene_policy':'paragraph/1','title':'MIXED SIGNAL FIXTURE; NOT CHAPTER','subtitles':{'enabled':False},'format':'horizontal','fps':30,'youtube_enabled':False,'chapters':[{'id':'chapter','scenes':[previous,s]}]}
+   path=root/'project.json';path.write_text(json.dumps(p))
+   with patch.dict(FORMATS,{'horizontal':(320,180)}):report=produce(path,root/'out')
+   self.assertTrue(report['passed'],report['errors']);timeline=json.loads((root/'out/timeline.json').read_text());second=timeline['scenes'][1]
+   self.assertAlmostEqual(second['narration_offset'],.2+1/30);self.assertAlmostEqual(second['subshots'][0]['narration_start'],.1+.2+1/30)
+   self.assertTrue(all(v['passed'] for v in report['correspondence']['scenes']))
