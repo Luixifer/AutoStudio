@@ -1,0 +1,59 @@
+{
+  "pages": [
+    {
+      "url": "https://www.hessdalen.org/",
+      "checked_utc": "2026-11-21T17:07:06.075039+00:00",
+      "rights": "NOT ESTABLISHED; reference access does not permit footage reuse",
+      "facts_approved": false,
+      "status": 200,
+      "final_url": "https://www.hessdalen.org/",
+      "sha256": "869f7b08cf0b2b4b29d84eaa784134f97848bfe1cb2f1253e8f12d96777b3d71",
+      "year_excerpts": [
+        "ng navigation... A non-profit volunteer Citizen Science organization. Established in 1983 to study the phenomena and in 1998 The Blue Box was installed as the world's first automated Anomaly Detection System. Latest images Latest news Monthly Status Meetings Our meetings are open for all. Use the \"Meeti",
+        "t to pay our internet bills) Go to https://ko-fi.com/projecthessdalen Established in 1983 to study the phenomena and in 1998 The Blue Box was installed as the world's first automated Anomaly Detection System. Latest images Latest news Ren Røros Digital Har du behov for hjelp til å forenkle og effektivis",
+        " world’s first fully autonomous, multi-sensor anomaly detection system, continuously monitoring the Hessdalen sky since 1998. Inspire research Hessdalen offers a rare opportunity to study a persistent natural mystery with modern tools. During the 1984 field study, 53 phenomena were documented with instr",
+        "nspire research Hessdalen offers a rare opportunity to study a persistent natural mystery with modern tools. During the 1984 field study, 53 phenomena were documented with instruments ranging from cameras and radar to magnetometers and infrared viewers — sparking international scientific interest that c",
+        "ignup . \"Hessdalen is really a UFO-laboratory\" J. Allen Hynek, 1985 \"Whatever it is, can be measured\" Erling P. Strand, 1984 \"We all know that UFOs are real\" Edgar Mitchell, 1978 “Somewhere, something incredible is waiting to be known” Carl Sagan Sitemap / about About Project Hessdalen 08/10/2025 / anno"
+      ],
+      "research_links": [
+        "https://www.hessdalen.org/reports/2026/SkippingOrb",
+        "https://www.hessdalen.org/announcement/report-from-ftw26",
+        "https://www.hessdalen.org/report-a-sighting",
+        "https://www.hessdalen.org/reports",
+        "https://www.hessdalen.org/reports/2026/SkippingOrb"
+      ]
+    },
+    {
+      "url": "https://www.hessdalen.org/reports/hpreport84.shtml",
+      "checked_utc": "2026-11-21T17:07:06.405656+00:00",
+      "rights": "NOT ESTABLISHED; reference access does not permit footage reuse",
+      "facts_approved": false,
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://www.hessdalen.org/station/",
+      "checked_utc": "2026-11-21T17:07:06.712902+00:00",
+      "rights": "NOT ESTABLISHED; reference access does not permit footage reuse",
+      "facts_approved": false,
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://www.hessdalen.org/reports/",
+      "checked_utc": "2026-11-21T17:07:07.138558+00:00",
+      "rights": "NOT ESTABLISHED; reference access does not permit footage reuse",
+      "facts_approved": false,
+      "status": 200,
+      "final_url": "https://www.hessdalen.org/reports",
+      "sha256": "62e5f90cafb12dc52f54b1c3340df1a1451b2e97808aef02921830fed5aa933f",
+      "year_excerpts": [
+        "tional Library. With english subtitles The following are just some of the observations: Observations by Jon Arvid Aspås 1981 From Himmelen i Hessdalen - norsk tekst Three lights appeared and moved in coordinated patterns. They seemed to communicate, with one ascending while another took its place. One l",
+        "revealing a solid metallic craft with a row of lights. First time he saw the phenomenon: It started before Christmas in 1981. (From what other people told him) It looked like a light went down behind the mountain \"Finnsåhøgden,\" and behind that, there's a small valley. Beyond that, there's another mount"
+      ],
+      "research_links": [
+        "https://www.hessdalen.org/report-a-sighting"
+      ]
+    }
+  ],
+  "human_fact_review": "pending",
+  "licensing": "pending"
+}

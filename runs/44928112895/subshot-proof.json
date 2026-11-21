@@ -1,0 +1,260 @@
+{
+  "passed": true,
+  "is_hessdalen": false,
+  "source_commit": "93d74c8c2229e8f0bb7742c8b835997e776bd206",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "duration": 13.966667,
+  "one_paragraph": true,
+  "one_unchanged_narration": true,
+  "subshot_count": 3,
+  "only_changed_visual_rerendered": [
+    true,
+    false,
+    true
+  ],
+  "relocated_cache_verified": true,
+  "chapter_checkpoint_called": [
+    "chapter_completed"
+  ],
+  "correspondence": {
+    "schema": "scene-correspondence/1",
+    "passed": true,
+    "errors": [],
+    "scenes": [
+      {
+        "id": "one-paragraph",
+        "position": 0,
+        "media": "media/0.jpg",
+        "media_sha256": "9ed9086bf765f439c51f23810cdd578ac8187178b7ff3516bd76467d80572c90",
+        "original_text": "Esta prueba técnica comprueba un único párrafo con varios planos. La narración continúa mientras cambia únicamente la imagen asignada. El resultado no es un capítulo de Hessdalen ni una aprobación editorial.",
+        "narration_start": 0,
+        "narration_end": 13.639291666666667,
+        "voice_seconds": 13.639291666666667,
+        "visual_seconds": 13.966666666666667,
+        "frames": [
+          {
+            "time": 0.1,
+            "subshot_id": "proof-shot-0",
+            "mean_absolute_error": 0.000771,
+            "passed": true
+          },
+          {
+            "time": 1.1,
+            "subshot_id": "proof-shot-0",
+            "mean_absolute_error": 0.001353,
+            "passed": true
+          },
+          {
+            "time": 2.1,
+            "subshot_id": "proof-shot-0",
+            "mean_absolute_error": 0.00156,
+            "passed": true
+          },
+          {
+            "time": 3.1333333333333333,
+            "subshot_id": "proof-shot-0",
+            "mean_absolute_error": 0.001428,
+            "passed": true
+          },
+          {
+            "time": 4.1,
+            "subshot_id": "proof-shot-0",
+            "mean_absolute_error": 0.001452,
+            "passed": true
+          },
+          {
+            "time": 4.4,
+            "subshot_id": "proof-shot-1",
+            "mean_absolute_error": 0.000575,
+            "passed": true
+          },
+          {
+            "time": 5.5,
+            "subshot_id": "proof-shot-1",
+            "mean_absolute_error": 0.000888,
+            "passed": true
+          },
+          {
+            "time": 6.633333333333334,
+            "subshot_id": "proof-shot-1",
+            "mean_absolute_error": 0.001187,
+            "passed": true
+          },
+          {
+            "time": 7.766666666666667,
+            "subshot_id": "proof-shot-1",
+            "mean_absolute_error": 0.001221,
+            "passed": true
+          },
+          {
+            "time": 8.866666666666667,
+            "subshot_id": "proof-shot-1",
+            "mean_absolute_error": 0.00115,
+            "passed": true
+          },
+          {
+            "time": 9.133333333333333,
+            "subshot_id": "proof-shot-2",
+            "mean_absolute_error": 0.000537,
+            "passed": true
+          },
+          {
+            "time": 10.2,
+            "subshot_id": "proof-shot-2",
+            "mean_absolute_error": 0.000818,
+            "passed": true
+          },
+          {
+            "time": 11.333333333333334,
+            "subshot_id": "proof-shot-2",
+            "mean_absolute_error": 0.001099,
+            "passed": true
+          },
+          {
+            "time": 12.433333333333334,
+            "subshot_id": "proof-shot-2",
+            "mean_absolute_error": 0.00111,
+            "passed": true
+          },
+          {
+            "time": 13.5,
+            "subshot_id": "proof-shot-2",
+            "mean_absolute_error": 0.000973,
+            "passed": true
+          }
+        ],
+        "subshots": [
+          {
+            "id": "proof-shot-0",
+            "frames": [
+              {
+                "time": 0.1,
+                "subshot_id": "proof-shot-0",
+                "mean_absolute_error": 0.000771,
+                "passed": true
+              },
+              {
+                "time": 1.1,
+                "subshot_id": "proof-shot-0",
+                "mean_absolute_error": 0.001353,
+                "passed": true
+              },
+              {
+                "time": 2.1,
+                "subshot_id": "proof-shot-0",
+                "mean_absolute_error": 0.00156,
+                "passed": true
+              },
+              {
+                "time": 3.1333333333333333,
+                "subshot_id": "proof-shot-0",
+                "mean_absolute_error": 0.001428,
+                "passed": true
+              },
+              {
+                "time": 4.1,
+                "subshot_id": "proof-shot-0",
+                "mean_absolute_error": 0.001452,
+                "passed": true
+              }
+            ],
+            "input_hash_valid": true,
+            "media_path": "media/0.jpg",
+            "passed": true
+          },
+          {
+            "id": "proof-shot-1",
+            "frames": [
+              {
+                "time": 4.4,
+                "subshot_id": "proof-shot-1",
+                "mean_absolute_error": 0.000575,
+                "passed": true
+              },
+              {
+                "time": 5.5,
+                "subshot_id": "proof-shot-1",
+                "mean_absolute_error": 0.000888,
+                "passed": true
+              },
+              {
+                "time": 6.633333333333334,
+                "subshot_id": "proof-shot-1",
+                "mean_absolute_error": 0.001187,
+                "passed": true
+              },
+              {
+                "time": 7.766666666666667,
+                "subshot_id": "proof-shot-1",
+                "mean_absolute_error": 0.001221,
+                "passed": true
+              },
+              {
+                "time": 8.866666666666667,
+                "subshot_id": "proof-shot-1",
+                "mean_absolute_error": 0.00115,
+                "passed": true
+              }
+            ],
+            "input_hash_valid": true,
+            "media_path": "media/1.jpg",
+            "passed": true
+          },
+          {
+            "id": "proof-shot-2",
+            "frames": [
+              {
+                "time": 9.133333333333333,
+                "subshot_id": "proof-shot-2",
+                "mean_absolute_error": 0.000537,
+                "passed": true
+              },
+              {
+                "time": 10.2,
+                "subshot_id": "proof-shot-2",
+                "mean_absolute_error": 0.000818,
+                "passed": true
+              },
+              {
+                "time": 11.333333333333334,
+                "subshot_id": "proof-shot-2",
+                "mean_absolute_error": 0.001099,
+                "passed": true
+              },
+              {
+                "time": 12.433333333333334,
+                "subshot_id": "proof-shot-2",
+                "mean_absolute_error": 0.00111,
+                "passed": true
+              },
+              {
+                "time": 13.5,
+                "subshot_id": "proof-shot-2",
+                "mean_absolute_error": 0.000973,
+                "passed": true
+              }
+            ],
+            "input_hash_valid": true,
+            "media_path": "media/2.jpg",
+            "passed": true
+          }
+        ],
+        "caption_text_exact": true,
+        "caption_bounds_valid": true,
+        "input_hash_valid": true,
+        "assembled_narration_correlation": 1.0,
+        "assembled_narration_matches": true,
+        "passed": true
+      }
+    ],
+    "scope": "Decoded samples at beginning, quarter, middle, three quarters and end of every narration; compared to its source-bound scene render. Not semantic image analysis or human listening approval.",
+    "human_approved": false
+  },
+  "human_listening_performed": false,
+  "voice_naturalness_approved": false,
+  "samsung_tested": false,
+  "youtube_enabled": false
+}
