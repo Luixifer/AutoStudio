@@ -23,6 +23,9 @@ class SceneIntegrityTests(unittest.TestCase):
    with patch.dict(FORMATS,{'horizontal':(320,180)}):report=produce(path,root/'good')
    self.assertTrue(report['passed'],report['errors']);self.assertTrue(report['correspondence']['passed'])
    timeline=json.loads((root/'good/timeline.json').read_text());self.assertEqual(len(timeline['scenes']),5)
+   before=(root/'good/c1/chapter.mp4').stat().st_mtime_ns
+   with patch.dict(FORMATS,{'horizontal':(320,180)}):produce(path,root/'good')
+   self.assertEqual(before,(root/'good/c1/chapter.mp4').stat().st_mtime_ns)
    for i,scene in enumerate(timeline['scenes']):
     self.assertEqual(scene['position'],i);self.assertAlmostEqual(scene['voice_seconds'],1)
     if i:self.assertGreaterEqual(scene['narration_start'],scene['start']+.399)
