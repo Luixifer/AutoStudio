@@ -1,2 +1,3 @@
 Native three-step editor, direct per-scene attachments; preserve stable Director 2 and profiles.
 Match the real MIME type and OPENABLE category when intercepting Android document picker in the test.
+Visual review: compact options beside title; hide irrelevant import/bulk actions once all scenes are ready.
