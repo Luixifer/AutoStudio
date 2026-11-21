@@ -70,7 +70,7 @@ def execute(request_id,work):
  if not release.get('draft') or release['tag_name']!='director-'+request_id:raise ValueError('Se requiere una entrega de revisión, no una publicación')
  intent=json.loads(release.get('body','{}'))
  if intent.get('autostudio_director')!=1 or intent.get('request_id')!=request_id or not re.fullmatch('[a-f0-9]{64}',intent.get('bundle_sha256','')):raise ValueError('La solicitud no tiene integridad verificable')
- if intent.get('source_ref')!='codex/autostudio-director':raise ValueError('Revisión de motor no autorizada')
+ if intent.get('source_ref') not in ('codex/autostudio-director','codex/director-2-scene-integrity') or os.environ.get('DIRECTOR_EXPECTED_REF',intent.get('source_ref'))!=intent.get('source_ref'):raise ValueError('Revisión de motor no autorizada')
  assets=release['assets'];bundles=[a for a in assets if a['name']=='project.zip']
  if len(bundles)!=1 or bundles[0]['size']>MAX_BUNDLE:raise ValueError('Falta el paquete de entrada válido')
  if any(a['name']=='result.json' for a in assets):raise ValueError('Solicitud ya procesada; no se sobrescribe un resultado')
@@ -82,6 +82,8 @@ def execute(request_id,work):
   for name in ('documental-REVISION.mp4','captions.srt','validation.json','timeline.json','input-audit.json','SHA256SUMS'):
    asset=upload(release,work/'render'/name)
    if name.endswith('.mp4'):result.update({'asset_id':asset['id'],'bytes':asset['size'],'sha256':report['sha256'],'duration':report['duration'],'width':report['width'],'height':report['height']})
+  result['scenes']=[{'id':s['id'],'voice_seconds':s['voice_seconds'],'text_sha256':__import__('hashlib').sha256(s['original_text'].encode()).hexdigest(),'media_sha256':s['input_media_sha256']} for s in json.loads((work/'render/timeline.json').read_text())['scenes']]
+  if (work/'render/correspondence.json').is_file():upload(release,work/'render/correspondence.json')
   result['status']='completed'
  except Exception as error:
   result['error']=str(error)[:1500];raise

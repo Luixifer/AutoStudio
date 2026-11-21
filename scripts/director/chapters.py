@@ -10,7 +10,7 @@ from scripts.director.project import load,digest,FORMATS,ID,MAX_BUNDLE,media_fil
 from scripts.director.engine import join_wavs,pcm_seconds,run,atomic_json,srt_time
 
 def canonical(data):return json.dumps(data,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
-def chapter_doc(project,chapter):return {**project,'chapters':[chapter]}
+def chapter_doc(project,chapter):return {**{k:v for k,v in project.items() if not k.startswith('_')},'chapters':[chapter]}
 def fingerprint(data):return hashlib.sha256(canonical(data)).hexdigest()
 def paths(value):
  found=set()
@@ -48,8 +48,13 @@ def package_render(project_path,render_dir,chapter_id,out):
  # Use actual measured word timings and the scene order used by the render.
  from scripts.personal_editor import caption_groups
  cues=[]
- for s in scenes:
-  cues.extend({**c,'start':c['start']+s['start']-offset,'end':c['end']+s['start']-offset} for c in caption_groups(s['words']))
+ if p.get('scene_policy')=='paragraph/1':
+  validation=json.loads((render/'validation.json').read_text())
+  if not validation.get('passed') or not validation.get('correspondence',{}).get('passed'):raise ValueError('Capítulo sin correspondencia verificada')
+  ids={s['id'] for s in scenes}
+  cues=[{**c,'start':c['start']-offset,'end':c['end']-offset} for c in timeline['cues'] if c.get('scene_id') in ids]
+ else:
+  for s in scenes:cues.extend({**c,'start':c['start']+s['start']-offset,'end':c['end']+s['start']-offset} for c in caption_groups(s['words']))
  v=next(s for s in probe(video)['streams'] if s['codec_type']=='video')
  if abs(float(v['duration'])-seconds)>.06:raise ValueError('El vídeo y el PCM del capítulo no coinciden')
  header={'schema':'autostudio-director-rendered/1','id':chapter_id,'document_sha256':fingerprint(chapter_doc(p,chapter)),'video_sha256':digest(video),'voice_sha256':digest(audio),'format':p['format'],'fps':p.get('fps',30),'duration':seconds,'cues':cues,'human_artistic_approved':False}

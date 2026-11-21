@@ -2,7 +2,7 @@ name: AutoStudio Director · prueba integral gratuita
 run-name: AutoStudio Director · evaluación · ${{ github.run_number }}
 on:
   push:
-    branches: ['codex/autostudio-director']
+    branches: ['codex/director-2-scene-integrity']
     paths: ['triggers/director-check-20261120.txt']
   workflow_dispatch:
 permissions:
@@ -20,7 +20,7 @@ jobs:
       actions: write
     env:
       AUTOSTUDIO_DIRECTOR_BUILD: '1'
-      AUTOSTUDIO_EMULATOR_APK: build/android/AutoStudio-Director-0.2.0-lab.apk
+      AUTOSTUDIO_EMULATOR_APK: build/android/AutoStudio-Director-2.0.0-lab.apk
       ANDROID_IMAGE: system-images;android-35;google_apis;x86_64
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -42,10 +42,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
           python -m pip install -r requirements-director.txt
           mkdir -p reports/director
-      - name: Recuperar registros del primer intento
+      - name: Auditar entrada real anterior sin publicar material privado
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python -m scripts.director.previous_logs 44793568260 --out reports/director/previous-run.log
+        run: python -m scripts.director.audit_remote --out reports/director/source-audit.json
       - name: Regresiones, compilación y firma reales
         run: |
           python -m unittest discover -s tests -v > reports/director/tests.txt 2>&1
@@ -62,19 +62,19 @@ jobs:
           sudo setfacl -m "u:$USER:rw" /dev/kvm
           python android/start_emulator.py > reports/director/emulator-start.txt 2>&1
           adb shell am force-stop com.google.android.apps.nexuslauncher
-          adb shell run-as com.luixifer.autostudio.director.lab03 mkdir -p files/director-projects/11111111111111111111111111111111
-          tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab03 tar -C files/director-projects/11111111111111111111111111111111 -xf -
+          adb shell run-as com.luixifer.autostudio.director.lab04 mkdir -p files/director-projects/11111111111111111111111111111111
+          tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab04 tar -C files/director-projects/11111111111111111111111111111111 -xf -
           adb shell am instrument -w -r -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/instrumentation.txt
-          adb exec-out run-as com.luixifer.autostudio.director.lab03 cat files/director-qa/roundtrip.json > reports/director/roundtrip.json
-          adb exec-out run-as com.luixifer.autostudio.director.lab03 cat files/director-qa/preview.png > reports/director/preview.png
-          adb exec-out run-as com.luixifer.autostudio.director.lab03 cat files/director-qa/simple-editor.png > reports/director/simple-editor.png
-          adb exec-out run-as com.luixifer.autostudio.director.lab03 cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
+          adb exec-out run-as com.luixifer.autostudio.director.lab04 cat files/director-qa/roundtrip.json > reports/director/roundtrip.json
+          adb exec-out run-as com.luixifer.autostudio.director.lab04 cat files/director-qa/preview.png > reports/director/preview.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab04 cat files/director-qa/simple-editor.png > reports/director/simple-editor.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab04 cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
           python -c 'import json; assert json.load(open("reports/director/roundtrip.json"))["passed"]'
       - name: Cerrar proceso, recuperar proyecto y exportar en Descargas
         run: |
-          adb shell am force-stop com.luixifer.autostudio.director.lab03
+          adb shell am force-stop com.luixifer.autostudio.director.lab04
           adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/recovery-instrumentation.txt
-          adb exec-out run-as com.luixifer.autostudio.director.lab03 cat files/director-qa/recovery.json > reports/director/recovery.json
+          adb exec-out run-as com.luixifer.autostudio.director.lab04 cat files/director-qa/recovery.json > reports/director/recovery.json
           python -c 'import json; assert json.load(open("reports/director/recovery.json"))["passed"]'
       - name: Entregar APK y evidencia real fuera de Git
         if: ${{ always() }}
@@ -85,3 +85,30 @@ jobs:
       - name: Detener Android aislado
         if: ${{ always() }}
         run: "$ANDROID_HOME/platform-tools/adb emu kill || true"
+
+  scene-proof:
+    needs: android-and-render
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Herramientas gratuitas CPU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          python scripts/fetch_voice.py
+      - name: Cinco párrafos, cinco imágenes y voz real por escena
+        run: |
+          python -m scripts.director.scene_proof --out reports/scene-proof/input
+          python -m scripts.director.engine reports/scene-proof/input/project.json --out reports/scene-proof/render
+      - name: Entregar documental de comprobación y QA por escena
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.publish_scene_proof

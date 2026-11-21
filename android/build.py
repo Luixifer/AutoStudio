@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];PROJECT=ROOT/'android';OUT=ROOT/'build/android'
 PACKAGE='com.luixifer.autostudio.lab04';APP_NAME='AutoStudio-Control-0.4.0-lab.apk'
 DIRECTOR=os.environ.get('AUTOSTUDIO_DIRECTOR_BUILD')=='1'
-if DIRECTOR:PACKAGE='com.luixifer.autostudio.director.lab03';APP_NAME='AutoStudio-Director-0.2.0-lab.apk'
+if DIRECTOR:PACKAGE='com.luixifer.autostudio.director.lab04';APP_NAME='AutoStudio-Director-2.0.0-lab.apk'
 def run(*args):subprocess.run([str(x) for x in args],check=True)
 def main():
     sdk=Path(os.environ.get('ANDROID_HOME',os.environ.get('ANDROID_SDK_ROOT','/nonexistent')));java=Path(os.environ.get('JAVA_HOME','/nonexistent'))
@@ -25,7 +25,7 @@ def main():
     manifest=PROJECT/'app/AndroidManifest.xml'
     if DIRECTOR:
         manifest=work/'AndroidManifest.xml'
-        text=(PROJECT/'app/AndroidManifest.xml').read_text().replace('com.luixifer.autostudio.lab04',PACKAGE).replace('android:versionCode="4"','android:versionCode="3"').replace('0.4.0-lab','director-0.2.0-lab').replace('android:label="@string/app_name"','android:label="AutoStudio Director Fácil LAB 3"')
+        text=(PROJECT/'app/AndroidManifest.xml').read_text().replace('com.luixifer.autostudio.lab04',PACKAGE).replace('android:versionCode="4"','android:versionCode="4"').replace('0.4.0-lab','director-2.0.0-lab').replace('android:label="@string/app_name"','android:label="AutoStudio Director 2 LAB"')
         text=text.replace('com.luixifer.autostudio.MainActivity" android:exported="true"','com.luixifer.autostudio.DirectorActivity" android:exported="true"').replace('    <activity android:name="com.luixifer.autostudio.DirectorActivity" android:exported="false"/>\n','')
         manifest.write_text(text)
     run(tools/'aapt2','link','-A',assets,'-I',platform,'--manifest',manifest,'--java',gen,'-o',work/'base.apk',*sorted(res.glob('*.flat')))
@@ -53,7 +53,7 @@ def main():
         with zipfile.ZipFile(work/'test-base.apk','a') as z:
             for f in testdex.glob('*.dex'):z.write(f,f.name,compress_type=zipfile.ZIP_STORED)
         sign(work/'test-base.apk',OUT/'autostudio-instrumentation.apk')
-    info={'schema':1,'application_id':PACKAGE,'version_name':'director-0.2.0-lab' if DIRECTOR else '0.4.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
+    info={'schema':1,'application_id':PACKAGE,'version_name':'director-2.0.0-lab' if DIRECTOR else '0.4.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
     info['published_topic_ids']=[t['id'] for t in json.loads((ROOT/'content/catalog.json').read_text())['topics'] if t.get('published',True)]
     info['catalog_sha256']=hashlib.sha256((ROOT/'content/catalog.json').read_bytes()).hexdigest()
     (OUT/'apk-info.json').write_text(json.dumps(info,indent=2)+'\n');(OUT/'SHA256SUMS').write_text(info['sha256']+'  '+target.name+'\n');print('REAL_APK',target)

@@ -5,7 +5,7 @@ import java.net.*;
 
 /** Official GitHub APIs only. Tokens never follow asset redirects. */
 public final class DirectorGitHub {
- public static final String REF="codex/autostudio-director",REPO="Luixifer/AutoStudio";
+ public static final String REF="codex/director-2-scene-integrity",REPO="Luixifer/AutoStudio";
  public static final class ApiFailure extends IOException {public final int status;ApiFailure(int value){super("GitHub HTTP "+value+". Revisa permisos, conexión y diagnóstico de Actions.");status=value;}}
  private final String token;
  public DirectorGitHub(String token)throws IOException{if(!TokenFormat.acceptable(token))throw new IOException("Conecta GitHub en Ajustes. Director requiere Actions: lectura/escritura y Contents: lectura/escritura.");this.token=token;}
