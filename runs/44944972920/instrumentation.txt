@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: stream=DIRECTOR_TEST_FAILED: java.lang.Exception: Ready action or direct scene attachment missing
+INSTRUMENTATION_CODE: 0

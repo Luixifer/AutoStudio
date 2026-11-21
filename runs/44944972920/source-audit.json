@@ -1,0 +1,14 @@
+{
+  "found_user_input": true,
+  "request_id": "dccf4e724fdf4ad2986ced09f12b5881",
+  "source_ref": "codex/director-2-scene-integrity",
+  "renderer_source_commit": "f55a0754001290eb70f12aa007794bf80445aa7a",
+  "renderer_run_id": "44930107539",
+  "renderer_status": "completed",
+  "rendered_seconds": 57.033333,
+  "original_paragraph_count": 5,
+  "rendered_scene_count": 5,
+  "paragraphs_preserved_1_to_1": true,
+  "repeated_resource_assignments": 0,
+  "scope": "Read-only inspection of actual uploaded JSON and production result. No user text, titles, images or media exported."
+}

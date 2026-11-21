@@ -1,0 +1,5 @@
+{
+  "passed": false,
+  "error": "java.lang.Exception: Ready action or direct scene attachment missing",
+  "physical_samsung_tested": false
+}
