@@ -222,7 +222,7 @@ def produce(project_path,out,chapter_id=None):
             meta={**meta,'start':global_offset+offset,'narration_start':global_offset+offset+meta['narration_offset'],'narration_end':global_offset+offset+meta['narration_offset']+meta['voice_seconds'],'position':len(scene_reports),'chapter':chapter['id']};parts.append((work,meta))
             from scripts.director.captions import phrases
             subtitle_options=config.get('subtitles',{});groups=phrases(meta['words'],subtitle_options.get('style','documentary')) if config.get('scene_policy')=='paragraph/1' else caption_groups(meta['words'])
-            cues.extend({**c,'scene_id':scene['id'],'start':c['start']+offset,'end':c['end']+offset} for c in groups)
+            cues.extend({**c,**({'hold_until':offset+meta['duration']} if config.get('scene_policy')=='paragraph/1' else {}),'scene_id':scene['id'],'start':c['start']+offset,'end':c['end']+offset} for c in groups)
             offset+=meta['duration'];scene_reports.append(meta)
         if offset>600:raise ValueError('Capítulo superior a diez minutos; divídelo para renderizar por partes')
         if global_offset+offset>3600:raise ValueError('Documental superior al límite de 60 minutos')

@@ -1,0 +1,45 @@
+name: Director 2 · corregir prueba original sin publicarla
+on:
+  push:
+    branches: ['codex/director-2-scene-integrity']
+    paths: ['triggers/director2-repair.txt']
+permissions:
+  contents: read
+jobs:
+  repair:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Herramientas CPU gratuitas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          python scripts/fetch_voice.py
+      - name: Reparar asociación en copia privada y comprobar el MP4 descargado
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_EXPECTED_REF: codex/director-2-scene-integrity
+        run: python -m scripts.director.repair_existing --source 9126b046336b46028f9ffcd6b13ba31e --out "$RUNNER_TEMP/private-repair"
+      - name: Conservar únicamente informe sin material del usuario
+        if: ${{ always() }}
+        env:
+          DIRECTOR_CHECK_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,shutil
+          from scripts.director import publish_check_fallback as publisher
+          out=Path('reports/director');out.mkdir(parents=True,exist_ok=True)
+          p=Path(os.environ['RUNNER_TEMP'])/'private-repair/safe-repair-report.json'
+          if p.is_file():shutil.copy2(p,out/p.name)
+          publisher.BRANCH='director-2-repair-evidence'
+          publisher.publish()
+          PY

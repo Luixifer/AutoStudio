@@ -12,6 +12,12 @@ class SceneIntegrityTests(unittest.TestCase):
   text='La narración debe conservar frases completas y una puntuación clara. Este es otro ejemplo.'
   words=[{'word':w,'start':i*.22,'end':i*.22+.2} for i,w in enumerate(text.split())]
   cues=phrases(words);self.assertEqual(' '.join(c['text'] for c in cues),text);self.assertGreater(len(cues[0]['text'].split()),3)
+ def test_burned_caption_hold_cannot_cross_scene_boundary(self):
+  from scripts.personal_editor import write_ass
+  with tempfile.TemporaryDirectory() as td:
+   p=Path(td)/'captions.ass';write_ass(p,[{'text':'Fin.','start':.2,'end':1.,'hold_until':1.01}],(1920,1080),'Ensayo',3.)
+   event=next(line for line in p.read_text().splitlines() if line.startswith('Dialogue: 2'))
+   self.assertEqual(event.split(',')[2],'0:00:01.01')
  def test_actual_five_scene_order_and_transition_quarantine(self):
   with tempfile.TemporaryDirectory() as td:
    root=Path(td);scenes=[]

@@ -79,7 +79,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f"Dialogue: 1,0:00:00.00,{ass_time(duration)},Disclosure,,0,0,0,,{notice}\n",
     ]
     for index,cue in enumerate(cues):
-        end=min(cue["end"]+.08,cues[index+1]["start"] if index+1<len(cues) else duration,duration)
+        end=min(cue["end"]+.08,cue.get("hold_until",duration),cues[index+1]["start"] if index+1<len(cues) else duration,duration)
         events.append(f"Dialogue: 2,{ass_time(cue['start'])},{ass_time(end)},Default,,0,0,0,,{subtitle_text(cue['text'])}\n")
     result=header+"".join(events)
     if result.count("\nDialogue:") != len(cues)+2:
