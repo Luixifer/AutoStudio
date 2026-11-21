@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "request_id": "3b347e386b6d4d56a459c88b4e3393fc",
+  "github_run_id": "44946506953",
+  "sha256": "0b1c87f6148130f6b63aa9a891abc4a2d7b65c4b3df410f0acdc6d3116cd5d5d",
+  "duration": 10.766667,
+  "native_playback_position_ms": 2719,
+  "actual_video_frame_rendered": true,
+  "simple_editor_title_text_multiple_images": true,
+  "automatic_scene_association_preserves_script": true,
+  "project_zip_backup_restored": true,
+  "settings_contents_write_instructions_verified": true,
+  "native_network_probes": 2,
+  "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+  "physical_samsung_tested": false
+}
