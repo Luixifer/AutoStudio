@@ -1,0 +1,55 @@
+{
+  "run_id": "44843101009",
+  "source_commit": "1ca9089f7b294780f2169afc7a12bb70ec6306e2",
+  "job_status": "success",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "android_emulator": {
+    "passed": true,
+    "request_id": "2770f7a62a9948a6b8da884d5b2e9053",
+    "github_run_id": "44843473839",
+    "sha256": "435f6bd89c5e2de5412967a9f8413f828c0df73ae04eaacdaeec5d884a7b27ac",
+    "duration": 11,
+    "native_playback_position_ms": 2803,
+    "actual_video_frame_rendered": true,
+    "simple_editor_title_text_multiple_images": true,
+    "automatic_scene_association_preserves_script": true,
+    "project_zip_backup_restored": true,
+    "settings_contents_write_instructions_verified": true,
+    "native_network_probes": 2,
+    "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+    "physical_samsung_tested": false
+  },
+  "android_recovery": {
+    "passed": true,
+    "process_restart_preserved_project": true,
+    "encrypted_connection_restored": true,
+    "actual_video_frame_rendered": true,
+    "native_playback_position_ms": 479,
+    "download_export_sha256": "435f6bd89c5e2de5412967a9f8413f828c0df73ae04eaacdaeec5d884a7b27ac",
+    "request_id": "2770f7a62a9948a6b8da884d5b2e9053",
+    "physical_samsung_tested": false
+  },
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab03",
+    "version_name": "director-0.2.0-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-0.2.0-lab.apk",
+    "bytes": 135715,
+    "sha256": "c33b62a18bdbb2ab2cd1af1c2766ec1260de67dffea5dd0f15a8863858fafc0e",
+    "source_commit": "1ca9089f7b294780f2169afc7a12bb70ec6306e2",
+    "github_run_id": "44843101009",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "application_id": "com.luixifer.autostudio.director.lab03",
+  "version_name": "director-0.2.0-lab",
+  "signing": "debug-only; no release credentials",
+  "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+  "apk": "AutoStudio-Director-0.2.0-lab.apk",
+  "bytes": 135715,
+  "sha256": "c33b62a18bdbb2ab2cd1af1c2766ec1260de67dffea5dd0f15a8863858fafc0e",
+  "source_commit": "1ca9089f7b294780f2169afc7a12bb70ec6306e2",
+  "github_run_id": "44843101009",
+  "worktree_dirty": false,
+  "physical_samsung_tested": false,
+  "published_topic_ids": [
+    "ocean-life",
+    "auroras",
+    "dna",
+    "volcanoes"
+  ],
+  "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+}
