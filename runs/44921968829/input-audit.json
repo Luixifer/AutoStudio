@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "title": "Cinco escenas verificables · ENSAYO, NO HESSDALEN",
+  "output_size": [
+    1920,
+    1080
+  ],
+  "scenes": [
+    {
+      "id": "paragraph-1",
+      "kind": "image",
+      "path": "media/paragraph-1.jpg",
+      "sha256": "9ed9086bf765f439c51f23810cdd578ac8187178b7ff3516bd76467d80572c90",
+      "rights": {
+        "license": "own_creation",
+        "credit": "AutoStudio; original Blender scientific illustration, NOT real footage"
+      },
+      "warnings": [],
+      "actual_format": "JPEG",
+      "width": 864,
+      "height": 1536,
+      "effective_upscale": 0.759
+    },
+    {
+      "id": "paragraph-2",
+      "kind": "image",
+      "path": "media/paragraph-2.jpg",
+      "sha256": "078aeb1a3f26794ac2f29b94e80aebe2e4ae0bdd1a1d6d6372f98067e835ba1c",
+      "rights": {
+        "license": "own_creation",
+        "credit": "AutoStudio; original Blender scientific illustration, NOT real footage"
+      },
+      "warnings": [],
+      "actual_format": "JPEG",
+      "width": 864,
+      "height": 1536,
+      "effective_upscale": 0.759
+    },
+    {
+      "id": "paragraph-3",
+      "kind": "image",
+      "path": "media/paragraph-3.jpg",
+      "sha256": "3fd6bb2ff3fcf03340f8f72b08a906ecf78b9e1252084615cdd3e435e06d3338",
+      "rights": {
+        "license": "own_creation",
+        "credit": "AutoStudio; original Blender scientific illustration, NOT real footage"
+      },
+      "warnings": [],
+      "actual_format": "JPEG",
+      "width": 864,
+      "height": 1536,
+      "effective_upscale": 0.759
+    },
+    {
+      "id": "paragraph-4",
+      "kind": "image",
+      "path": "media/paragraph-4.jpg",
+      "sha256": "f7ba2a9f5793227dac011c3c6d1bfd68e3758879da9e10239c9568d427c0d5f7",
+      "rights": {
+        "license": "own_creation",
+        "credit": "AutoStudio; original Blender scientific illustration, NOT real footage"
+      },
+      "warnings": [],
+      "actual_format": "JPEG",
+      "width": 864,
+      "height": 1536,
+      "effective_upscale": 0.759
+    },
+    {
+      "id": "paragraph-5",
+      "kind": "image",
+      "path": "media/paragraph-5.jpg",
+      "sha256": "2068b3aa64b1a3a2028605b4c7e1d6cc3082c5fa2f995dd66068ee6025b7c42b",
+      "rights": {
+        "license": "own_creation",
+        "credit": "AutoStudio; original Blender scientific illustration, NOT real footage"
+      },
+      "warnings": [],
+      "actual_format": "JPEG",
+      "width": 864,
+      "height": 1536,
+      "effective_upscale": 0.759
+    }
+  ],
+  "warnings": [],
+  "human_quality_approved": false
+}

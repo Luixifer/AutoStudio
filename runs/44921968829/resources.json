@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 452.187,
+  "child_user_cpu_seconds": 794.827394,
+  "child_system_cpu_seconds": 6.830312,
+  "child_max_rss_kib": 940004,
+  "scope": "Linux process resource counters; not a physical Android measurement",
+  "physical_samsung_tested": false
+}
