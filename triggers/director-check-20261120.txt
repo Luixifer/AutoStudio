@@ -9,3 +9,4 @@ Acceptance 8: keep passed round trip and additionally verify force-stop recovery
 Acceptance 9: correct inherited PAT setup text/link to Contents write for Director; LAB 2 installs alongside previous app and keeps its projects.
 
 2026-11-21: Director Fácil LAB3: título + texto completo + selección múltiple de imágenes; asociación automática y recorrido real en Android.
+Revisión visual: cerrar ANR externo de Pixel Launcher y exigir que la ventana capturada sea la APK antes de aprobar la captura.

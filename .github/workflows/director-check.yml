@@ -61,6 +61,7 @@ jobs:
           if [ ! -e /dev/kvm ]; then echo 'Sin KVM: no se simula validación Android.'; exit 1; fi
           sudo setfacl -m "u:$USER:rw" /dev/kvm
           python android/start_emulator.py > reports/director/emulator-start.txt 2>&1
+          adb shell am force-stop com.google.android.apps.nexuslauncher
           adb shell run-as com.luixifer.autostudio.director.lab03 mkdir -p files/director-projects/11111111111111111111111111111111
           tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab03 tar -C files/director-projects/11111111111111111111111111111111 -xf -
           adb shell am instrument -w -r -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/instrumentation.txt

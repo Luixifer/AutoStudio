@@ -48,6 +48,10 @@ public final class DirectorInstrumentation extends Instrumentation {
   runOnMainSync(()->((DirectorActivity)activity).onActivityResult(30,Activity.RESULT_OK,selected));waitForIdleSync();
   long importDeadline=System.currentTimeMillis()+30000;while(System.currentTimeMillis()<importDeadline){Thread.sleep(300);checkUiError(activity);if(store.load(projectId).getJSONObject("_quick").getJSONArray("images").length()==2)break;}
   JSONObject simple=store.load(projectId);check(simple.getJSONObject("_quick").getJSONArray("images").length()==2,"Multiple image selection not imported");check(simple.getJSONObject("_quick").getString("text").equals(quickScript),"Script lost during image import");
+  // The emulator's Pixel Launcher may show its own ANR over an otherwise live app.
+  // Remove that external process, then require actual foreground accessibility.
+  try(android.os.ParcelFileDescriptor shell=getUiAutomation().executeShellCommand("am force-stop com.google.android.apps.nexuslauncher")){try(InputStream drain=new android.os.ParcelFileDescriptor.AutoCloseInputStream(shell)){byte[] b=new byte[1024];while(drain.read(b)!=-1){}}}
+  Thread.sleep(1500);android.view.accessibility.AccessibilityNodeInfo foreground=getUiAutomation().getRootInActiveWindow();check(foreground!=null&&foreground.getPackageName()!=null&&context.getPackageName().contentEquals(foreground.getPackageName()),"Simple editor obscured by external window; screenshot not accepted");
   File quickQa=new File(context.getFilesDir(),"director-qa");quickQa.mkdirs();Thread.sleep(500);getUiAutomation().takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG,100,new FileOutputStream(new File(quickQa,"simple-editor.png")));
   click(activity,2106);
   JSONObject compiled=store.load(projectId);JSONArray autoScenes=compiled.getJSONArray("chapters").getJSONObject(0).getJSONArray("scenes");check(autoScenes.length()==2,"Automatic image/text association missing");check((autoScenes.getJSONObject(0).getString("narration")+" "+autoScenes.getJSONObject(1).getString("narration")).equals(quickScript),"Automatic grouping lost text");
