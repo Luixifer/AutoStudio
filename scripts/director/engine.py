@@ -137,33 +137,16 @@ def scene_cache_key(scene,config,root):
             for value in obj.values():collect(value)
         elif isinstance(obj,list):
             for value in obj:collect(value)
-    collect(scene);collect(config.get('voice',{}))
-    code=[Path(__file__).parent/'project.py',Path(__file__).parent/'narration.py',Path(__file__).parent/'text.py',ROOT/'scripts/neural_narration.py',ROOT/'assets/voice-models.json']
+    collect({k:v for k,v in scene.items() if not (scene.get('subshots') and k in ('media','camera'))});collect(config.get('voice',{}))
+    code=[Path(__file__).parent/'project.py',Path(__file__).parent/'narration.py',Path(__file__).parent/'text.py',Path(__file__).parent/'subshots.py',ROOT/'scripts/neural_narration.py',ROOT/'assets/voice-models.json']
     import inspect,hashlib
-    functions={fn.__name__:hashlib.sha256(inspect.getsource(fn).encode()).hexdigest() for fn in (render_scene,narrate,canvas,camera_filter,ease_keys,pcm_seconds,run,zoom_filter)}
+    functions={fn.__name__:hashlib.sha256(inspect.getsource(fn).encode()).hexdigest() for fn in (render_scene,render_visual,narrate,cached_narration,canvas,camera_filter,ease_keys,pcm_seconds,run,zoom_filter)}
     value={'cache_schema':2,'functions':functions,'size':FORMATS[config['format']],'scene':scene,'subtitle_options':config.get('subtitles',{}),'scene_policy':config.get('scene_policy'),'format':config['format'],'fps':config.get('fps',30),'voice':config.get('voice'), 'inputs':inputs,'code':{str(p.relative_to(ROOT)):digest(p) for p in code},'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]}
     import hashlib
     return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
 
-def render_scene(scene,config,root,cache,narrators,outgoing=True):
-    key=scene_cache_key({**scene,'_outgoing':outgoing,'_incoming_seconds':scene.get('_incoming_seconds',0),'_strict':config.get('scene_policy')=='paragraph/1'},config,root);work=cache/key;work.mkdir(parents=True,exist_ok=True)
-    marker=work/'complete.json';video=work/'visual.mp4';audio=work/'narration.wav'
-    if marker.is_file():
-        old=json.loads(marker.read_text())
-        if all((work/name).is_file() and digest(work/name)==sha for name,sha in old['files'].items()):return work,old
-    raw,words,voice=narrate(scene,config,root,work,narrators)
-    fps=config.get('fps',30);size=FORMATS[config['format']];width,height=size
-    spoken=pcm_seconds(raw);incoming=scene.get('_incoming_seconds',0) if config.get('scene_policy')=='paragraph/1' else 0
-    pause=scene.get('pause_after',.35) if config.get('scene_policy')=='paragraph/1' else .2
-    duration=math.ceil((spoken+pause+incoming)*fps)/fps
-    words=[{**w,'start':w['start']+incoming,'end':w['end']+incoming} for w in words]
-    transition=scene.get('transition',{})
-    extra=transition.get('seconds',0) if outgoing and transition.get('type','cut')!='cut' else 0
-    if config.get('scene_policy')=='paragraph/1':extra=math.ceil(extra*fps)/fps
-    # Narration never crossfades/overlaps: visual handles extend after its scene.
-    if extra>=duration:raise ValueError('Transición mayor que la escena')
-    frames=math.ceil((duration+extra)*fps);visual_seconds=frames/fps
-    run('-i',raw,'-af',f'adelay={round(incoming*24000)}S:all=1,apad','-t',f'{duration:.6f}','-ar','48000','-ac','1','-c:a','pcm_s16le',audio)
+def render_visual(scene,root,work,frames,size,fps):
+    width,height=size;visual_seconds=frames/fps;video=work/'visual.mp4'
     m=scene['media'];source=Path(root)/m['path'];args=[];graph=[]
     if m['kind']=='image':
         big=(width*2,height*2);still=work/'canvas.png';canvas(source,still,big,m.get('fit','contain'))
@@ -195,10 +178,46 @@ def render_scene(scene,config,root,cache,narrators,outgoing=True):
     temp=work/'visual.tmp.mp4'
     run(*args,'-filter_complex_threads','1','-filter_complex',';'.join(graph),'-map','[v]','-an','-frames:v',frames,'-c:v','libx264','-preset','veryfast','-crf','20','-pix_fmt','yuv420p','-r',fps,'-movflags','+faststart',temp)
     os.replace(temp,video)
-    info={'id':scene['id'],'key':key,'duration':duration,'voice_seconds':spoken,'visual_seconds':visual_seconds,'transition_seconds':extra,'transition':transition.get('type','cut'),'words':words,'voice':voice,'files':{p.name:digest(p) for p in (video,audio)},'input_media_sha256':digest(source),'original_text':scene['narration'],'media_path':m['path'],'camera':scene.get('camera',{}),'narration_file':str(raw),'incoming_silence':incoming,'pause_after':duration-incoming-spoken,'narration_offset':incoming,'validation_state':'rendered; assembly pending'}
+    return video
+
+def render_scene(scene,config,root,cache,narrators,outgoing=True):
+    key=scene_cache_key({**scene,'_outgoing':outgoing,'_incoming_seconds':scene.get('_incoming_seconds',0),'_strict':config.get('scene_policy')=='paragraph/1'},config,root);work=cache/key;work.mkdir(parents=True,exist_ok=True)
+    marker=work/'complete.json';video=work/'visual.mp4';audio=work/'narration.wav'
+    if marker.is_file():
+        old=json.loads(marker.read_text())
+        if all((work/name).is_file() and digest(work/name)==sha for name,sha in old['files'].items()) and all((cache.parent/'visual-cache'/slot['video_key']/'visual.mp4').is_file() and digest(cache.parent/'visual-cache'/slot['video_key']/'visual.mp4')==slot['video_sha256'] for slot in old.get('subshots',[])):
+            old['scene_cache_reused']=True;old['voice']['cache_reused']=True
+            for slot in old.get('subshots',[]):slot['cache_reused']=True
+            return work,old
+    raw,words,voice=cached_narration(scene,config,root,work,narrators,cache.parent)
+    fps=config.get('fps',30);size=FORMATS[config['format']];width,height=size
+    spoken=pcm_seconds(raw);incoming=scene.get('_incoming_seconds',0) if config.get('scene_policy')=='paragraph/1' else 0
+    pause=scene.get('pause_after',.35) if config.get('scene_policy')=='paragraph/1' else .2
+    duration=math.ceil((spoken+pause+incoming)*fps)/fps
+    words=[{**w,'start':w['start']+incoming,'end':w['end']+incoming} for w in words]
+    transition=scene.get('transition',{})
+    extra=transition.get('seconds',0) if outgoing and transition.get('type','cut')!='cut' else 0
+    if config.get('scene_policy')=='paragraph/1':extra=math.ceil(extra*fps)/fps
+    # Narration never crossfades/overlaps: visual handles extend after its scene.
+    if extra>=duration:raise ValueError('Transición mayor que la escena')
+    frames=math.ceil((duration+extra)*fps);visual_seconds=frames/fps
+    run('-i',raw,'-af',f'adelay={round(incoming*24000)}S:all=1,apad','-t',f'{duration:.6f}','-ar','48000','-ac','1','-c:a','pcm_s16le',audio)
+    shot_plan=[]
+    if scene.get('subshots'):
+        from scripts.director.subshots import resolve
+        shot_plan=resolve(scene,words,fps,frames)
+        clips=[]
+        for slot in shot_plan:
+            path,visual_key,reused=visual_cached({'media':slot['media'],'camera':slot['camera']},root,cache.parent,slot['frames'],size,fps)
+            slot.update(video_key=visual_key,video_path=str(path.relative_to(cache.parent)),cache_reused=reused,video_sha256=digest(path),input_media_sha256=digest(Path(root)/slot['media']['path']))
+            clips.append(path)
+        join_subshots(clips,shot_plan,video,frames,fps)
+    else:render_visual(scene,root,work,frames,size,fps)
+    m=scene.get('media',scene.get('subshots',[{}])[0].get('media'));source=Path(root)/m['path']
+    info={'id':scene['id'],'key':key,'duration':duration,'voice_seconds':spoken,'visual_seconds':visual_seconds,'transition_seconds':extra,'transition':transition.get('type','cut'),'words':words,'voice':voice,'files':{p.name:digest(p) for p in (video,audio,raw)},'input_media_sha256':digest(source),'original_text':scene['narration'],'media_path':m['path'],'camera':scene.get('camera',{}),'narration_file':str(raw),'incoming_silence':incoming,'pause_after':duration-incoming-spoken,'narration_offset':incoming,'validation_state':'rendered; assembly pending','scene_cache_reused':False,'subshots':shot_plan}
     atomic_json(marker,info);return work,info
 
-def produce(project_path,out,chapter_id=None):
+def produce(project_path,out,chapter_id=None,checkpoint=None):
     path=Path(project_path).resolve();config=load(path);root=path.parent;out=Path(out).resolve();out.mkdir(parents=True,exist_ok=True)
     from scripts.director.audit import audit
     atomic_json(out/'input-audit.json',audit(path))
@@ -247,8 +266,8 @@ def produce(project_path,out,chapter_id=None):
         graph.append(f"[{prev}]"+(f"ass=filename='{safe}'," if config.get('subtitles',{}).get('enabled',True) else '')+"format=yuv420p[final]")
         target=work/'chapter.mp4';temp=work/'chapter.tmp.mp4'
         import hashlib,inspect as source_inspect
-        chapter_key=hashlib.sha256(json.dumps({'graph':graph,'parts':[m['key'] for p,m in parts],'duration':offset,'ass':digest(ass),'producer':source_inspect.getsource(produce)},sort_keys=True).encode()).hexdigest()
-        checkpoint=work/'chapter.json';previous=json.loads(checkpoint.read_text()) if checkpoint.is_file() else {}
+        chapter_key=hashlib.sha256(json.dumps({'graph':[g.replace(str(out),'<render>') for g in graph],'parts':[m['key'] for p,m in parts],'duration':offset,'ass':digest(ass),'producer':source_inspect.getsource(produce)},sort_keys=True).encode()).hexdigest()
+        chapter_marker=work/'chapter.json';previous=json.loads(chapter_marker.read_text()) if chapter_marker.is_file() else {}
         reused=target.is_file() and previous.get('cache_key')==chapter_key and previous.get('video_sha256')==digest(target)
         if not reused:
             run(*args,'-filter_complex_threads','1','-filter_complex',';'.join(graph),'-map','[final]','-an','-t',offset,'-c:v','libx264','-preset','veryfast','-crf','20','-r',fps,'-pix_fmt','yuv420p','-movflags','+faststart',temp)
@@ -256,6 +275,7 @@ def produce(project_path,out,chapter_id=None):
         outputs.append((target,chapter_audio))
         global_cues.extend({**c,'start':c['start']+global_offset,'end':c['end']+global_offset} for c in cues);global_offset+=offset
         atomic_json(work/'chapter.json',{'id':chapter['id'],'cache_key':chapter_key,'reused':reused,'duration':offset,'video_sha256':digest(target),'voice_sha256':digest(chapter_audio),'scenes':[m['id'] for p,m in parts]})
+        if checkpoint:checkpoint(out)
     listing=out/'chapters.txt';listing.write_text(''.join("file '"+str(v.relative_to(out))+"'\n" for v,a in outputs))
     speech=out/'narration.wav';join_wavs([a for v,a in outputs],speech)
     args=['-f','concat','-safe','1','-i',str(listing),'-i',str(speech)];graph=[];audio='1:a';index=2
@@ -297,6 +317,57 @@ def produce(project_path,out,chapter_id=None):
     if not report['passed']:raise RuntimeError('QA rechazado: '+str(report['errors']))
     (out/'SHA256SUMS').write_text(digest(final)+'  '+final.name+'\n')
     return report
+
+def link_copy(source,target):
+    target=Path(target)
+    if target.exists():target.unlink()
+    try:os.link(source,target)
+    except OSError:shutil.copy2(source,target)
+
+def cached_narration(scene,config,root,work,narrators,out):
+    import inspect,hashlib
+    voice=scene.get('voice',config.get('voice',{'mode':'kokoro','voice':'em_alex'}))
+    hashes={name:digest(ROOT/name) for name in ('scripts/neural_narration.py','scripts/director/narration.py','scripts/director/text.py','assets/voice-models.json')}
+    if voice.get('mode')=='file':hashes['input']=digest(Path(root)/voice['path'])
+    key=hashlib.sha256(json.dumps({'text':scene['narration'],'voice':voice,'policy':config.get('scene_policy'),'code':hashes,'function':inspect.getsource(narrate)},sort_keys=True).encode()).hexdigest()
+    folder=Path(out)/'narration-cache'/key;folder.mkdir(parents=True,exist_ok=True);marker=folder/'complete.json';raw=folder/'spoken.wav'
+    if marker.is_file():
+        data=json.loads(marker.read_text())
+        if raw.is_file() and data.get('sha256')==digest(raw):
+            validate_words(data['words'],scene['narration'],pcm_seconds(raw));target=Path(work)/'spoken.wav';link_copy(raw,target);return target,data['words'],{**data['voice'],'cache_reused':True}
+    raw,words,info=narrate(scene,config,root,folder,narrators)
+    atomic_json(marker,{'sha256':digest(raw),'words':words,'voice':info})
+    target=Path(work)/'spoken.wav';link_copy(raw,target);return target,words,{**info,'cache_reused':False}
+
+def visual_cached(scene,root,out,frames,size,fps):
+    import inspect,hashlib
+    def hashes(value):
+        result={}
+        if isinstance(value,dict):
+            if 'path' in value:result[value['path']]=digest(Path(root)/value['path'])
+            for v in value.values():result.update(hashes(v))
+        elif isinstance(value,list):
+            for v in value:result.update(hashes(v))
+        return result
+    code=''.join(inspect.getsource(fn) for fn in (render_visual,canvas,camera_filter,ease_keys,zoom_filter,run))
+    key=hashlib.sha256(json.dumps({'visual':scene,'frames':frames,'size':size,'fps':fps,'inputs':hashes(scene),'code':code,'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]},sort_keys=True).encode()).hexdigest()
+    folder=Path(out)/'visual-cache'/key;folder.mkdir(parents=True,exist_ok=True);marker=folder/'complete.json';video=folder/'visual.mp4'
+    if marker.is_file() and video.is_file() and json.loads(marker.read_text()).get('sha256')==digest(video):return video,key,True
+    render_visual(scene,root,folder,frames,size,fps);atomic_json(marker,{'sha256':digest(video)});return video,key,False
+
+def join_subshots(clips,plan,target,frames,fps):
+    args=[];graph=[]
+    for i,path in enumerate(clips):
+        args+=['-i',str(path)];graph.append(f'[{i}:v]setsar=1,setpts=PTS-STARTPTS,format=yuv420p,settb=AVTB,fps={fps}[s{i}]')
+    previous='s0'
+    for i in range(1,len(clips)):
+        duration=plan[i-1]['transition_frames']/fps;label='x'+str(i)
+        if duration:graph.append(f'[{previous}][s{i}]xfade=transition=fade:duration={duration}:offset={plan[i]["start_frame"]/fps},fps={fps}[{label}]')
+        else:graph.append(f'[{previous}][s{i}]concat=n=2:v=1:a=0,fps={fps}[{label}]')
+        previous=label
+    temp=Path(target).with_suffix('.tmp.mp4')
+    run(*args,'-filter_complex_threads','1','-filter_complex',';'.join(graph),'-map',f'[{previous}]','-an','-frames:v',frames,'-c:v','libx264','-preset','veryfast','-crf','20','-r',fps,'-pix_fmt','yuv420p','-movflags','+faststart',temp)
+    os.replace(temp,target)
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('project',type=Path);p.add_argument('--out',type=Path,required=True);p.add_argument('--chapter');a=p.parse_args();print(json.dumps(produce(a.project,a.out,a.chapter),ensure_ascii=False,indent=2))

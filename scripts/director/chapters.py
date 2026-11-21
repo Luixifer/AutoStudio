@@ -24,7 +24,7 @@ def paths(value):
 def chapter_identity(project,chapter,root):
  document=chapter_doc(project,chapter)
  code_root=Path(__file__).resolve().parents[2]
- renderer={name:digest(code_root/name) for name in ('scripts/director/engine.py','scripts/director/narration.py','scripts/director/captions.py','scripts/director/text.py','scripts/director/project.py','scripts/personal_editor.py','assets/voice-models.json')}
+ renderer={name:digest(code_root/name) for name in ('scripts/director/engine.py','scripts/director/narration.py','scripts/director/captions.py','scripts/director/text.py','scripts/director/subshots.py','scripts/director/project.py','scripts/personal_editor.py','assets/voice-models.json')}
  return fingerprint({'document':document,'input_sha256':{name:digest(Path(root)/name) for name in sorted(paths(document))},'renderer_sha256':renderer,'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]})
 
 def split(project_path,out):

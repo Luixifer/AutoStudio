@@ -1,0 +1,907 @@
+{
+  "schema": "autostudio-production-plan/1",
+  "title": "Las misteriosas luces de Hessdalen · Capítulo 1",
+  "baseline_commit": "f55a075",
+  "issue": "https://github.com/Luixifer/AutoStudio/issues/80",
+  "status": "BLOCKED_MISSING_APPROVED_SCRIPT_AND_ASSETS",
+  "script": {
+    "path": null,
+    "sha256": null,
+    "approved": false
+  },
+  "output": {
+    "format": "horizontal",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "target_seconds": [
+      285,
+      330
+    ]
+  },
+  "narration": {
+    "voice_candidate": "em_alex",
+    "human_listening_approved": false,
+    "hessdalen_pronunciation_approved": false
+  },
+  "youtube_enabled": false,
+  "editorial_targets_are_not_runtime_durations": true,
+  "blocks": [
+    {
+      "id": "aparicion",
+      "title": "Aparición nocturna"
+    },
+    {
+      "id": "valle1981",
+      "title": "Valle y testimonios de 1981; fecha pendiente de contrastar"
+    },
+    {
+      "id": "investigacion1984",
+      "title": "Investigación de 1984; alcance pendiente de contrastar"
+    },
+    {
+      "id": "estacion1998",
+      "title": "Vigilancia automatizada desde 1998; fecha pendiente de contrastar"
+    },
+    {
+      "id": "hipotesis",
+      "title": "Hipótesis físicas; no son explicaciones confirmadas"
+    },
+    {
+      "id": "limites",
+      "title": "Límites del conocimiento"
+    },
+    {
+      "id": "cierre",
+      "title": "Cierre y transición a señales de radio"
+    }
+  ],
+  "shots": [
+    {
+      "id": "h01-p01",
+      "block_id": "aparicion",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Horizonte nocturno del valle; espacio para la primera aparición",
+      "classification": "recreation",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p02",
+      "block_id": "aparicion",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Luz distante sobre el horizonte, sin fingir registro histórico",
+      "classification": "recreation",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p03",
+      "block_id": "aparicion",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Entorno nocturno y escala humana; localización verificable",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p04",
+      "block_id": "aparicion",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Contraplano de observación; separar testigo y explicación",
+      "classification": "recreation",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p05",
+      "block_id": "valle1981",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Geografía real del valle y orientación",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "pan_up"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p06",
+      "block_id": "valle1981",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Mapa con localización y escala geográfica verificadas",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p07",
+      "block_id": "valle1981",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Documento o testimonio fechado; no fabricar declaraciones",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p08",
+      "block_id": "valle1981",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Punto de observación real o recreación rotulada si se autoriza",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p09",
+      "block_id": "investigacion1984",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Archivo de la campaña con fecha y autor identificados",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p10",
+      "block_id": "investigacion1984",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Instrumento documentado; no atribuir equipos no verificados",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p11",
+      "block_id": "investigacion1984",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Representación del procedimiento de medida, rotulada",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p12",
+      "block_id": "investigacion1984",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Datos o informe con referencia legible y contexto",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p13",
+      "block_id": "estacion1998",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Estación automática real con identificación y derechos",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p14",
+      "block_id": "estacion1998",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Cámara o sensor acreditado; distinguir imagen actual de archivo",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p15",
+      "block_id": "estacion1998",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Diagrama temporal de observaciones, datos con procedencia",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p16",
+      "block_id": "estacion1998",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Cielo sobre emplazamiento documentado; no sustituir por auroras",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "pan_up"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p17",
+      "block_id": "hipotesis",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Separación visual entre observación y explicación propuesta",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p18",
+      "block_id": "hipotesis",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Hipótesis física concreta SOLO tras recibir su frase aprobada",
+      "classification": "hypothesis",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p19",
+      "block_id": "hipotesis",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Segunda hipótesis SOLO si el guion y fuentes la sostienen",
+      "classification": "hypothesis",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p20",
+      "block_id": "hipotesis",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Método para contrastar una hipótesis; variables verificables",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p21",
+      "block_id": "hipotesis",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Comparación de predicciones y datos sin inventar resultados",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p22",
+      "block_id": "limites",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Calidad de observación: distancia, exposición, escala",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p23",
+      "block_id": "limites",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Fuente instrumental documentada y límites de interpretación",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "zoom_in"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p24",
+      "block_id": "limites",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Incertidumbre representada explícitamente sin cifras ficticias",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p25",
+      "block_id": "limites",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Revisión de registro ambiguo; rótulo y fuente siempre presentes",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p26",
+      "block_id": "limites",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Valle en silencio: pausa editorial acorde al audio real",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "zoom_out"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p27",
+      "block_id": "cierre",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Regreso al horizonte inicial sin repetir archivo por defecto",
+      "classification": "archive",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "zoom_out"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p28",
+      "block_id": "cierre",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Instrumento de observación con procedencia o recreación rotulada",
+      "classification": "recreation",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "medio",
+      "camera": {
+        "movement": "pan_left"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p29",
+      "block_id": "cierre",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Ondas o espectro de radio ilustrativo; no dato medido ficticio",
+      "classification": "visualization",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "detalle",
+      "camera": {
+        "movement": "static"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    },
+    {
+      "id": "h01-p30",
+      "block_id": "cierre",
+      "scene_id": null,
+      "start_phrase": null,
+      "end_phrase": null,
+      "visual_motif": "Último horizonte y transición al siguiente capítulo",
+      "classification": "recreation",
+      "media": {
+        "kind": null,
+        "path": null,
+        "rights": {
+          "license": null,
+          "credit": null,
+          "source_url": null
+        }
+      },
+      "editorial_target_seconds": 10,
+      "framing": "general",
+      "camera": {
+        "movement": "zoom_out"
+      },
+      "transition": {
+        "type": "cut",
+        "seconds": 0
+      },
+      "status": "pending_script_and_media"
+    }
+  ],
+  "editorial_review": {
+    "facts_verified": false,
+    "rights_verified": false,
+    "visual_pertinence_approved": false,
+    "narration_approved": false
+  }
+}

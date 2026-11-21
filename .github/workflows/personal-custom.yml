@@ -10,11 +10,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: autostudio-custom-${{ contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity"]'), github.ref) && inputs.request_id || github.event.sender.login }}
+  group: autostudio-custom-${{ contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity","refs/heads/codex/hessdalen-issue-80"]'), github.ref) && inputs.request_id || github.event.sender.login }}
   cancel-in-progress: false
 jobs:
   render-personal:
-    if: ${{ github.event.repository.private == false && !contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity"]'), github.ref) }}
+    if: ${{ github.event.repository.private == false && !contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity","refs/heads/codex/hessdalen-issue-80"]'), github.ref) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -92,7 +92,7 @@ jobs:
           retention-days: 7
 
   director:
-    if: ${{ github.event.repository.private == false && contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity"]'), github.ref) }}
+    if: ${{ github.event.repository.private == false && contains(fromJSON('["refs/heads/codex/autostudio-director","refs/heads/codex/director-2-scene-integrity","refs/heads/codex/hessdalen-issue-80"]'), github.ref) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     permissions:

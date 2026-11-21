@@ -23,7 +23,7 @@ def api(path,method='GET',body=None,accept='application/vnd.github+json'):
 def get_json(path):
  with api(path) as response:return json.load(response)
 
-def download(asset,path,expected):
+def asset_stream(asset):
  try:r=api('/releases/assets/'+str(asset['id']),accept='application/octet-stream')
  except urllib.error.HTTPError as e:
   if e.code not in (301,302,303,307,308):raise
@@ -31,11 +31,15 @@ def download(asset,path,expected):
   if u.scheme!='https' or u.username or u.port or not (u.hostname=='release-assets.githubusercontent.com' or (u.hostname or '').endswith('.blob.core.windows.net')):
    raise RuntimeError('Redirección de descarga no reconocida')
   r=urllib.request.build_opener(NoRedirect).open(urllib.request.Request(location,headers={'User-Agent':'AutoStudio-Director'}),timeout=120)
+ return r
+
+def download(asset,path,expected,max_bytes=MAX_BUNDLE):
+ r=asset_stream(asset)
  total=0
  with r,Path(path).open('xb') as out:
   for block in iter(lambda:r.read(1024*1024),b''):
    total+=len(block)
-   if total>MAX_BUNDLE:raise ValueError('Paquete demasiado grande')
+   if total>max_bytes:raise ValueError('Paquete demasiado grande')
    out.write(block)
  if total!=asset['size'] or digest(path)!=expected:raise ValueError('La descarga no coincide con su SHA-256')
 
@@ -70,24 +74,32 @@ def execute(request_id,work):
  if not release.get('draft') or release['tag_name']!='director-'+request_id:raise ValueError('Se requiere una entrega de revisión, no una publicación')
  intent=json.loads(release.get('body','{}'))
  if intent.get('autostudio_director')!=1 or intent.get('request_id')!=request_id or not re.fullmatch('[a-f0-9]{64}',intent.get('bundle_sha256','')):raise ValueError('La solicitud no tiene integridad verificable')
- if intent.get('source_ref') not in ('codex/autostudio-director','codex/director-2-scene-integrity') or os.environ.get('DIRECTOR_EXPECTED_REF',intent.get('source_ref'))!=intent.get('source_ref'):raise ValueError('Revisión de motor no autorizada')
+ if intent.get('source_ref') not in ('codex/autostudio-director','codex/director-2-scene-integrity','codex/hessdalen-issue-80') or os.environ.get('DIRECTOR_EXPECTED_REF',intent.get('source_ref'))!=intent.get('source_ref'):raise ValueError('Revisión de motor no autorizada')
  assets=release['assets'];bundles=[a for a in assets if a['name']=='project.zip']
  if len(bundles)!=1 or bundles[0]['size']>MAX_BUNDLE:raise ValueError('Falta el paquete de entrada válido')
  if any(a['name']=='result.json' for a in assets):raise ValueError('Solicitud ya procesada; no se sobrescribe un resultado')
  work=Path(work);work.mkdir(parents=True,exist_ok=True);result={'request_id':request_id,'status':'failed','github_run_id':os.environ.get('GITHUB_RUN_ID'),'source_commit':os.environ.get('GITHUB_SHA'),'youtube_enabled':False,'physical_samsung_tested':False}
+ cache=None
  try:
   bundle=work/'project.zip';download(bundles[0],bundle,intent['bundle_sha256']);extract_bundle(bundle,work/'input')
   from scripts.director.engine import produce
-  report=produce(work/'input/project.json',work/'render')
+  from scripts.director.remote_cache import RemoteCache
+  project=json.loads((work/'input/project.json').read_text())
+  project_id=project.get('project_id')
+  if project_id and project_id!=intent.get('project_id'):raise ValueError('Project/cache identity does not match request')
+  cache=RemoteCache(project_id,release,work,request_id);cache.restore(work/'render')
+  report=produce(work/'input/project.json',work/'render',checkpoint=cache.save)
   for name in ('documental-REVISION.mp4','captions.srt','validation.json','timeline.json','input-audit.json','SHA256SUMS'):
    asset=upload(release,work/'render'/name)
    if name.endswith('.mp4'):result.update({'asset_id':asset['id'],'bytes':asset['size'],'sha256':report['sha256'],'duration':report['duration'],'width':report['width'],'height':report['height']})
-  result['scenes']=[{'id':s['id'],'voice_seconds':s['voice_seconds'],'text_sha256':__import__('hashlib').sha256(s['original_text'].encode()).hexdigest(),'media_sha256':s['input_media_sha256']} for s in json.loads((work/'render/timeline.json').read_text())['scenes']]
+  result['scenes']=[{'id':s['id'],'voice_seconds':s['voice_seconds'],'text_sha256':__import__('hashlib').sha256(s['original_text'].encode()).hexdigest(),'media_sha256':s['input_media_sha256'],'voice_reused':s['voice'].get('cache_reused',False),'scene_reused':s.get('scene_cache_reused',False),'subshots':[{'id':v['id'],'cache_reused':v['cache_reused']} for v in s.get('subshots',[])]} for s in json.loads((work/'render/timeline.json').read_text())['scenes']]
   if (work/'render/correspondence.json').is_file():upload(release,work/'render/correspondence.json')
   result['status']='completed'
  except Exception as error:
   result['error']=str(error)[:1500];raise
  finally:
+  if cache:
+   cache.save(work/'render');result['cache']=cache.stats
   p=work/'result.json';p.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');upload(release,p)
 
 if __name__=='__main__':

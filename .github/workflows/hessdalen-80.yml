@@ -1,0 +1,54 @@
+name: Director 2 · Hessdalen 80 · preparación verificable
+run-name: Hessdalen 80 · regresiones y fuentes · ${{ github.run_number }}
+on:
+  push:
+    branches: ['codex/hessdalen-issue-80']
+    paths: ['triggers/hessdalen-80.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-hessdalen-80
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Herramientas libres CPU sin APIs de pago
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          mkdir -p reports/director
+      - name: Regresiones completas
+        run: python -m unittest discover -s tests -v > reports/director/tests.txt 2>&1
+      - name: Consultar fuentes oficiales y todos los comentarios de la incidencia
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.hessdalen_sources
+      - name: Comprobar bloqueo editorial sin inventar el capítulo
+        run: |
+          python -m scripts.director.production_plan content/projects/hessdalen/chapter01.plan.json --out reports/director/readiness.json && exit 1 || test "$?" = 2
+      - name: Audio neuronal y montaje REAL de subplanos; no es Hessdalen
+        run: |
+          python scripts/fetch_voice.py
+          python -m scripts.director.subshot_proof > reports/director/subshot-render.txt 2>&1
+      - name: Conservar únicamente informes; no publicar un demo como documental
+        if: ${{ always() }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_CHECK_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY'
+          from scripts.director import publish_check_fallback as evidence
+          evidence.BRANCH='hessdalen-80-evidence'
+          evidence.publish()
+          PY
