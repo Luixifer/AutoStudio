@@ -1,0 +1,55 @@
+{
+  "run_id": "44945503995",
+  "source_commit": "d835387533a839d277d00931264052ca9c7ec393",
+  "job_status": "success",
+  "physical_samsung_tested": false,
+  "hessdalen_produced": false,
+  "youtube_enabled": false,
+  "android_emulator": {
+    "passed": true,
+    "request_id": "ca85280b486b4bc4b120f379431c2bce",
+    "github_run_id": "44945880464",
+    "sha256": "75d72e5390c0b667ea16d73060190aed4841cea730af95006d5e81417641dac0",
+    "duration": 10.766667,
+    "native_playback_position_ms": 2786,
+    "actual_video_frame_rendered": true,
+    "simple_editor_title_text_multiple_images": true,
+    "automatic_scene_association_preserves_script": true,
+    "project_zip_backup_restored": true,
+    "settings_contents_write_instructions_verified": true,
+    "native_network_probes": 4,
+    "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+    "physical_samsung_tested": false
+  },
+  "android_recovery": {
+    "passed": true,
+    "process_restart_preserved_project": true,
+    "encrypted_connection_restored": true,
+    "actual_video_frame_rendered": true,
+    "native_playback_position_ms": 416,
+    "download_export_sha256": "75d72e5390c0b667ea16d73060190aed4841cea730af95006d5e81417641dac0",
+    "request_id": "ca85280b486b4bc4b120f379431c2bce",
+    "physical_samsung_tested": false
+  },
+  "apk": {
+    "schema": 1,
+    "application_id": "com.luixifer.autostudio.director.lab05",
+    "version_name": "director-2.1.0-facil-lab",
+    "signing": "debug-only; no release credentials",
+    "architectures": "Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+",
+    "apk": "AutoStudio-Director-2.1.0-facil-lab.apk",
+    "bytes": 152099,
+    "sha256": "1eb1ee7cd05daa451c518c265ba5af2bc11ed23bcb79bc686295f88e25d356fe",
+    "source_commit": "d835387533a839d277d00931264052ca9c7ec393",
+    "github_run_id": "44945503995",
+    "worktree_dirty": false,
+    "physical_samsung_tested": false,
+    "published_topic_ids": [
+      "ocean-life",
+      "auroras",
+      "dna",
+      "volcanoes"
+    ],
+    "catalog_sha256": "f0df3e0e628f077f3706f0b91254ee41a937075226728e7bbc87487348376cec"
+  }
+}

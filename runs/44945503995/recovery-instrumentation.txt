@@ -1,0 +1,11 @@
+INSTRUMENTATION_RESULT: stream={
+  "passed": true,
+  "process_restart_preserved_project": true,
+  "encrypted_connection_restored": true,
+  "actual_video_frame_rendered": true,
+  "native_playback_position_ms": 416,
+  "download_export_sha256": "75d72e5390c0b667ea16d73060190aed4841cea730af95006d5e81417641dac0",
+  "request_id": "ca85280b486b4bc4b120f379431c2bce",
+  "physical_samsung_tested": false
+}
+INSTRUMENTATION_CODE: -1
