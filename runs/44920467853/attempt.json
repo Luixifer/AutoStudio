@@ -1,0 +1,8 @@
+{
+  "managed_by": "autostudio-director-evaluation",
+  "run_id": "44920467853",
+  "source_commit": "4cf70f2e5c2d5023cf99360bbe96d309a3141c5a",
+  "status": "cancelled",
+  "release_delivery_error": "No se pudo adjuntar el resultado a GitHub: HTTP 422",
+  "physical_samsung_tested": false
+}

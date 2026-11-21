@@ -1,0 +1,14 @@
+{
+  "found_user_input": true,
+  "request_id": "9126b046336b46028f9ffcd6b13ba31e",
+  "source_ref": "codex/autostudio-director",
+  "renderer_source_commit": "2ec4e4de121f24c88786642affc2bfadefd7ac57",
+  "renderer_run_id": "44885499433",
+  "renderer_status": "completed",
+  "rendered_seconds": 5.466667,
+  "original_paragraph_count": 3,
+  "rendered_scene_count": 3,
+  "paragraphs_preserved_1_to_1": false,
+  "repeated_resource_assignments": 0,
+  "scope": "Read-only inspection of actual uploaded JSON and production result. No user text, titles, images or media exported."
+}
