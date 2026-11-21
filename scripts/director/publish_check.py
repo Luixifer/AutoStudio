@@ -17,7 +17,7 @@ def main():
   try:check['android_recovery']=json.loads(recovery.read_text())
   except json.JSONDecodeError:check['recovery_error']='Invalid recovery report'
  if status=='success' and not (check.get('android_emulator',{}).get('passed') and check.get('android_recovery',{}).get('passed')):raise RuntimeError('Success without real emulator and recovery evidence')
- apk=Path('build/android/AutoStudio-Director-0.1.1-lab.apk')
+ apk=Path('build/android/AutoStudio-Director-0.2.0-lab.apk')
  if apk.is_file():
   info=json.loads(Path('build/android/apk-info.json').read_text())
   if info['sha256']!=digest(apk) or info['source_commit']!=os.environ['GITHUB_SHA'] or info['github_run_id']!=run:raise ValueError('APK provenance mismatch')

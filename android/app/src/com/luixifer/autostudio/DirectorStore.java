@@ -33,6 +33,17 @@ public final class DirectorStore {
         try(InputStream in=context.getContentResolver().openInputStream(uri);OutputStream out=new FileOutputStream(temp)){if(in==null)throw new IOException("No se puede abrir el recurso");byte[] b=new byte[65536];int n;long total=0;while((n=in.read(b))!=-1){total+=n;if(total>MAX)throw new IOException("El recurso supera 200 MiB");out.write(b,0,n);}if(total==0)throw new IOException("Recurso vacío");}catch(Exception e){temp.delete();throw e;}
         if(!temp.renameTo(target))throw new IOException("No se pudo guardar el recurso");return "media/"+target.getName();
     }
+    public static void compileQuick(JSONObject project)throws Exception{
+        JSONObject quick=project.getJSONObject("_quick");JSONArray images=quick.getJSONArray("images");
+        List<String> parts=DirectorQuickPlan.split(quick.optString("text"),images.length());
+        JSONArray chapters=new JSONArray(),scenes=null;
+        for(int i=0;i<parts.size();i++){
+            if(i%30==0){scenes=new JSONArray();chapters.put(new JSONObject().put("id","quick-c-"+(i/30)).put("title","Parte "+(i/30+1)).put("scenes",scenes));}
+            String path=images.getString(DirectorQuickPlan.imageFor(i,parts.size(),images.length()));
+            scenes.put(new JSONObject().put("id","quick-s-"+i).put("narration",parts.get(i)).put("media",new JSONObject().put("kind","image").put("path",path).put("fit","contain").put("source_audio",false).put("rights",ownRights())).put("camera",new JSONObject().put("movement",i%2==0?"zoom_in":"zoom_out")).put("transition",new JSONObject().put("type","dissolve").put("seconds",.4)));
+        }
+        project.put("chapters",chapters);
+    }
     public static JSONArray parseScript(String text)throws Exception{
         if(text.length()>100000)throw new IOException("Guion demasiado grande; divide el documental");
         JSONArray chapters=new JSONArray(),scenes=new JSONArray();JSONObject chapter=new JSONObject().put("id","c-"+id()).put("title","Capítulo 1").put("scenes",scenes);chapters.put(chapter);

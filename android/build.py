@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];PROJECT=ROOT/'android';OUT=ROOT/'build/android'
 PACKAGE='com.luixifer.autostudio.lab04';APP_NAME='AutoStudio-Control-0.4.0-lab.apk'
 DIRECTOR=os.environ.get('AUTOSTUDIO_DIRECTOR_BUILD')=='1'
-if DIRECTOR:PACKAGE='com.luixifer.autostudio.director.lab02';APP_NAME='AutoStudio-Director-0.1.1-lab.apk'
+if DIRECTOR:PACKAGE='com.luixifer.autostudio.director.lab03';APP_NAME='AutoStudio-Director-0.2.0-lab.apk'
 def run(*args):subprocess.run([str(x) for x in args],check=True)
 def main():
     sdk=Path(os.environ.get('ANDROID_HOME',os.environ.get('ANDROID_SDK_ROOT','/nonexistent')));java=Path(os.environ.get('JAVA_HOME','/nonexistent'))
@@ -15,16 +15,17 @@ def main():
     if not platform.is_file() or not (java/'bin/javac').is_file():raise RuntimeError('Need Android platform 35, build-tools 35.0.0 and a full JDK. See android/README.md.')
     os.environ['PATH']=str(java/'bin')+os.pathsep+os.environ['PATH'];os.environ['JAVA_HOME']=str(java)
     OUT.mkdir(parents=True,exist_ok=True);unit=OUT/'unit';unit.mkdir(exist_ok=True)
-    run(java/'bin/javac','-encoding','UTF-8','-d',unit,PROJECT/'app/src/com/luixifer/autostudio/TokenFormat.java',PROJECT/'test/unit/TokenFormatTest.java',PROJECT/'app/src/com/luixifer/autostudio/DirectorMediaFormat.java',PROJECT/'test/unit/DirectorMediaFormatTest.java')
+    run(java/'bin/javac','-encoding','UTF-8','-d',unit,PROJECT/'app/src/com/luixifer/autostudio/TokenFormat.java',PROJECT/'test/unit/TokenFormatTest.java',PROJECT/'app/src/com/luixifer/autostudio/DirectorMediaFormat.java',PROJECT/'test/unit/DirectorMediaFormatTest.java',PROJECT/'app/src/com/luixifer/autostudio/DirectorQuickPlan.java',PROJECT/'test/unit/DirectorQuickPlanTest.java')
     run(java/'bin/java','-cp',unit,'TokenFormatTest')
     run(java/'bin/java','-cp',unit,'DirectorMediaFormatTest')
+    run(java/'bin/java','-cp',unit,'DirectorQuickPlanTest')
     work=OUT/'work';shutil.rmtree(work,ignore_errors=True);work.mkdir();classes=work/'classes';classes.mkdir();gen=work/'gen';gen.mkdir();res=work/'res';res.mkdir();dex=work/'dex';dex.mkdir()
     run(tools/'aapt2','compile','--dir',PROJECT/'app/res','-o',res)
     assets=work/'assets';assets.mkdir();shutil.copy2(ROOT/'content/catalog.json',assets/'catalog.json')
     manifest=PROJECT/'app/AndroidManifest.xml'
     if DIRECTOR:
         manifest=work/'AndroidManifest.xml'
-        text=(PROJECT/'app/AndroidManifest.xml').read_text().replace('com.luixifer.autostudio.lab04',PACKAGE).replace('android:versionCode="4"','android:versionCode="2"').replace('0.4.0-lab','director-0.1.1-lab').replace('android:label="@string/app_name"','android:label="AutoStudio Director LAB 2"')
+        text=(PROJECT/'app/AndroidManifest.xml').read_text().replace('com.luixifer.autostudio.lab04',PACKAGE).replace('android:versionCode="4"','android:versionCode="3"').replace('0.4.0-lab','director-0.2.0-lab').replace('android:label="@string/app_name"','android:label="AutoStudio Director Fácil LAB 3"')
         text=text.replace('com.luixifer.autostudio.MainActivity" android:exported="true"','com.luixifer.autostudio.DirectorActivity" android:exported="true"').replace('    <activity android:name="com.luixifer.autostudio.DirectorActivity" android:exported="false"/>\n','')
         manifest.write_text(text)
     run(tools/'aapt2','link','-A',assets,'-I',platform,'--manifest',manifest,'--java',gen,'-o',work/'base.apk',*sorted(res.glob('*.flat')))
@@ -52,7 +53,7 @@ def main():
         with zipfile.ZipFile(work/'test-base.apk','a') as z:
             for f in testdex.glob('*.dex'):z.write(f,f.name,compress_type=zipfile.ZIP_STORED)
         sign(work/'test-base.apk',OUT/'autostudio-instrumentation.apk')
-    info={'schema':1,'application_id':PACKAGE,'version_name':'director-0.1.1-lab' if DIRECTOR else '0.4.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
+    info={'schema':1,'application_id':PACKAGE,'version_name':'director-0.2.0-lab' if DIRECTOR else '0.4.0-lab','signing':'debug-only; no release credentials','architectures':'Java DEX, no native libraries; runs on ARM64 or x86_64 Android API 26+','apk':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'github_run_id':os.environ.get('GITHUB_RUN_ID'),'worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'physical_samsung_tested':False}
     info['published_topic_ids']=[t['id'] for t in json.loads((ROOT/'content/catalog.json').read_text())['topics'] if t.get('published',True)]
     info['catalog_sha256']=hashlib.sha256((ROOT/'content/catalog.json').read_bytes()).hexdigest()
     (OUT/'apk-info.json').write_text(json.dumps(info,indent=2)+'\n');(OUT/'SHA256SUMS').write_text(info['sha256']+'  '+target.name+'\n');print('REAL_APK',target)
