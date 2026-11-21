@@ -3,7 +3,7 @@ Never places documentary MP4s, input packages, keys or credentials in Git.
 """
 import json,os,re,shutil,subprocess,tempfile
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];BRANCH='director-preview'
+ROOT=Path(__file__).resolve().parents[2];BRANCH=os.environ.get('DIRECTOR_EVIDENCE_BRANCH','director-preview')
 def git(*args,cwd=ROOT):return subprocess.check_output(['git',*args],cwd=cwd,text=True).strip()
 def publish(error=None):
  if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='Luixifer/AutoStudio':raise RuntimeError('Genuine workflow only')
@@ -23,7 +23,7 @@ def publish(error=None):
    if p.suffix in ('.txt','.json','.log'):
     text=p.read_text(errors='replace')[-300000:];text=re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)\b','[REDACTED]',text);(dest/p.name).write_text(text)
    elif p.stat().st_size<5*1024*1024:shutil.copy2(p,dest/p.name)
-  for name in ['AutoStudio-Director-2.0.0-lab.apk','apk-info.json','SHA256SUMS']:
+  for name in [Path(os.environ.get('DIRECTOR_CHECK_APK','build/android/AutoStudio-Director-2.0.0-lab.apk')).name,'apk-info.json','SHA256SUMS']:
    p=ROOT/'build/android'/name
    if p.is_file() and p.stat().st_size<2*1024*1024:shutil.copy2(p,dest/p.name)
   (tree/'latest.json').write_text(json.dumps(metadata,indent=2)+'\n');(dest/'attempt.json').write_text(json.dumps(metadata,indent=2)+'\n')

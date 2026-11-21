@@ -1,0 +1,92 @@
+name: AutoStudio Fácil · APK y recorrido real
+run-name: AutoStudio Fácil · evaluación · ${{ github.run_number }}
+on:
+  push:
+    branches: ['codex/director-mobile-simplify']
+    paths: ['triggers/director-easy-check.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-director-easy-evaluation
+  cancel-in-progress: true
+jobs:
+  android-and-render:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      actions: write
+    env:
+      AUTOSTUDIO_DIRECTOR_BUILD: '1'
+      AUTOSTUDIO_EASY_BUILD: '1'
+      DIRECTOR_CHECK_APK: build/android/AutoStudio-Director-2.1.0-facil-lab.apk
+      DIRECTOR_EVIDENCE_BRANCH: director-easy-evidence
+      AUTOSTUDIO_EMULATOR_APK: build/android/AutoStudio-Director-2.1.0-facil-lab.apk
+      ANDROID_IMAGE: system-images;android-35;google_apis;x86_64
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Herramientas oficiales y dependencias libres
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          echo "ANDROID_USER_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
+          echo "ANDROID_AVD_HOME=$RUNNER_TEMP/autostudio-android/avd" >> "$GITHUB_ENV"
+          echo "ANDROID_EMULATOR_HOME=$RUNNER_TEMP/autostudio-android" >> "$GITHUB_ENV"
+          (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools' emulator "$ANDROID_IMAGE"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+          mkdir -p reports/director
+      - name: Auditar entrada real anterior sin publicar material privado
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.director.audit_remote --out reports/director/source-audit.json
+      - name: Regresiones, compilación y firma reales
+        run: |
+          python -m unittest discover -s tests -v > reports/director/tests.txt 2>&1
+          python android/build.py > reports/director/build.txt 2>&1
+      - name: Crear material técnico identificado, sin APIs de imágenes
+        run: |
+          python scripts/fetch_voice.py
+          python -m scripts.director.fixture --with-imported-audio --out "$RUNNER_TEMP/director-fixture"
+      - name: Android 15 real y prueba APK → Actions → MP4
+        env:
+          ANDROID_TEST_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -e /dev/kvm ]; then echo 'Sin KVM: no se simula validación Android.'; exit 1; fi
+          sudo setfacl -m "u:$USER:rw" /dev/kvm
+          python android/start_emulator.py > reports/director/emulator-start.txt 2>&1
+          adb shell am force-stop com.google.android.apps.nexuslauncher
+          adb shell run-as com.luixifer.autostudio.director.lab05 mkdir -p files/director-projects/11111111111111111111111111111111
+          tar -C "$RUNNER_TEMP/director-fixture" -cf - . | adb shell run-as com.luixifer.autostudio.director.lab05 tar -C files/director-projects/11111111111111111111111111111111 -xf -
+          adb shell am instrument -w -r -e githubToken "$ANDROID_TEST_GITHUB_TOKEN" com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/instrumentation.txt
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-qa/roundtrip.json > reports/director/roundtrip.json
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-qa/preview.png > reports/director/preview.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-qa/simple-editor.png > reports/director/simple-editor.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-qa/step1-script.png > reports/director/step1-script.png
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-projects/11111111111111111111111111111111/documental-REVISION.mp4 > reports/director/ensayo-tecnico-NO-HESSDALEN.mp4
+          python -c 'import json; assert json.load(open("reports/director/roundtrip.json"))["passed"]'
+      - name: Cerrar proceso, recuperar proyecto y exportar en Descargas
+        run: |
+          adb shell am force-stop com.luixifer.autostudio.director.lab05
+          adb shell am instrument -w -r -e mode recovery com.luixifer.autostudio.director.test/com.luixifer.autostudio.test.DirectorInstrumentation > reports/director/recovery-instrumentation.txt
+          adb exec-out run-as com.luixifer.autostudio.director.lab05 cat files/director-qa/recovery.json > reports/director/recovery.json
+          python -c 'import json; assert json.load(open("reports/director/recovery.json"))["passed"]'
+      - name: Entregar APK y evidencia real fuera de Git
+        if: ${{ always() }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DIRECTOR_CHECK_STATUS: ${{ job.status }}
+        run: python -m scripts.director.publish_check
+      - name: Detener Android aislado
+        if: ${{ always() }}
+        run: "$ANDROID_HOME/platform-tools/adb emu kill || true"
+
