@@ -21,6 +21,12 @@ def paths(value):
   for v in value:found.update(paths(v))
  return found
 
+def chapter_identity(project,chapter,root):
+ document=chapter_doc(project,chapter)
+ code_root=Path(__file__).resolve().parents[2]
+ renderer={name:digest(code_root/name) for name in ('scripts/director/engine.py','scripts/director/narration.py','scripts/director/captions.py','scripts/director/text.py','scripts/director/project.py','scripts/personal_editor.py','assets/voice-models.json')}
+ return fingerprint({'document':document,'input_sha256':{name:digest(Path(root)/name) for name in sorted(paths(document))},'renderer_sha256':renderer,'ffmpeg':subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0]})
+
 def split(project_path,out):
  source=Path(project_path);p=load(source);root=source.parent;out=Path(out);out.mkdir(parents=True,exist_ok=True)
  if any(s.get('effects') for c in p['chapters'] for s in c['scenes']):raise ValueError('El reparto portátil aún no admite efectos por escena; el montaje completo sí')
@@ -32,7 +38,7 @@ def split(project_path,out):
   with zipfile.ZipFile(target,'w',zipfile.ZIP_STORED) as z:
    z.writestr('project.json',json.dumps(document,ensure_ascii=False,indent=2)+'\n')
    for name in sorted(required):z.write(root/name,name)
-  plan['chapters'].append({'id':chapter['id'],'input':target.name,'input_sha256':digest(target),'document_sha256':fingerprint(document),'rendered':'rendered-'+chapter['id']+'.zip'})
+  plan['chapters'].append({'id':chapter['id'],'input':target.name,'input_sha256':digest(target),'document_sha256':chapter_identity(p,chapter,root),'rendered':'rendered-'+chapter['id']+'.zip'})
  if p.get('music'):
   folder=out/'assembly-media';folder.mkdir(exist_ok=True);m=p['music'];name='music'+Path(m['path']).suffix.lower();shutil.copy2(root/m['path'],folder/name);plan['music']={**m,'path':'assembly-media/'+name,'sha256':digest(folder/name)}
  atomic_json(out/'assembly.json',plan);return out/'assembly.json'
@@ -44,6 +50,11 @@ def package_render(project_path,render_dir,chapter_id,out):
  render=Path(render_dir);timeline=json.loads((render/'timeline.json').read_text());scenes=[s for s in timeline['scenes'] if s['chapter']==chapter_id]
  if [s['id'] for s in scenes]!=[s['id'] for s in chapter['scenes']]:raise ValueError('El capítulo renderizado no corresponde al guion')
  if timeline['project_sha256']!=digest(project_path):raise ValueError('El proyecto cambió después de renderizar')
+ from scripts.director.engine import scene_cache_key
+ for index,(source,rendered) in enumerate(zip(chapter['scenes'],scenes)):
+  envelope={**source,'_incoming_seconds':rendered.get('narration_offset',0),'_outgoing':index<len(scenes)-1,'_strict':p.get('scene_policy')=='paragraph/1'}
+  if scene_cache_key(envelope,p,Path(project_path).parent)!=rendered['key']:raise ValueError('El recurso o renderizador cambió después de completar el capítulo')
+
  base=render/chapter_id;video=base/'chapter.mp4';audio=base/'voice.wav';seconds=pcm_seconds(audio);offset=scenes[0]['start']
  # Use actual measured word timings and the scene order used by the render.
  from scripts.personal_editor import caption_groups
@@ -57,7 +68,7 @@ def package_render(project_path,render_dir,chapter_id,out):
   for s in scenes:cues.extend({**c,'start':c['start']+s['start']-offset,'end':c['end']+s['start']-offset} for c in caption_groups(s['words']))
  v=next(s for s in probe(video)['streams'] if s['codec_type']=='video')
  if abs(float(v['duration'])-seconds)>.06:raise ValueError('El vídeo y el PCM del capítulo no coinciden')
- header={'schema':'autostudio-director-rendered/1','id':chapter_id,'document_sha256':fingerprint(chapter_doc(p,chapter)),'video_sha256':digest(video),'voice_sha256':digest(audio),'format':p['format'],'fps':p.get('fps',30),'duration':seconds,'cues':cues,'human_artistic_approved':False}
+ header={'schema':'autostudio-director-rendered/1','id':chapter_id,'document_sha256':chapter_identity(p,chapter,Path(project_path).parent),'video_sha256':digest(video),'voice_sha256':digest(audio),'format':p['format'],'fps':p.get('fps',30),'duration':seconds,'cues':cues,'human_artistic_approved':False}
  out=Path(out);out.parent.mkdir(parents=True,exist_ok=True)
  if video.stat().st_size+audio.stat().st_size>=2*1024**3:raise ValueError('Capítulo superior a 2 GiB; divídelo')
  with zipfile.ZipFile(out,'w',zipfile.ZIP_STORED) as z:z.write(video,'chapter.mp4');z.write(audio,'voice.wav');z.writestr('chapter.json',json.dumps(header,ensure_ascii=False,indent=2)+'\n')
