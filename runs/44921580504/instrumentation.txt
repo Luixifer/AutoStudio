@@ -1,0 +1,17 @@
+INSTRUMENTATION_RESULT: stream={
+  "passed": true,
+  "request_id": "d8513c26689b4639b1a70dfc69cf20d5",
+  "github_run_id": "44921902299",
+  "sha256": "6bbb490cc3b68674369f30e8d91c0cc5d0e2c32caf2a7ca6ce09e0fe741a084b",
+  "duration": 10.766667,
+  "native_playback_position_ms": 2836,
+  "actual_video_frame_rendered": true,
+  "simple_editor_title_text_multiple_images": true,
+  "automatic_scene_association_preserves_script": true,
+  "project_zip_backup_restored": true,
+  "settings_contents_write_instructions_verified": true,
+  "native_network_probes": 2,
+  "input_method": "File URI through real ContentResolver; SAF picker UI requires human test",
+  "physical_samsung_tested": false
+}
+INSTRUMENTATION_CODE: -1
