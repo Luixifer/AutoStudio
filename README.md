@@ -1,3 +1,5 @@
+> **Director 2 — párrafos y escenas verificables:** [APK, auditoría y documentación](docs/director2/README.md), rama `codex/director-2-scene-integrity`. Mantiene las versiones estables anteriores. No se ha validado todavía el capítulo completo de Hessdalen ni una producción de una hora.
+
 > **AutoStudio Director LAB** se desarrolla en la rama independiente `codex/autostudio-director`. [Auditoría, motor documental y guía Android](docs/director/README.md). Conserva las versiones anteriores. No se ha producido todavía el documental de Hessdalen con materiales del usuario.
 
 # AutoStudio 0.2 — escenas y voz neuronal

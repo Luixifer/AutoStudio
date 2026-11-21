@@ -1,0 +1,11 @@
+{
+  "chapters": [{
+    "id": "hessdalen-capitulo-1",
+    "title": "Las misteriosas luces de Hessdalen",
+    "scenes": [
+      {"id": "hessdalen-001", "text": "Sustituye este texto por el primer párrafo de tu guion."},
+      {"id": "hessdalen-002", "text": "Sustituye este texto por el segundo párrafo de tu guion."},
+      {"id": "hessdalen-003", "text": "Sustituye este texto por el tercer párrafo de tu guion."}
+    ]
+  }]
+}

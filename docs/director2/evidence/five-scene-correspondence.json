@@ -1,0 +1,229 @@
+{
+  "schema": "scene-correspondence/1",
+  "passed": true,
+  "errors": [],
+  "scenes": [
+    {
+      "id": "paragraph-1",
+      "position": 0,
+      "media": "media/paragraph-1.jpg",
+      "media_sha256": "9ed9086bf765f439c51f23810cdd578ac8187178b7ff3516bd76467d80572c90",
+      "original_text": "El cielo puede convertirse en una pantalla de luz sin que nadie encienda un foco. Las auroras aparecen cuando partículas energéticas encuentran la atmósfera y transfieren energía a sus gases. Esa energía termina liberándose en forma de luz. La ilustración de esta escena muestra cortinas luminosas sobre un paisaje frío. Es una recreación artística, no una fotografía ni una medida científica. El campo magnético terrestre ayuda a explicar por qué estos fenómenos se observan con más frecuencia cerca de las regiones polares. Sin embargo, una explicación general no permite identificar cualquier luz desconocida que aparezca en una grabación. Para investigar un caso concreto hacen falta datos sobre el lugar, la hora, la orientación de la cámara y las condiciones del cielo. También resulta importante distinguir lo observado de lo interpretado. Esta primera escena debe conservar su paisaje durante toda la explicación, hasta que termine la última palabra de este párrafo.",
+      "narration_start": 0,
+      "narration_end": 63.000625,
+      "voice_seconds": 63.000625,
+      "visual_seconds": 63.53333333333333,
+      "frames": [
+        {
+          "time": 0.06666666666666667,
+          "mean_absolute_error": 0.000555,
+          "passed": true
+        },
+        {
+          "time": 15.766666666666667,
+          "mean_absolute_error": 0.000728,
+          "passed": true
+        },
+        {
+          "time": 31.533333333333335,
+          "mean_absolute_error": 0.000823,
+          "passed": true
+        },
+        {
+          "time": 47.266666666666666,
+          "mean_absolute_error": 0.000761,
+          "passed": true
+        },
+        {
+          "time": 62.96666666666667,
+          "mean_absolute_error": 0.000493,
+          "passed": true
+        }
+      ],
+      "caption_text_exact": true,
+      "caption_bounds_valid": true,
+      "input_hash_valid": true,
+      "assembled_narration_correlation": 1.0,
+      "assembled_narration_matches": true,
+      "passed": true
+    },
+    {
+      "id": "paragraph-2",
+      "position": 1,
+      "media": "media/paragraph-2.jpg",
+      "media_sha256": "078aeb1a3f26794ac2f29b94e80aebe2e4ae0bdd1a1d6d6372f98067e835ba1c",
+      "original_text": "Ahora viajamos al interior de una célula representada mediante un modelo artístico. La imagen cambia porque comienza otro párrafo y otra explicación. El material hereditario contiene instrucciones que intervienen en numerosos procesos biológicos, pero no funciona como un plano sencillo que determine por sí solo cada rasgo de un organismo. La actividad de los genes depende de mecanismos de regulación y de su relación con el entorno celular. Las moléculas reales son mucho más pequeñas que cualquier objeto que podamos observar directamente a simple vista. Por eso se utilizan modelos, técnicas de microscopía y métodos experimentales complementarios. Una representación con colores vivos puede ayudar a entender una estructura, siempre que se explique qué partes son convenciones visuales. No debemos confundir un dibujo didáctico con una observación directa. El siguiente recurso no debe aparecer mientras todavía se están pronunciando las palabras finales de esta escena.",
+      "narration_start": 63.96666666666666,
+      "narration_end": 125.82124999999999,
+      "voice_seconds": 61.85458333333333,
+      "visual_seconds": 62.8,
+      "frames": [
+        {
+          "time": 64.03333333333333,
+          "mean_absolute_error": 0.000834,
+          "passed": true
+        },
+        {
+          "time": 79.43333333333334,
+          "mean_absolute_error": 0.001205,
+          "passed": true
+        },
+        {
+          "time": 94.9,
+          "mean_absolute_error": 0.001591,
+          "passed": true
+        },
+        {
+          "time": 110.36666666666666,
+          "mean_absolute_error": 0.001233,
+          "passed": true
+        },
+        {
+          "time": 125.8,
+          "mean_absolute_error": 0.000618,
+          "passed": true
+        }
+      ],
+      "caption_text_exact": true,
+      "caption_bounds_valid": true,
+      "input_hash_valid": true,
+      "assembled_narration_correlation": 0.993178,
+      "assembled_narration_matches": true,
+      "passed": true
+    },
+    {
+      "id": "paragraph-3",
+      "position": 2,
+      "media": "media/paragraph-3.jpg",
+      "media_sha256": "3fd6bb2ff3fcf03340f8f72b08a906ecf78b9e1252084615cdd3e435e06d3338",
+      "original_text": "Un volcán es una ventana parcial a procesos que ocurren bajo nuestros pies. Esta escena utiliza una ilustración original de un paisaje volcánico para acompañar una explicación general. El magma puede ascender a través de fracturas y sistemas complejos de conductos. La forma de una erupción depende de factores como la composición del material, la presencia de gases y las condiciones del sistema. No todos los volcanes se comportan del mismo modo, ni todas las erupciones pueden anticiparse con precisión. Los equipos de vigilancia combinan distintas observaciones, entre ellas la sismicidad, las deformaciones del terreno y el estudio de gases. Ninguna señal aislada debe interpretarse fuera de contexto. La gestión del riesgo también incluye comunicación, planificación y respeto por las indicaciones de las autoridades locales. Solo después podrá comenzar la transición hacia la siguiente escena, sin mezclar las dos locuciones.",
+      "narration_start": 126.76666666666667,
+      "narration_end": 186.30654166666667,
+      "voice_seconds": 59.539875,
+      "visual_seconds": 60.5,
+      "frames": [
+        {
+          "time": 126.83333333333333,
+          "mean_absolute_error": 0.000463,
+          "passed": true
+        },
+        {
+          "time": 141.66666666666666,
+          "mean_absolute_error": 0.000526,
+          "passed": true
+        },
+        {
+          "time": 156.56666666666666,
+          "mean_absolute_error": 0.000857,
+          "passed": true
+        },
+        {
+          "time": 171.43333333333334,
+          "mean_absolute_error": 0.000747,
+          "passed": true
+        },
+        {
+          "time": 186.26666666666668,
+          "mean_absolute_error": 0.000761,
+          "passed": true
+        }
+      ],
+      "caption_text_exact": true,
+      "caption_bounds_valid": true,
+      "input_hash_valid": true,
+      "assembled_narration_correlation": 0.993523,
+      "assembled_narration_matches": true,
+      "passed": true
+    },
+    {
+      "id": "paragraph-4",
+      "position": 3,
+      "media": "media/paragraph-4.jpg",
+      "media_sha256": "f7ba2a9f5793227dac011c3c6d1bfd68e3758879da9e10239c9568d427c0d5f7",
+      "original_text": "Volvemos a las moléculas para observar otro encuadre de la doble hélice. Aunque esta ilustración pertenece al mismo tema general que una escena anterior, es un archivo distinto y tiene una asociación propia con este párrafo. La forma de un modelo no explica por sí sola todas las funciones del material genético. En la célula intervienen proteínas, mecanismos de reparación y numerosos procesos coordinados. Las analogías con libros y códigos pueden resultar útiles, pero también tienen límites. Un organismo no es un programa informático que se ejecute de manera idéntica en cualquier situación. La investigación necesita comparar organismos, medir cambios y comprobar explicaciones mediante experimentos. También es necesario comunicar la incertidumbre con claridad. Por eso verificamos cada escena mediante su identificador, la huella de su archivo y los tiempos reales de su narración, sin reutilizar recursos por conveniencia.",
+      "narration_start": 187.26666666666665,
+      "narration_end": 246.09387499999997,
+      "voice_seconds": 58.82720833333333,
+      "visual_seconds": 59.766666666666666,
+      "frames": [
+        {
+          "time": 187.33333333333334,
+          "mean_absolute_error": 0.00058,
+          "passed": true
+        },
+        {
+          "time": 202.0,
+          "mean_absolute_error": 0.000769,
+          "passed": true
+        },
+        {
+          "time": 216.7,
+          "mean_absolute_error": 0.000785,
+          "passed": true
+        },
+        {
+          "time": 231.4,
+          "mean_absolute_error": 0.000779,
+          "passed": true
+        },
+        {
+          "time": 246.06666666666666,
+          "mean_absolute_error": 0.000817,
+          "passed": true
+        }
+      ],
+      "caption_text_exact": true,
+      "caption_bounds_valid": true,
+      "input_hash_valid": true,
+      "assembled_narration_correlation": 0.993087,
+      "assembled_narration_matches": true,
+      "passed": true
+    },
+    {
+      "id": "paragraph-5",
+      "position": 4,
+      "media": "media/paragraph-5.jpg",
+      "media_sha256": "2068b3aa64b1a3a2028605b4c7e1d6cc3082c5fa2f995dd66068ee6025b7c42b",
+      "original_text": "Terminamos con otra vista del cielo terrestre, diferente de la primera ilustración. Una imagen del planeta invita a pensar en escalas que no percibimos durante la vida cotidiana. La atmósfera parece una frontera tenue cuando se representa desde el espacio, pero alberga procesos físicos complejos y cambiantes. Para comprenderlos se combinan observaciones desde tierra, instrumentos a distintas alturas y modelos que se contrastan con datos. Cada herramienta responde a unas preguntas y deja otras abiertas. Esa es una idea importante para cualquier documental de ciencia, historia o misterio: explicar lo que sabemos no exige fingir que lo sabemos todo. Las hipótesis deben distinguirse de los hechos, y las recreaciones deben identificarse como tales. En esta prueba hemos recorrido cinco párrafos con cinco ilustraciones diferentes. Una buena historia termina dejando una pregunta valiosa y una explicación que el espectador puede comprobar.",
+      "narration_start": 247.0333333333333,
+      "narration_end": 306.816,
+      "voice_seconds": 59.782666666666664,
+      "visual_seconds": 60.733333333333334,
+      "frames": [
+        {
+          "time": 247.1,
+          "mean_absolute_error": 0.000765,
+          "passed": true
+        },
+        {
+          "time": 262.0,
+          "mean_absolute_error": 0.000788,
+          "passed": true
+        },
+        {
+          "time": 276.93333333333334,
+          "mean_absolute_error": 0.000909,
+          "passed": true
+        },
+        {
+          "time": 291.9,
+          "mean_absolute_error": 0.000619,
+          "passed": true
+        },
+        {
+          "time": 306.8,
+          "mean_absolute_error": 0.000915,
+          "passed": true
+        }
+      ],
+      "caption_text_exact": true,
+      "caption_bounds_valid": true,
+      "input_hash_valid": true,
+      "assembled_narration_correlation": 0.993146,
+      "assembled_narration_matches": true,
+      "passed": true
+    }
+  ],
+  "scope": "Decoded samples at beginning, quarter, middle, three quarters and end of every narration; compared to its source-bound scene render. Not semantic image analysis or human listening approval.",
+  "human_approved": false
+}

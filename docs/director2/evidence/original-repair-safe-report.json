@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "source_request": "9126b046336b46028f9ffcd6b13ba31e",
+  "new_request": "cb4e6a368114fa095418894c17f51840",
+  "run_id": "44922706382",
+  "source_commit": "e20295681d279f421fa37985e42c6ed75f5ee412",
+  "paragraphs": 3,
+  "scenes": 3,
+  "seconds": 6.566667,
+  "mp4_sha256": "4a026c7719168538c8d5564573c9b4f8f2380b6a1fdc06370606a376602b6946",
+  "private_release_url": "https://github.com/Luixifer/AutoStudio/releases/tag/untagged-8fb7717f71224f63922d",
+  "requires_repository_owner_login": true,
+  "original_release_unchanged": true,
+  "downloaded_result_sha256_verified": true,
+  "topic_hessdalen": false,
+  "contains_user_material": true,
+  "publication": "New private draft only. No source text or images in public diagnostic.",
+  "human_listening_approved": false
+}
