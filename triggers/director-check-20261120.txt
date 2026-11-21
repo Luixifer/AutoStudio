@@ -15,3 +15,4 @@ Director 2: cada párrafo es una escena; recursos persistentes, transiciones en 
 Director 2 final: guardado automático de tarjetas, encuadre elegible, rechazo de recursos faltantes, y pruebas de caché y voz por frases.
 Final Android: selector de cámara reversible; comprobación de todas las tarjetas y guardado. El documental largo está validándose en la ejecución anterior independiente.
 Final de integración: Markdown y JSON conservan capítulos e IDs; selector de cámara reversible y guardado de tarjetas.
+Usabilidad final: narrador, música y subtítulos accesibles antes de la lista de escenas; conservar cada asociación.

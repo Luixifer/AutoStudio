@@ -50,6 +50,8 @@ public class DirectorActivity extends Activity {
  private void showQuick()throws Exception{
   LinearLayout frame=Ui.root(this,"Tu documental");body=Ui.scroll(this,frame);status=Ui.para(body,"Un párrafo = una escena = un recurso. La locución fija su duración.");
   title=new EditText(this);title.setId(2401);title.setSingleLine(true);title.setHint("Título del documental");title.setText(project.optString("title"));body.addView(title);title.setOnFocusChangeListener((v,f)->{if(!f&&!busy)saveTitle();});quickText=null;
+  Ui.para(body,"Voz: "+(project.getJSONObject("voice").optString("voice").equals("em_santa")?"Santa":project.getJSONObject("voice").optString("voice").equals("ef_dora")?"Dora":"Álex")+" · "+(project.optString("format").equals("vertical")?"Vertical":"Horizontal")+" · "+(project.has("music")?"Música añadida":"Sin música"));
+  Ui.button(body,"Narrador, música y subtítulos",2404,false).setOnClickListener(v->{if(busy)return;saveTitle();showQuickOptions();});
   boolean prepared=project.optString("scene_policy").equals("paragraph/1");
   if(!prepared){Ui.para(body,"Pega el guion con una línea en blanco entre párrafos. No se dividirán ni se repetirán automáticamente.");quickText=new EditText(this);quickText.setId(2402);quickText.setGravity(android.view.Gravity.TOP);quickText.setMinLines(5);quickText.setMaxLines(9);quickText.setHint("Párrafo 1\n\nPárrafo 2\n\nPárrafo 3");quickText.setText(project.getJSONObject("_quick").optString("text"));body.addView(quickText);}
   Ui.button(body,"Importar guion TXT, Markdown o JSON",2405,false).setOnClickListener(v->{if(busy)return;saveTitle();pick("*/*",31);});
@@ -61,7 +63,6 @@ public class DirectorActivity extends Activity {
    LinearLayout row=new LinearLayout(this);card.addView(row);for(int delta:new int[]{-1,1}){Button move=new Button(this);move.setText(delta<0?"Subir escena":"Bajar escena");row.addView(move,new LinearLayout.LayoutParams(0,Ui.dp(this,52),1));move.setEnabled(flat+delta>=0&&flat+delta<DirectorStore.allScenes(project).size());move.setOnClickListener(v->{if(busy)return;saveTitle();try{DirectorStore.moveScene(project,flat,delta);store.save(projectId,project);show();}catch(Exception e){Ui.error(this,e.getMessage());}});}
   }}
   Ui.para(body,"Los recursos se asignan una sola vez a los párrafos sin recurso. Reordenar una escena mueve juntos su texto y su imagen o vídeo.");
-  Ui.button(body,"Narrador, música y subtítulos",2404,false).setOnClickListener(v->{if(busy)return;saveTitle();showQuickOptions();});
   File jobFile=new File(store.folder(projectId),"job.json");boolean ready=jobFile.isFile()&&DirectorStore.read(jobFile).optString("stage").equals("READY");
   if(jobFile.isFile()&&!ready)Ui.button(body,"Consultar progreso",2107,false).setOnClickListener(v->refresh());
   if(ready){status.setText("Último documental listo. Los cambios posteriores requieren generar otra versión.");Ui.button(frame,"Ver mi documental",2119,true).setOnClickListener(v->startActivity(new Intent(this,Preview.class).putExtra("project_id",projectId)));Ui.button(body,"Generar otra versión",2106,false).setOnClickListener(v->generate());}else Ui.button(frame,"Generar documental",2106,true).setOnClickListener(v->generate());
