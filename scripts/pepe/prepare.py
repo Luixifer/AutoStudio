@@ -3,6 +3,7 @@ import json,hashlib,argparse,shutil
 from pathlib import Path
 from scripts.director.engine import narrate,pcm_seconds
 from scripts.director.subshots import resolve
+from scripts.pepe.voice import ChildNarrator,PERFORMANCE
 ROOT=Path(__file__).resolve().parents[2]
 CUTS=['brillaba al sol.','«¡quiquiriquí!».','entre las flores.','no se podía cruzar.','«¡No sé volver!».','¡Voy a ayudarte!».','movió las alas y...','Pero la tabla era corta.','Nube, el conejito.','«Un pasito... y otro pasito...».','a abrazar a Pepe.','Pepe sonrió.','Bueno... ¡casi siempre!']
 BRIEFS=[
@@ -25,16 +26,18 @@ def prepare(out):
  source=ROOT/'content/pepe-el-gallo-travieso-episodio-1/guion.txt';raw=source.read_text();paragraphs=[p.strip() for p in raw.strip().split('\n\n') if p.strip()]
  if len(paragraphs)!=13:raise ValueError('El guion debe conservar 13 párrafos')
  config={'schema':'autostudio-director/1','title':'Pepe el Gallo Travieso · El gran rescate de Pío','scene_policy':'paragraph/1','youtube_enabled':False,'format':'horizontal','fps':30,'voice':{'mode':'kokoro','voice':'ef_dora'},'subtitles':{'enabled':False,'style':'documentary'}}
- scenes=[];shots=[];narrators={};total=0
+ scenes=[];shots=[];narrators={'ef_dora':ChildNarrator()};total=0
  for i,(text,cut) in enumerate(zip(paragraphs,CUTS)):
   split=text.index(cut)+len(cut);left=text[:split].strip();right=text[split:].strip()
   assert left and right and (left+' '+right).split()==text.split()
   scene={'id':f'pepe-e01-s{i+1:02}','narration':text,'pause_after':4 if i==12 else .45,'transition':{'type':'dissolve','seconds':.25},'subshots':[]}
   voicefolder=out/f'voice-{i+1:02}';voicefolder.mkdir(exist_ok=True);marker=voicefolder/'metadata.json'
-  if marker.is_file():
+  if marker.is_file() and json.loads(marker.read_text()).get('performance')==PERFORMANCE:
    meta=json.loads(marker.read_text());assert meta['text_sha256']==hashlib.sha256(text.encode()).hexdigest();path=voicefolder/'spoken.wav';words=meta['words']
   else:
-   path,words,info=narrate(scene,config,out,voicefolder,narrators);meta={'words':words,'voice':info,'text_sha256':hashlib.sha256(text.encode()).hexdigest(),'seconds':pcm_seconds(path)};marker.write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+   if marker.is_file():
+    shutil.copy2(marker,voicefolder/'metadata-before-preschool.json');shutil.copy2(voicefolder/'spoken.wav',voicefolder/'spoken-before-preschool.wav')
+   path,words,info=narrate(scene,config,out,voicefolder,narrators);meta={'performance':PERFORMANCE,'words':words,'voice':info,'text_sha256':hashlib.sha256(text.encode()).hexdigest(),'seconds':pcm_seconds(path)};marker.write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
   target=out/'media'/f'narration-{i+1:02}.wav';shutil.copy2(path,target);scene['voice']={'mode':'file','path':'media/'+target.name,'timed_words':words}
   for j,part in enumerate((left,right)):
    n=i*2+j+1;slug,brief=BRIEFS[n-1];shot={'id':f'pepe-e01-p{n:02}','start_phrase':part,'end_phrase':part,'media':{'kind':'image','path':f'media/shot-{n:02}.png','fit':'cover','rights':{'license':'own_creation','credit':'AutoStudio; original Blender characters, scene, materials and render; no reference-sheet crops'}},'camera':{'movement':'zoom_in' if n%2==0 else 'pan_left'},'transition':{'type':'cut','seconds':0}}

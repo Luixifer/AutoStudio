@@ -67,6 +67,11 @@ def create(root):
   pair=shots['shots'][i*2:i*2+2];incoming=0 if i==0 else .30
   for kind,slot,gain in cues.get(i,[]):
    at=pair[slot]['narration_start'] # already includes paragraph incoming silence
+   anchors={(1,'rooster'):'quiquiriquí',(2,'flutter'):'mariposa',(4,'steps'):'corrió',(6,'steps'):'Dio',(7,'wood'):'tabla',(8,'wood'):'colocaron',(9,'steps'):'pasito'}
+   token=anchors.get((i,kind))
+   if token:
+    match=next((w for w in words if token.casefold() in w['word'].casefold()),None)
+    if match:at=match['start']+incoming
    s['effects'].append({'path':f'media/sfx-{kind}.wav','at':round(at,6),'gain':gain,'rights':rights});events.append({'paragraph':s['id'],'shot':pair[slot]['id'],'kind':kind,'at_within_paragraph':at,'gain':gain})
  (root/'project.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
  files=[media/'pepe-original-music.wav',*sorted(media.glob('sfx-*.wav'))]

@@ -3,7 +3,7 @@ import argparse,json,subprocess,hashlib,tempfile,shutil,os
 from pathlib import Path
 import numpy as np
 from PIL import Image
-OIDN=Path('/workspace/autostudio-toolchain/oidn/oidn-2.3.3.x86_64.linux/bin/oidnDenoise')
+OIDN=Path(os.environ.get('AUTOSTUDIO_OIDN',shutil.which('oidnDenoise') or '/workspace/autostudio-toolchain/oidn/oidn-2.3.3.x86_64.linux/bin/oidnDenoise'))
 def denoise(source,target,tool=OIDN):
  source=Path(source);target=Path(target);im=Image.open(source).convert('RGB');rgb=np.asarray(im,dtype=np.float32)/255;h,w=rgb.shape[:2]
  with tempfile.TemporaryDirectory() as td:
@@ -16,9 +16,16 @@ def denoise(source,target,tool=OIDN):
  return {'raw_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'output_sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'native_dimensions':[w,h],'resampled':False,'tool':'Open Image Denoise 2.3.3 CPU, high quality LDR sRGB','source_url':'https://github.com/RenderKit/oidn/releases/tag/v2.3.3','license':'Apache-2.0'}
 def all_shots(root):
  root=Path(root);raw=root/'raw';raw.mkdir(exist_ok=True);records=[]
+ previous={r['shot']:r for r in json.loads((root/'denoise.json').read_text())} if (root/'denoise.json').is_file() else {}
+ typography=json.loads((root/'typography.json').read_text()) if (root/'typography.json').is_file() else {}
+ final_titles={entry.get('final_sha256') for entry in typography.values() if isinstance(entry,dict)}
  for n in range(1,27):
   image=root/'media'/f'shot-{n:02}.png';original=raw/image.name
-  if not original.exists():shutil.copy2(image,original)
+  current=hashlib.sha256(image.read_bytes()).hexdigest();old=previous.get(n,{})
+  fresh=original.exists() and old and current!=old.get('output_sha256') and current not in final_titles
+  if fresh:
+   old_sha=hashlib.sha256(original.read_bytes()).hexdigest();shutil.copy2(original,raw/(original.stem+'-previous-'+old_sha[:10]+'.png'))
+  if not original.exists() or fresh:shutil.copy2(image,original)
   record=denoise(original,image);records.append({'shot':n,**record});print('DENOISED',n,flush=True)
  (root/'denoise.json').write_text(json.dumps(records,indent=2)+'\n')
 if __name__=='__main__':

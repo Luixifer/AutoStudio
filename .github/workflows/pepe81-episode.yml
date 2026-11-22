@@ -1,0 +1,64 @@
+name: Pepe E01 · episodio completo real
+run-name: Pepe E01 · montaje completo · ${{ github.run_number }}
+on:
+  push:
+    branches: ['codex/pepe-episode-81']
+    paths: ['triggers/pepe81-episode.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: autostudio-pepe-episode-production
+  cancel-in-progress: false
+jobs:
+  produce:
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Herramientas libres · sin llamadas a servicios de pago
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install -r requirements-director.txt
+      - name: Regresiones completas
+        run: |
+          mkdir -p reports/pepe-production
+          python -m unittest discover -s tests -v > reports/pepe-production/tests.txt 2>&1
+      - name: Verificar y extraer el proyecto preparado, sin ejecutar código del ZIP
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.director.project import digest,extract_bundle
+          base=Path('content/pepe-el-gallo-travieso-episodio-1')
+          source=base/'prepared-episode-v001.zip';m=json.loads((base/'prepared-episode-v001.json').read_text())
+          assert digest(source)==m['sha256'] and source.stat().st_size==m['bytes']
+          extract_bundle(source,Path('reports/pepe-production/input'))
+          from scripts.pepe.assemble import inputs_qa
+          assert inputs_qa('reports/pepe-production/input')['passed']
+          PY
+      - name: Montar el cuento REAL con sus 26 planos, audio y efectos
+        run: python -m scripts.director.engine reports/pepe-production/input/project.json --out reports/pepe-production/render
+      - name: Decodificar el MP4 completo y contrastar su AAC real con cada narración
+        run: python -m scripts.pepe.verify --input reports/pepe-production/input --render reports/pepe-production/render --out reports/pepe-production/render/episode-quality.json
+      - name: Entregar episodio, proyecto editable y pruebas verificadas
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.pepe.publish_episode --input reports/pepe-production/input --render reports/pepe-production/render --archive content/pepe-el-gallo-travieso-episodio-1/prepared-episode-v001.zip
+      - name: Conservar diagnóstico si falla, sin publicarlo como episodio terminado
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pepe-failed-production-diagnostics
+          path: |
+            reports/pepe-production/tests.txt
+            reports/pepe-production/render/*error*.json
+            reports/pepe-production/render/validation.json
+          retention-days: 7

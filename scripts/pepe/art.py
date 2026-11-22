@@ -5,7 +5,7 @@ blender -b -t 4 --python scripts/pepe/art.py -- --out reports/pepe81/input --sho
 import bpy,math,random,json,sys,argparse,time,hashlib
 from pathlib import Path
 from mathutils import Vector
-A=argparse.ArgumentParser();A.add_argument('--out',type=Path,required=True);A.add_argument('--shots',type=int,nargs='*');A.add_argument('--preview',action='store_true');A.add_argument('--motion-start',type=int);A.add_argument('--motion-end',type=int);A.add_argument('--motion-total',type=int,default=84);args=A.parse_args(sys.argv[sys.argv.index('--')+1:]);OUT=args.out.resolve();OUT.mkdir(parents=True,exist_ok=True);(OUT/'media').mkdir(exist_ok=True)
+A=argparse.ArgumentParser();A.add_argument('--out',type=Path,required=True);A.add_argument('--shots',type=int,nargs='*');A.add_argument('--preview',action='store_true');A.add_argument('--samples',type=int,default=32);A.add_argument('--render-threads',type=int,default=4);A.add_argument('--motion-crop',action='store_true');A.add_argument('--motion-start',type=int);A.add_argument('--motion-end',type=int);A.add_argument('--motion-total',type=int,default=84);args=A.parse_args(sys.argv[sys.argv.index('--')+1:]);OUT=args.out.resolve();OUT.mkdir(parents=True,exist_ok=True);(OUT/'media').mkdir(exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True);S=bpy.context.scene;S.name='Pepe · El gran rescate de Pío';R=random.Random(81);M={};ACT={};GROUPS={}
 
 def mat(name,color,rough=.45,sub=.0,metal=0,noise=False):
@@ -197,7 +197,7 @@ for side in (-1,1):
 # Broad stepping rock is only scenery; no jump is animated.
 egg('Stream · broad gentle rock',(.18,1.2,.05),(.34,.45,.12),stone)
 
-S.render.engine='CYCLES';S.cycles.samples=32 if not args.preview else 16;S.cycles.use_denoising=False;S.cycles.max_bounces=4;S.cycles.diffuse_bounces=2;S.cycles.glossy_bounces=2;S.cycles.use_adaptive_sampling=True;S.cycles.adaptive_threshold=.08;S.render.threads_mode='FIXED';S.render.threads=4;S.render.resolution_x=1920;S.render.resolution_y=1080;S.render.resolution_percentage=50 if args.preview else 100;S.render.image_settings.file_format='PNG';S.render.image_settings.color_mode='RGB';S.render.film_transparent=False;S.view_settings.view_transform='AgX';S.view_settings.look='AgX - Medium High Contrast';S.render.fps=30
+S.render.engine='CYCLES';S.cycles.samples=args.samples if not args.preview else 16;S.cycles.use_denoising=False;S.cycles.max_bounces=4;S.cycles.diffuse_bounces=2;S.cycles.glossy_bounces=2;S.cycles.use_adaptive_sampling=True;S.cycles.adaptive_threshold=.08;S.render.threads_mode='FIXED';S.render.threads=args.render_threads;S.render.resolution_x=1920;S.render.resolution_y=1080;S.render.resolution_percentage=50 if args.preview else 100;S.render.image_settings.file_format='PNG';S.render.image_settings.color_mode='RGB';S.render.film_transparent=False;S.view_settings.view_transform='AgX';S.view_settings.look='AgX - Medium High Contrast';S.render.fps=30
 w=bpy.data.worlds.new('Warm pastel blue sky');w.use_nodes=True;w.node_tree.nodes['Background'].inputs[0].default_value=(.45,.69,.85,1);w.node_tree.nodes['Background'].inputs[1].default_value=.55;S.world=w
 
 def area(name,loc,power,color,size):
@@ -215,7 +215,7 @@ def visible(root,yes):
 def pose(n):
  for name,(loc,rot,scale) in BASE.items():ob=bpy.data.objects[name];ob.location=loc;ob.rotation_euler=rot;ob.scale=scale
  for root in (pepe,pio,lola,nube,butterfly,board1,board2,bridge):visible(root,False);root.rotation_euler=(0,0,0)
- visible(pepe,True);pepe.location=(-6,0,0);pio.location=(2,0,0);lola.location=(-3.1,.3,0);nube.location=(-1.45,1.0,0);butterfly.location=(-2.5,0,1.7)
+ visible(pepe,True);pepe.location=(-6,0,0);pio.location=(2,0,0);lola.location=(-3.1,.3,0);nube.location=(-4.10,-.35,0);butterfly.location=(-2.5,0,1.7)
  camera=(-6,-9,4.3);target=(-6,1.3,1.0);lens=42
  if n==2:camera=(-6,-4.2,2.1);target=(-6,0,1.32);lens=57;pepe.rotation_euler.z=-.12
  if n==3:camera=(-6,-5.2,2.5);target=(-6,0,1.05);lens=50;ACT['pepe_wing_-1'].rotation_euler.y=-.55;ACT['pepe_wing_1'].rotation_euler.y=.30
@@ -224,6 +224,7 @@ def pose(n):
   visible(pepe,False);visible(pio,True);visible(butterfly,True);pio.location=(-3.1 if n==5 else -2.1,.6 if n==5 else 1.2,0);butterfly.location=(pio.location.x+.48,pio.location.y+.08,1.18);camera=(pio.location.x,-4.3,2.1);target=(pio.location.x+.15,.6,.65);lens=51 if n==5 else 39
  if n in (7,8,9):
   visible(pepe,False);visible(pio,True);camera=(0,-9,4.8) if n==7 else (1,-4.7,2.2);target=(0,1,.2) if n==7 else (2,0,.55);lens=40 if n==7 else 52
+ if n==9:camera=(2,-2.9,1.25);target=(2,0,.67);lens=57;pio.rotation_euler.z=-.08
  if n==7:pio.location=(-1.70,.5,0) # before the narrated crossing, Pío is still on the home bank
  if n==10:pepe.location=(-3.9,0,0);camera=(-4,-5.0,2.3);target=(-3.8,0,.95);lens=48;ACT['pepe_leg_-1'].rotation_euler.x=.23;ACT['pepe_leg_1'].rotation_euler.x=-.23;pepe.rotation_euler.y=-.10
  if n in (11,12,13,14,17,18,19,20,21,22):
@@ -233,14 +234,14 @@ def pose(n):
  if n==14:camera=(-1.8,-4.5,2.4);target=(-1.9,0,.95);lens=46;ACT['pepe_wing_-1'].rotation_euler.y=-.65;ACT['pepe_wing_1'].rotation_euler.y=.65
  if n in (15,16):
   pepe.location=(-4.0,.1,0);visible(board1,True);visible(board2,n==16);camera=(-3.8,-5.5,2.8);target=(-3.9,1,.65);lens=45;ACT['pepe_wing_1'].rotation_euler.y=.45
- if n in (17,18,22):visible(lola,True);visible(nube,True);camera=(-.8,-9,4.3);target=(-.8,.4,.8);lens=43
+ if n in (17,18,22):visible(lola,True);visible(nube,True);camera=(-.8,-9,4.3);target=(-.8,.4,.8);lens=40
  if n>=18 and n<=22:visible(bridge,True)
  if n==19:pio.location=(.95,-.08,.31);camera=(.3,-6.1,2.8);target=(-.15,0,.75);lens=46
  if n==20:pio.location=(-1.65,-.35,0);pepe.location=(-2.55,0,0);camera=(-1.9,-5.0,2.4);target=(-1.9,0,.9);lens=46
  if n in (21,22):
   pio.location=(-1.58,-.38,0);pepe.location=(-2.1,-.02,0);ACT['pepe_wing_1'].rotation_euler.y=.62
   if n==21:camera=(-1.85,-4.5,2.2);target=(-1.85,-.1,.9);lens=55
- if n==22:visible(butterfly,True);butterfly.location=(-2.15,0,2.35);lola.location=(-3.30,.3,0);nube.location=(-1.45,.9,0)
+ if n==22:visible(butterfly,True);butterfly.location=(-2.15,0,2.35);lola.location=(-3.30,.3,0);nube.location=(-4.20,-.25,0)
  if n in (23,24,25,26):
   key.data.color=(1,.63,.34);rim.data.color=(1,.53,.25);w.node_tree.nodes['Background'].inputs[0].default_value=(.65,.48,.46,1)
   if n>=24:visible(pio,True);pio.location=(-5.1,-.1,0)
@@ -264,7 +265,7 @@ for action in bpy.data.actions:
  for f in action.fcurves:
   for k in f.keyframe_points:k.interpolation='CONSTANT'
 S.frame_start=1;S.frame_end=26;S.camera=cameras[0];S.frame_set(1);S['production_note']='26 individual original still illustrations, shared exact geometry, object-pivot rigs, CPU Cycles. Camera movement assembled by AutoStudio. Not full character animation.';S['source_generator']='scripts/pepe/art.py';S['character_ids']='Pepe|Pío|Lola|Nube';S['continuity']='Safe/home bank x < -1; Pío starts isolated x=2; new deck appears P18; Pío crosses right-to-left P19-P20.'
-master=OUT/'pepe-e01-master-v001.blend';bpy.ops.wm.save_as_mainfile(filepath=str(master))
+master=OUT/('pepe-e01-master-v002.blend' if args.samples!=32 else 'pepe-e01-master-v001.blend');bpy.ops.wm.save_as_mainfile(filepath=str(master))
 if args.motion_start is not None:
  # Genuine 3D walk across the safe bridge, NOT a translated flat character image.
  S.frame_set(20)
@@ -287,13 +288,24 @@ if args.motion_start is not None:
  S.frame_start=1001;S.frame_end=1000+args.motion_total;S.render.fps=12;S.render.resolution_x=1280;S.render.resolution_y=720;S.render.resolution_percentage=100;S.cycles.samples=12;S['production_note']='26 source still poses at frames 1-26; actual 3D Pío bridge walk at 1001-1084, native 1280x720 at 12 fps. Assembly interpolates 30 fps; no claim of native 1080p character animation.'
  master=OUT/'pepe-e01-motion-master-v001.blend';S.frame_set(1001);S.camera=cam;bpy.ops.wm.save_as_mainfile(filepath=str(master))
  records=[];folder=OUT/'motion';folder.mkdir(exist_ok=True)
+ crop=None
+ if args.motion_crop:
+  # Original 3D region rendering over its own invariant background. No sheet crops.
+  from bpy_extras.object_utils import world_to_camera_view
+  S.frame_set(1001);S.camera=cam
+  for ob in [pio,*pio.children_recursive]:ob.hide_render=True
+  S.render.filepath=str(OUT/'motion-background.png');bpy.ops.render.render(write_still=True)
+  projected=[world_to_camera_view(S,cam,Vector((x,y,z))) for x in (-2.15,1.55) for y in (-.85,.8) for z in (-.12,1.45)]
+  w,h=1280,720;x0=max(0,int((min(p.x for p in projected)-.035)*w));x1=min(w,int((max(p.x for p in projected)+.035)*w)+1);y0=max(0,int((min(p.y for p in projected)-.035)*h));y1=min(h,int((max(p.y for p in projected)+.035)*h)+1)
+  S.render.use_border=True;S.render.use_crop_to_border=True;S.render.border_min_x=x0/w;S.render.border_max_x=x1/w;S.render.border_min_y=y0/h;S.render.border_max_y=y1/h;crop=[x0,y0,x1,y1]
+  (OUT/'motion-crop.json').write_text(json.dumps({'crop_bottom_left':crop,'canvas':[w,h],'fps':12,'frames':args.motion_total,'background':'motion-background.png','technique':'Actual Cycles region renders composited onto the same static 3D camera background; all foreground occlusions and lighting rendered in 3D.'},indent=2)+'\n')
  for k in range(args.motion_start,args.motion_end):
-  S.frame_set(1001+k);S.camera=cam;target=folder/f'frame-{k:04}.png';S.render.filepath=str(target);start=time.time();bpy.ops.render.render(write_still=True);records.append({'frame':k,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'seconds':round(time.time()-start,3),'native_dimensions':[1280,720],'fps':12,'blender_version':bpy.app.version_string});print('PEPE_MOTION',k,flush=True)
+  S.frame_set(1001+k);S.camera=cam;target=folder/f'frame-{k:04}.png';S.render.filepath=str(target);start=time.time();bpy.ops.render.render(write_still=True);records.append({'frame':k,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'seconds':round(time.time()-start,3),'native_dimensions':([crop[2]-crop[0],crop[3]-crop[1]] if crop else [1280,720]),'canvas':[1280,720],'region_render':crop,'fps':12,'blender_version':bpy.app.version_string});print('PEPE_MOTION',k,flush=True)
  (OUT/f'motion-{args.motion_start:03}.json').write_text(json.dumps(records,indent=2)+'\n')
  raise SystemExit(0)
 records=[]
 for n in (args.shots or list(range(1,27))):
  S.frame_set(n);S.camera=cameras[n-1];target=OUT/'media'/f'shot-{n:02}.png'
  if args.preview:target=OUT/f'preview-{n:02}.png'
- S.render.filepath=str(target);start=time.time();bpy.ops.render.render(write_still=True);record={'shot':n,'file':target.name,'seconds':round(time.time()-start,3),'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'native_resolution':[int(S.render.resolution_x*S.render.resolution_percentage/100),int(S.render.resolution_y*S.render.resolution_percentage/100)],'render_engine':'Cycles CPU','blender_version':bpy.app.version_string,'samples':S.cycles.samples,'reference_sheet_used':False};records.append(record);print('PEPE_RENDER',json.dumps(record),flush=True)
+ S.render.filepath=str(target);start=time.time();bpy.ops.render.render(write_still=True);record={'shot':n,'file':target.name,'seconds':round(time.time()-start,3),'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'native_resolution':[int(S.render.resolution_x*S.render.resolution_percentage/100),int(S.render.resolution_y*S.render.resolution_percentage/100)],'render_engine':'Cycles CPU','blender_version':bpy.app.version_string,'samples':S.cycles.samples,'reference_sheet_used':False};records.append(record);(OUT/f'render-shot-{n:02}.json').write_text(json.dumps(record,indent=2)+'\n');print('PEPE_RENDER',json.dumps(record),flush=True)
 (OUT/('preview-render.json' if args.preview else 'render-'+str((args.shots or [0])[0])+'.json')).write_text(json.dumps(records,indent=2)+'\n')
