@@ -3,3 +3,5 @@ Render the complete verified 13-paragraph/26-shot Pepe episode from the immutabl
 Verify final AAC with measured limiter latency, retaining strict 10 ms alignment bound.
 
 Cancel superseded incomplete production when a corrected source arrives.
+
+Include corrected final AAC verifier in the portable editable source package.
