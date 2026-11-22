@@ -1,1 +1,3 @@
 Render the complete verified 13-paragraph/26-shot Pepe episode from the immutable prepared source bundle; real final AAC and video QA required.
+
+Verify final AAC with measured limiter latency, retaining strict 10 ms alignment bound.

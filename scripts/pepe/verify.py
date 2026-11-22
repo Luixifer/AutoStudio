@@ -5,6 +5,19 @@ import numpy as np
 from scripts.director.project import probe,digest
 from scripts.director.audio import pcm
 
+def voice_alignment(voice, mixed, start, rate=16000):
+ # The existing final limiter has a measured 5 ms look-ahead. Search is
+ # bounded to 20 ms; anything beyond 10 ms is still a sync failure.
+ voice=voice.astype(np.float64);voice=voice-voice.mean();norm=np.linalg.norm(voice);best=(-1.,0)
+ for lag in range(-round(.020*rate),round(.020*rate)+1):
+  pos=start+lag
+  if pos<0 or pos+len(voice)>len(mixed):continue
+  heard=mixed[pos:pos+len(voice)].astype(np.float64);heard-=heard.mean();denom=norm*np.linalg.norm(heard)
+  correlation=float(np.dot(voice,heard)/denom) if denom>1e-12 else 0.
+  if correlation>best[0]:best=(correlation,lag)
+ correlation,lag=best
+ return {'correlation':round(correlation,6),'offset_seconds':lag/rate,'passed':correlation>.90 and abs(lag)<=round(.010*rate)}
+
 def verify(root,render,out):
  root=Path(root);render=Path(render);movie=render/'documental-REVISION.mp4';p=json.loads((root/'project.json').read_text());timeline=json.loads((render/'timeline.json').read_text());qa=json.loads((render/'validation.json').read_text());original=Path('content/pepe-el-gallo-travieso-episodio-1/guion.txt').read_text().strip().split('\n\n');scenes=timeline['scenes'];errors=[]
  if not qa.get('passed'):errors.append('Director technical QA failed')
@@ -30,12 +43,8 @@ def verify(root,render,out):
  # This is deliberately the decoded AAC from the final film, not its dry WAV.
  decoded=subprocess.run(['ffmpeg','-v','error','-nostdin','-i',str(movie),'-vn','-ac','1','-ar','16000','-f','f32le','pipe:1'],capture_output=True,check=True,timeout=900);mixed=np.frombuffer(decoded.stdout,'<f4');dry=pcm(render/'narration.wav',600);checks=[]
  for scene in scenes:
-  a=round(scene['narration_start']*16000)+800;b=min(round(scene['narration_end']*16000)-800,len(dry));voice=dry[a:b];scores=[]
-  for lag in range(-3,4):
-   heard=mixed[max(0,a+lag):max(0,a+lag)+len(voice)]
-   if len(heard)==len(voice) and np.std(heard)>1e-7:scores.append(float(np.corrcoef(voice,heard)[0,1]))
-  correlation=max(scores,default=0);checks.append({'scene_id':scene['id'],'decoded_final_aac_correlation_to_original_voice':round(correlation,6),'passed':correlation>.90})
-  if correlation<=.90:errors.append('Wrong/missing narration in final AAC: '+scene['id'])
+  a=round(scene['narration_start']*16000)+800;b=min(round(scene['narration_end']*16000)-800,len(dry));check=voice_alignment(dry[a:b],mixed,a);checks.append({'scene_id':scene['id'],**check})
+  if not check['passed']:errors.append('Wrong/missing or misaligned narration in final AAC: '+scene['id'])
  peak=float(np.max(np.abs(mixed)));clipped=int(np.sum(np.abs(mixed)>=.999))
  if clipped:errors.append('Digital clipping in final movie')
  result={'passed':not errors,'errors':errors,'actual_mp4_sha256':digest(movie),'bytes':movie.stat().st_size,'duration_seconds':duration,'timeline_measured_seconds':timeline['duration'],'width':video['width'],'height':video['height'],'fps':video['avg_frame_rate'],'video_codec':video['codec_name'],'audio_codec':audio['codec_name'],'audio_channels':audio['channels'],'full_decode_passed':decoder.returncode==0 and not decoder.stderr.strip(),'black_intervals':black_found,'paragraphs':len(scenes),'active_subshots':len(slots),'unique_active_resources':len(set(source_hashes)),'original_script_preserved':original_preserved,'subtitle_text_matches_original':subtitle_exact,'final_aac_peak':peak,'digital_clipping_samples':clipped,'final_mixed_aac_checks':checks,'character_animation_scope':'One actual 3D crossing (P20), other shots are original 3D illustrations with smooth camera moves. No claim of fully animated characters throughout.','motion_source_native_canvas':[1280,720],'motion_native_fps':12,'human_full_listening_performed':False,'human_child_audience_tested':False,'samsung_physical_tested':False,'original_zip_images_or_mp3_used':False,'paid_apis_used':False,'youtube_published':False,'artistic_commercial_approval':False}

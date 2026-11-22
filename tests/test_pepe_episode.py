@@ -46,3 +46,10 @@ class PepeEpisodeTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as td:
    movie=Path(td)/'proof.mp4';subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','testsrc2=s=160x90:r=30:d=6','-c:v','libx264','-pix_fmt','yuv420p',str(movie)],check=True)
    selected=frames(movie,list(range(160))+[3,6]);self.assertEqual(sorted(selected),list(range(160)));self.assertFalse(np.array_equal(selected[0],selected[159]))
+ def test_final_mix_recognizes_limiter_latency_but_rejects_wrong_voice_or_bad_sync(self):
+  from scripts.pepe.verify import voice_alignment
+  rng=np.random.default_rng(31);voice=rng.normal(size=2400);a=1000
+  for offset,expected in ((80,True),(240,False)):
+   mixed=np.zeros(6000);mixed[a+offset:a+offset+len(voice)]=voice*.7
+   result=voice_alignment(voice,mixed,a);self.assertEqual(result['passed'],expected);self.assertEqual(result['offset_seconds'],offset/16000)
+  wrong=rng.normal(size=6000);self.assertFalse(voice_alignment(voice,wrong,a)['passed'])
