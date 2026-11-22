@@ -1,0 +1,13 @@
+{
+  "file": "prepared-episode-v001.zip",
+  "bytes": 69597099,
+  "sha256": "0a7a3a7374e3d789f5bf2dc7e03978dc2045c9a90f789147b2bf8463a4e769c0",
+  "uncompressed_bytes": 118077861,
+  "entries": 181,
+  "schema": "autostudio-pepe-prepared/1",
+  "source_code_commit": "df50856f98fe89163ab548d104df1d4d1696c5ff",
+  "original_story_paragraphs": 13,
+  "visual_shots": 26,
+  "free_tools_only": true,
+  "youtube_enabled": false
+}
