@@ -1,0 +1,41 @@
+{
+  "run_id": "45060038066",
+  "attempt": "1",
+  "source_commit": "befefe0475724fc0f30ade47c96a86a0a8629c9b",
+  "complete_story": true,
+  "duration": 203.533333,
+  "paid_services_used": false,
+  "youtube_published": false,
+  "physical_samsung_tested": false,
+  "artistic_approved": false,
+  "files": {
+    "Pepe-El-gran-rescate-de-Pio-v001.mp4": {
+      "sha256": "c0165b7b700b92f57cab205e7506f17222f97db7bf2bdbe09d385faba743eeec",
+      "bytes": 29360144
+    },
+    "Pepe-E01-Proyecto-editable-v001.zip": {
+      "sha256": "0604d0e7d5e441988327eb0fae62b5daa20eb389b1bfdab9ce33410b963459c2",
+      "bytes": 69597352
+    },
+    "Pepe-E01-Calidad.json": {
+      "sha256": "32964dccee3df8eb2eed05e756f0fec8bbf6486fb32d95a8dfc2a97c133f57d7",
+      "bytes": 2894
+    },
+    "Pepe-E01-Subtitulos.srt": {
+      "sha256": "81b97b0d776e003fd0e0b9027307d3b337057ec24c7ee2c5a81f0e49dd7faf11",
+      "bytes": 4352
+    },
+    "Pepe-E01-Linea-de-tiempo.json": {
+      "sha256": "5ecdfe415e6c3fd687577dc071e25bcc2cad840166f0bae005589f06cac1aeba",
+      "bytes": 126416
+    },
+    "Pepe-E01-Correspondencia.json": {
+      "sha256": "be4b08dc220757f3bd585af29e7f6f9aa8fc7845822f87ac4d8263ca51bba68f",
+      "bytes": 61217
+    },
+    "Pepe-E01-26-planos-del-video.jpg": {
+      "sha256": "9d9ca12f424c0f5523d9d7f1e8557ee5e082f64272bd5caa059dead9f9f13e9c",
+      "bytes": 244872
+    }
+  }
+}

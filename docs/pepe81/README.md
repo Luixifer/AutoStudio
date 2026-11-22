@@ -76,3 +76,19 @@ La revisión visual sigue mostrando un cuento ilustrado sencillo: los personajes
 **350 pruebas superadas**, 77,670 s, ejecución local real con FFmpeg y sin red de pago. [Registro completo](evidence/regressions-350.txt). Incluye integración Director, montaje de capítulos, asociación imagen/párrafo, recuperación de caché y compatibilidad de la aplicación existente, además de ocho pruebas específicas de este episodio. Las pruebas no sustituyen una escucha humana ni la evaluación con niños.
 
 Para repetir desde el móvil: abrir Actions en GitHub, seleccionar «Pepe E01 · episodio completo real», pulsar «Run workflow» y elegir la rama `codex/pepe-episode-81`. Esta acción vuelve a montar los recursos ya preparados; no regenera modelos ni voces. Al terminar correctamente, su versión preliminar de Releases contiene el MP4, el proyecto editable y los informes. Los vídeos grandes no se guardan indefinidamente en Git; este primer paquete de recursos preparado sí está versionado (66,37 MiB) para reproducibilidad. Para una serie con muchos episodios debe sustituirse por entradas con hashes almacenadas como entregas, evitando engordar el historial.
+
+## Entrega real verificada en GitHub Actions
+
+La [ejecución 45060038066](https://github.com/Luixifer/AutoStudio/actions/runs/45060038066) ha terminado correctamente: regresiones, extracción verificada, montaje completo, decodificación independiente y publicación. Commit de producción `befefe0475724fc0f30ade47c96a86a0a8629c9b`. [Todos los archivos de entrega](https://github.com/Luixifer/AutoStudio/releases/tag/pepe-e01-45060038066-r1).
+
+- [MP4 completo — 29.360.144 bytes](https://github.com/Luixifer/AutoStudio/releases/download/pepe-e01-45060038066-r1/Pepe-El-gran-rescate-de-Pio-v001.mp4).
+- [Proyecto editable — 69.597.352 bytes](https://github.com/Luixifer/AutoStudio/releases/download/pepe-e01-45060038066-r1/Pepe-E01-Proyecto-editable-v001.zip).
+- [26 planos extraídos del vídeo real](https://github.com/Luixifer/AutoStudio/releases/download/pepe-e01-45060038066-r1/Pepe-E01-26-planos-del-video.jpg).
+- [Subtítulos SRT](https://github.com/Luixifer/AutoStudio/releases/download/pepe-e01-45060038066-r1/Pepe-E01-Subtitulos.srt).
+- [Calidad del MP4 de Actions](evidence/cloud-final-quality.json) y [registro de hashes de entrega](evidence/cloud-delivery.json).
+
+Se han descargado **desde los enlaces públicos de Releases** el MP4, ZIP, hoja de contacto, informes y sumas. Se han comparado todos sus SHA-256 con la entrega, comprobado el CRC de las 181 entradas del ZIP y decodificado de nuevo íntegramente el MP4 descargado con `ffmpeg -xerror`. También se ha inspeccionado su hoja de contacto real. No se confunde esta verificación con la exportación local anterior.
+
+MP4 público: **203,533333 s**, 1920×1080, 30 fps, H.264/AAC estéreo. SHA-256 `c0165b7b700b92f57cab205e7506f17222f97db7bf2bdbe09d385faba743eeec`. ZIP editable SHA-256 `0604d0e7d5e441988327eb0fae62b5daa20eb389b1bfdab9ce33410b963459c2`.
+
+Para verlo en Samsung: abrir el enlace MP4 desde el navegador, descargar y reproducir con el reproductor del teléfono. No requiere otro token. Si el navegador no inicia la descarga directa, abrir la página de entrega, desplegar «Assets» y tocar `Pepe-El-gran-rescate-de-Pio-v001.mp4`. El SRT es opcional y se ofrece aparte; el vídeo no tiene una caja con párrafos sobre la imagen. La APK estable no se ha modificado. Queda pendiente la escucha humana y aprobación artística; no se ha publicado en YouTube ni probado físicamente en Samsung.
