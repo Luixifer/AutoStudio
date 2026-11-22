@@ -24,3 +24,25 @@ class PepeEpisodeTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as td:
    path=Path(td)/'score.wav';save(path,score(1.25))
    with wave.open(str(path),'rb') as w:self.assertEqual(w.getnchannels(),2);self.assertEqual(w.getframerate(),RATE);self.assertEqual(w.getnframes(),30000)
+ def test_portable_archive_inside_story_directory_cannot_include_itself(self):
+  import zipfile
+  from scripts.pepe.assemble import bundle
+  with tempfile.TemporaryDirectory() as td:
+   root=Path(td)/'input';root.mkdir();story=Path(td)/'story';story.mkdir();(story/'guion.txt').write_text('Original test story');(story/'ENCARGO.md').write_text('Archive-only fixture, not approved episode assets.')
+   required=['project.json','shots.json','audio-provenance.json','input-quality.json','denoise.json','motion-provenance.json','typography.json','master-audit.json']
+   for name in required:(root/name).write_text('{}')
+   (root/'raw').mkdir();(root/'media').mkdir()
+   from PIL import Image
+   for i in range(1,27):Image.new('RGB',(8,8),(i*7,80,100)).save(root/'media'/f'shot-{i:02}.png')
+   for i in (1,26):Image.new('RGB',(8,8),(20,80,100)).save(root/'raw'/f'shot-{i:02}.png')
+   for i in range(1,14):folder=root/f'voice-{i:02}';folder.mkdir();(folder/'metadata.json').write_text('{}')
+   target=story/'prepared.zip';report=bundle(root,target,include_master=False,story_dir=story)
+   self.assertLess(report['bytes'],4*1024**2)
+   with zipfile.ZipFile(target) as z:self.assertIsNone(z.testzip());self.assertFalse(any(n.endswith('.zip') for n in z.namelist()));self.assertIn('content/pepe-el-gallo-travieso-episodio-1/guion.txt',z.namelist())
+   self.assertRaises(ValueError,bundle,root,root/'project.json',False,story)
+ def test_actual_ffmpeg_reader_checks_more_than_130_frames_without_dropping_samples(self):
+  import subprocess
+  from scripts.director.correspondence import frames
+  with tempfile.TemporaryDirectory() as td:
+   movie=Path(td)/'proof.mp4';subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','testsrc2=s=160x90:r=30:d=6','-c:v','libx264','-pix_fmt','yuv420p',str(movie)],check=True)
+   selected=frames(movie,list(range(160))+[3,6]);self.assertEqual(sorted(selected),list(range(160)));self.assertFalse(np.array_equal(selected[0],selected[159]))

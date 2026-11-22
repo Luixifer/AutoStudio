@@ -56,3 +56,9 @@ Además de las regresiones, se comprueba el MP4 real: decodificación completa, 
 El informe de Blender registra geometría/materiales compartidos, estados de visibilidad, cámaras, orillas y aparición del nuevo paso. Se revisan imágenes de grupo y fotogramas del cruce. La hoja de contacto final se extrae del MP4 real.
 
 Pendiente: escucha humana completa, prueba con familias/niños, prueba física en Samsung y aprobación artística. La animación corporal completa de los 26 planos, lip-sync y expresiones faciales más ricas no están implementadas. Esta entrega no acredita calidad comercial definitiva solo por pasar controles técnicos.
+
+## Regresiones descubiertas con el episodio real
+
+El chequeo de 5 puntos por cada uno de los 26 planos produjo 130 términos de selección. FFmpeg rechazó la suma lineal por el límite de profundidad de su evaluador. Se equilibró el árbol de la expresión, conservando todos los puntos: una prueba real decodifica 160 fotogramas distintos sin descartarlos. No se cambian reglas de montaje, RNG ni tiempos para superar el QA.
+
+El primer empaquetado dentro del directorio del cuento detectó una autoreferencia al ZIP de salida. Se detuvo, eliminó únicamente ese archivo inválido generado y se sustituyó por un listado previo acotado: archivos fuente originales `.txt`/`.md`, medios declarados y fuentes, nunca el propio ZIP. Se comprueba el tamaño antes de escribir. Una regresión reproduce la salida dentro del directorio de origen y verifica el ZIP real, sin incluirse a sí mismo.

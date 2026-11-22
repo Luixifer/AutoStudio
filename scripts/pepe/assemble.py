@@ -73,8 +73,9 @@ def contacts(root,target):
   im=Image.open(root/'media'/f'shot-{n:02}.png').convert('RGB');im.thumbnail((312,176));x=((n-1)%5)*320;y=((n-1)//5)*205;out.paste(im,(x,y+22));d.text((x+6,y+4),f'P{n:02} / 26 · fuente original',fill=(35,65,55))
  out.save(target)
 
-def bundle(root,out,include_master=True):
+def bundle(root,out,include_master=True,story_dir=None):
  root=Path(root);out=Path(out);p=json.loads((root/'project.json').read_text());paths={'project.json','shots.json','audio-provenance.json','input-quality.json','denoise.json','motion-provenance.json','typography.json','master-audit.json','raw/shot-01.png','raw/shot-26.png'}
+ if out.suffix.lower()!='.zip':raise ValueError('El proyecto portátil debe terminar en .zip')
  def collect(x):
   if isinstance(x,dict):
    if 'path' in x:paths.add(x['path'])
@@ -83,22 +84,30 @@ def bundle(root,out,include_master=True):
    for v in x:collect(v)
  collect(p);paths.update(f'media/shot-{n:02}.png' for n in range(1,27))
  if include_master:paths.update(['pepe-e01-master-v002.blend','pepe-e01-motion-master-v001.blend'])
+ files={}
+ def add(f,name):
+  f=Path(f);arc=Path(name)
+  if f.resolve()==out.resolve():raise ValueError('El ZIP no puede incluirse a sí mismo')
+  if not f.is_file() or arc.is_absolute() or '..' in arc.parts:raise ValueError('Recurso portátil ausente o ruta no válida: '+str(name))
+  if str(arc) in files and files[str(arc)]!=f:raise ValueError('Nombre duplicado en el proyecto')
+  files[str(arc)]=f
+ for name in sorted(paths):add(root/name,name)
+ for f in sorted(Path('scripts').rglob('*.py')):add(f,str(f))
+ for name in ('requirements.txt','requirements-neural.txt','requirements-director.txt','assets/voice-models.json'):
+  f=Path(name)
+  if f.is_file():add(f,name)
+ if (root/'full-motion-source.json').is_file():add(root/'full-motion-source.json','full-motion-source.json')
+ story_dir=Path(story_dir) if story_dir is not None else Path('content/pepe-el-gallo-travieso-episodio-1')
+ # Only original story/spec text, never output ZIPs, generated archives or videos.
+ for f in sorted(story_dir.glob('*')):
+  if f.is_file() and f.suffix.lower() in ('.txt','.md'):add(f,'content/pepe-el-gallo-travieso-episodio-1/'+f.name)
+ for i in range(1,14):add(root/f'voice-{i:02}/metadata.json',f'provenance/voice-{i:02}.json')
+ total=sum(f.stat().st_size for f in files.values())
+ if total>198*1024**2:raise ValueError('El proyecto supera el límite portátil de 198 MiB')
  out.parent.mkdir(parents=True,exist_ok=True)
  with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=3) as z:
-  for name in sorted(paths):
-   f=root/name
-   if not f.is_file():raise ValueError('Missing editable project file '+name)
-   z.write(f,name)
-  for f in sorted(Path('scripts').rglob('*.py')):z.write(f,str(f))
-  for name in ('requirements.txt','requirements-neural.txt','requirements-director.txt','assets/voice-models.json'):
-   f=Path(name)
-   if f.is_file():z.write(f,name)
-  for name in ('full-motion-source.json',):
-   if (root/name).is_file():z.write(root/name,name)
-  for f in sorted(Path('content/pepe-el-gallo-travieso-episodio-1').glob('*')):
-   if f.is_file():z.write(f,str(f))
-  for i in range(1,14):z.write(root/f'voice-{i:02}/metadata.json',f'provenance/voice-{i:02}.json')
- return {'file':out.name,'bytes':out.stat().st_size,'sha256':digest(out)}
+  for name,f in sorted(files.items()):z.write(f,name)
+ return {'file':out.name,'bytes':out.stat().st_size,'sha256':digest(out),'uncompressed_bytes':total,'entries':len(files)}
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--input',type=Path,required=True);p.add_argument('--motion',action='store_true');p.add_argument('--stills',action='store_true');p.add_argument('--qa',action='store_true');a=p.parse_args()
  if a.stills:all_shots(a.input);titles(a.input)

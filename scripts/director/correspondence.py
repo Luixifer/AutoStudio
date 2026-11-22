@@ -7,7 +7,13 @@ import numpy as np
 from scripts.director.project import digest
 
 def frames(path,indices):
- indices=sorted(set(indices));expression='+'.join(f'eq(n\\,{i})' for i in indices)
+ indices=sorted(set(indices))
+ if not indices:return {}
+ # FFmpeg's evaluator rejects long left-associated sums (~100 terms).
+ # Balance the exact same selected indices; never reduce the QA samples.
+ terms=[f'eq(n\\,{i})' for i in indices]
+ while len(terms)>1:terms=['('+terms[i]+'+'+terms[i+1]+')' if i+1<len(terms) else terms[i] for i in range(0,len(terms),2)]
+ expression=terms[0]
  result=subprocess.run(['ffmpeg','-v','error','-nostdin','-threads','2','-i',str(path),'-vf',f'select={expression},scale=160:90','-fps_mode','passthrough','-f','rawvideo','-pix_fmt','rgb24','pipe:1'],capture_output=True,check=True,timeout=1800)
  expected=len(indices)*160*90*3
  if len(result.stdout)!=expected:raise ValueError('Faltan fotogramas reales para comprobar escenas')
