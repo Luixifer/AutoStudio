@@ -62,3 +62,17 @@ Pendiente: escucha humana completa, prueba con familias/niños, prueba física e
 El chequeo de 5 puntos por cada uno de los 26 planos produjo 130 términos de selección. FFmpeg rechazó la suma lineal por el límite de profundidad de su evaluador. Se equilibró el árbol de la expresión, conservando todos los puntos: una prueba real decodifica 160 fotogramas distintos sin descartarlos. No se cambian reglas de montaje, RNG ni tiempos para superar el QA.
 
 El primer empaquetado dentro del directorio del cuento detectó una autoreferencia al ZIP de salida. Se detuvo, eliminó únicamente ese archivo inválido generado y se sustituyó por un listado previo acotado: archivos fuente originales `.txt`/`.md`, medios declarados y fuentes, nunca el propio ZIP. Se comprueba el tamaño antes de escribir. Una regresión reproduce la salida dentro del directorio de origen y verifica el ZIP real, sin incluirse a sí mismo.
+
+## Revisión final de audio real
+
+El control independiente detectó el retardo real de **5 ms** del limitador final (`alimiter`, look-ahead), no un cambio de narración. Se mide explícitamente buscando como máximo ±20 ms y se rechaza una desviación mayor de **10 ms**. La correlación de cada uno de los trece párrafos con el AAC real es de **0,975 a 0,985**, incluido el fondo musical. El umbral de identidad se mantiene en 0,90. Una regresión comprueba voz correcta a 5 ms, rechaza 15 ms y rechaza otra señal. No se altera la narración ni se ocultan errores de orden con esta tolerancia.
+
+La [hoja de contacto](evidence/local-final-26-shots.jpg) se ha extraído del MP4 completo local y se ha inspeccionado: muestra 26 planos, incluida la animación del cruce y los personajes al mismo lado al final. El [informe local independiente](evidence/local-final-quality.json) registra la decodificación completa sin errores, sin intervalos negros y sin clipping digital. El archivo local es de **29.354.985 bytes**, SHA-256 `5f58aabf836e398d440b73f95a5e684db618bc416aee9b049be34410cf9fe930`. La exportación de Actions se valida por separado y puede tener otro hash por las versiones de FFmpeg; su informe de entrega es la fuente de verdad para la descarga pública.
+
+La revisión visual sigue mostrando un cuento ilustrado sencillo: los personajes son volumétricos y coherentes, pero no hablan con lip-sync ni interpretan corporalmente todos los planos. Se conservan esos límites en la entrega en lugar de declararlo animación comercial terminada.
+
+## Pruebas completas de esta revisión
+
+**350 pruebas superadas**, 77,670 s, ejecución local real con FFmpeg y sin red de pago. [Registro completo](evidence/regressions-350.txt). Incluye integración Director, montaje de capítulos, asociación imagen/párrafo, recuperación de caché y compatibilidad de la aplicación existente, además de ocho pruebas específicas de este episodio. Las pruebas no sustituyen una escucha humana ni la evaluación con niños.
+
+Para repetir desde el móvil: abrir Actions en GitHub, seleccionar «Pepe E01 · episodio completo real», pulsar «Run workflow» y elegir la rama `codex/pepe-episode-81`. Esta acción vuelve a montar los recursos ya preparados; no regenera modelos ni voces. Al terminar correctamente, su versión preliminar de Releases contiene el MP4, el proyecto editable y los informes. Los vídeos grandes no se guardan indefinidamente en Git; este primer paquete de recursos preparado sí está versionado (66,37 MiB) para reproducibilidad. Para una serie con muchos episodios debe sustituirse por entradas con hashes almacenadas como entregas, evitando engordar el historial.

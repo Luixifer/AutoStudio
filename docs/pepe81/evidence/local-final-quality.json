@@ -1,0 +1,116 @@
+{
+  "passed": true,
+  "errors": [],
+  "actual_mp4_sha256": "5f58aabf836e398d440b73f95a5e684db618bc416aee9b049be34410cf9fe930",
+  "bytes": 29354985,
+  "duration_seconds": 203.533333,
+  "timeline_measured_seconds": 203.53333333333333,
+  "width": 1920,
+  "height": 1080,
+  "fps": "30/1",
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "audio_channels": 2,
+  "full_decode_passed": true,
+  "black_intervals": [],
+  "paragraphs": 13,
+  "active_subshots": 26,
+  "unique_active_resources": 26,
+  "original_script_preserved": true,
+  "subtitle_text_matches_original": true,
+  "final_aac_peak": 0.8587969541549683,
+  "digital_clipping_samples": 0,
+  "final_mixed_aac_checks": [
+    {
+      "scene_id": "pepe-e01-s01",
+      "correlation": 0.985251,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s02",
+      "correlation": 0.977069,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s03",
+      "correlation": 0.975602,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s04",
+      "correlation": 0.984861,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s05",
+      "correlation": 0.980573,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s06",
+      "correlation": 0.980224,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s07",
+      "correlation": 0.984279,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s08",
+      "correlation": 0.977508,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s09",
+      "correlation": 0.984177,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s10",
+      "correlation": 0.980201,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s11",
+      "correlation": 0.975564,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s12",
+      "correlation": 0.983238,
+      "offset_seconds": 0.005,
+      "passed": true
+    },
+    {
+      "scene_id": "pepe-e01-s13",
+      "correlation": 0.982033,
+      "offset_seconds": 0.005,
+      "passed": true
+    }
+  ],
+  "character_animation_scope": "One actual 3D crossing (P20), other shots are original 3D illustrations with smooth camera moves. No claim of fully animated characters throughout.",
+  "motion_source_native_canvas": [
+    1280,
+    720
+  ],
+  "motion_native_fps": 12,
+  "human_full_listening_performed": false,
+  "human_child_audience_tested": false,
+  "samsung_physical_tested": false,
+  "original_zip_images_or_mp3_used": false,
+  "paid_apis_used": false,
+  "youtube_published": false,
+  "artistic_commercial_approval": false
+}
