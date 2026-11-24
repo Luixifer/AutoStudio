@@ -13,8 +13,8 @@ RATE="-13%"
 PITCH="-2Hz"
 # Each silence starts at the end of the corresponding spoken phrase.
 SEGMENTS=[
- ("Érase una vez", 0.2),
- ("en un bosque lleno de secretos", 0.2),
+ ("Érase una vez", 0.7),
+ ("en un bosque lleno de secretos", 0.7),
  ("una pequeña luciérnaga llamada", 0.1),
  ("Luma.", 0.2),
  ("Vivía", 0.1),
@@ -44,7 +44,7 @@ async def main():
             data.extend(chunk)
             data.extend(bytes(round(seconds*SAMPLE_RATE*2)))
             print("SEGMENT_OK",i,line,"pause",seconds)
-    wav=OUT/"ximena_pausas_0p2_0p2_0p1_0p2_0p1.wav"
+    wav=OUT/"ximena_pausas_0p7_0p7_0p1_0p2_0p1.wav"
     with wave.open(str(wav),"wb") as f:
         f.setnchannels(1);f.setsampwidth(2);f.setframerate(SAMPLE_RATE);f.writeframes(data)
     mp3=OUT/"ximena_pausas_experimentales.mp3"
