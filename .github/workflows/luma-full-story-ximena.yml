@@ -24,6 +24,8 @@ jobs:
           python-version: '3.11'
       - name: Install narration tools
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
           python -m pip install edge-tts
           ffmpeg -version | head -1
       - name: Generate all 14 pages and complete narration
