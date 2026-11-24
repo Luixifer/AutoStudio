@@ -5,6 +5,11 @@ on:
     paths:
       - 'scripts/luma_alvaro_pausas.py'
       - '.github/workflows/luma-alvaro-pausas.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_alvaro_pausas.py'
+      - '.github/workflows/luma-alvaro-pausas.yml'
   workflow_dispatch:
 permissions:
   contents: read
