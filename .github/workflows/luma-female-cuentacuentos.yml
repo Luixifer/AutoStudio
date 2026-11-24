@@ -1,0 +1,33 @@
+name: Luma - narradoras castellanas
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_female_cuentacuentos.py'
+      - '.github/workflows/luma-female-cuentacuentos.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_female_cuentacuentos.py'
+      - '.github/workflows/luma-female-cuentacuentos.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install edge-tts
+      - name: Render gentle female es-ES samples
+        run: python -m scripts.luma_female_cuentacuentos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-narradoras-castellanas
+          path: out/luma-mujeres-cuentacuentos/
+          retention-days: 14
+          if-no-files-found: error
