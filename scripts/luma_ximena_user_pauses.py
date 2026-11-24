@@ -37,7 +37,7 @@ async def main():
             if mp3.stat().st_size<1000:raise RuntimeError("No audio for segment "+str(i))
             # Strip synthetic start/end gaps; keep the natural word endings, then
             # insert exactly the user-requested number of silent PCM samples.
-            ffmpeg("-i",mp3,"-af","silenceremove=start_periods=1:start_duration=0:start_threshold=-48dB:stop_periods=1:stop_duration=0:stop_threshold=-48dB",
+            ffmpeg("-i",mp3,"-af","silenceremove=start_periods=1:start_duration=0:start_threshold=-48dB,areverse,silenceremove=start_periods=1:start_duration=0:start_threshold=-48dB,areverse",
                    "-f","s16le","-ac","1","-ar",str(SAMPLE_RATE),raw)
             chunk=raw.read_bytes()
             if len(chunk)<4000:raise RuntimeError("Empty segment "+str(i))
