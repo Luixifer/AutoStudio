@@ -1,0 +1,37 @@
+name: Luma - Nuba soCOOrrooo
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_nuba_stressed_socorro.py'
+      - '.github/workflows/luma-nuba-stressed-socorro.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_nuba_stressed_socorro.py'
+      - '.github/workflows/luma-nuba-stressed-socorro.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install TTS and DSP
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install edge-tts numpy scipy librosa
+      - name: Render three stressed socorro takes
+        run: python -u -m scripts.luma_nuba_stressed_socorro
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-nuba-soCOOrrooo
+          path: out/luma-nuba-socooorrooo/
+          if-no-files-found: error
+          retention-days: 14
