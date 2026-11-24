@@ -1,0 +1,33 @@
+name: Luma - Ximena tres entonaciones
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_ximena_interpretations.py'
+      - '.github/workflows/luma-ximena-interpretations.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_ximena_interpretations.py'
+      - '.github/workflows/luma-ximena-interpretations.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install edge-tts
+      - name: Generate three uninterrupted Ximena performances
+        run: python -m scripts.luma_ximena_interpretations
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-ximena-tres-entonaciones
+          path: out/luma-ximena-entonaciones/
+          if-no-files-found: error
+          retention-days: 14
