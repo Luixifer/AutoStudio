@@ -18,7 +18,8 @@ LINES=[
 ]
 TAKES=[
  ("01_ximena_v2_natural", "-12%", "-2Hz", {"opening":.32,"mystery":.47,"sentence":.52,"scene":.76,"anticipation":.42,"wonder":.48,"wish":.29,"ending":.90}),
- ("02_ximena_v2_magica", "-14%", "-2Hz", {"opening":.49,"mystery":.64,"sentence":.57,"scene":.84,"anticipation":.58,"wonder":.66,"wish":.42,"ending":1.08})
+ ("02_ximena_v2_magica", "-14%", "-2Hz", {"opening":.49,"mystery":.64,"sentence":.57,"scene":.84,"anticipation":.58,"wonder":.66,"wish":.42,"ending":1.08}),
+ ("03_ximena_v3_pausas_emotivas", "-14%", "-2Hz", {"opening":.70,"mystery":.90,"sentence":1.50,"scene":1.70,"anticipation":.90,"wonder":1.20,"wish":.80,"ending":1.40})
 ]
 def ffmpeg(*args):
  subprocess.run(["ffmpeg","-nostdin","-hide_banner","-loglevel","error","-y",*map(str,args)],check=True)
