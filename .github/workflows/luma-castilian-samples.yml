@@ -1,0 +1,33 @@
+name: Luma - voces castellanas (evaluacion privada)
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_castilian_samples.py'
+      - '.github/workflows/luma-castilian-samples.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_castilian_samples.py'
+      - '.github/workflows/luma-castilian-samples.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install edge-tts
+      - name: Generate 4 voices (non publishing)
+        run: python -m scripts.luma_castilian_samples
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-voces-castellanas
+          path: out/luma-castellano/
+          retention-days: 14
+          if-no-files-found: error
