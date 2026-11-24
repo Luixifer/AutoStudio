@@ -1,0 +1,37 @@
+name: Luma - Ximena pausas indicadas
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_ximena_user_pauses.py'
+      - '.github/workflows/luma-ximena-user-pauses.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_ximena_user_pauses.py'
+      - '.github/workflows/luma-ximena-user-pauses.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install voice and audio tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install edge-tts
+      - name: Generate exact pauses experiment
+        run: python -m scripts.luma_ximena_user_pauses
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-ximena-pausas-exactas
+          path: out/luma-ximena-pausas-exactas/
+          if-no-files-found: error
+          retention-days: 14

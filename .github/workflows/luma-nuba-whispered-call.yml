@@ -1,0 +1,37 @@
+name: Luma - Nuba socorro contenido
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_nuba_whispered_call.py'
+      - '.github/workflows/luma-nuba-whispered-call.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_nuba_whispered_call.py'
+      - '.github/workflows/luma-nuba-whispered-call.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install voice and audio tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install edge-tts
+      - name: Generate Nuba auditions
+        run: python -u -m scripts.luma_nuba_whispered_call
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-nuba-socorro-contenido
+          path: out/luma-nuba-socorro-contenido/
+          retention-days: 14
+          if-no-files-found: error
