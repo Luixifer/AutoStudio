@@ -1,0 +1,36 @@
+name: Luma - cuento completo Ximena expresiva
+on:
+  push:
+    branches: [experiments/luma-narrator-voices]
+    paths:
+      - 'scripts/luma_full_story_ximena.py'
+      - '.github/workflows/luma-full-story-ximena.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/luma_full_story_ximena.py'
+      - '.github/workflows/luma-full-story-ximena.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install narration tools
+        run: |
+          python -m pip install edge-tts
+          ffmpeg -version | head -1
+      - name: Generate all 14 pages and complete narration
+        run: python -u -m scripts.luma_full_story_ximena
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luma-cuento-14-paginas-ximena
+          path: out/luma-cuento-completo-ximena/
+          retention-days: 14
+          if-no-files-found: error
